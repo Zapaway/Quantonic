@@ -38,7 +38,7 @@ namespace Managers {
         private async UniTaskVoid OnEnable() {
             // reference is null when GameManager is instantiated, so wait
             await UniTask.WaitUntil(() => _stageInputs != null);
-            _stageInputs.Enable();
+            _stageInputs.Controllable.Enable();
         }
 
         private void OnDisable() {

@@ -11,8 +11,7 @@ namespace Managers {
     [RequireComponent(typeof(AddOns.DontDestroyOnLoad))]
     public class GameManager : Manager<GameManager>
     {
-        // for control managers to use
-        public StageInputs StageInputs {get; private set;}
+        public StageInputs StageInputs {get; private set;}  // for control manager to use
 
         protected override void Awake()
         {
