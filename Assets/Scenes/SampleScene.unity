@@ -649,6 +649,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _player
+      value: 
+      objectReference: {fileID: 1904763973}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _plaformLayerMask.m_Bits
+      value: 64
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
 --- !u!1001 &3250575968441346296
@@ -661,10 +669,6 @@ PrefabInstance:
     - target: {fileID: 149633266581603708, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}
       propertyPath: m_RootOrder
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 149633266581603708, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 149633266581603708, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}
       propertyPath: m_LocalPosition.x
@@ -709,6 +713,10 @@ PrefabInstance:
     - target: {fileID: 4243845693806056704, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}
       propertyPath: m_Name
       value: Rectangle Platform
+      objectReference: {fileID: 0}
+    - target: {fileID: 4243845693806056704, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 112eeaefb82616f48ac4ce42d9326ab7, type: 3}

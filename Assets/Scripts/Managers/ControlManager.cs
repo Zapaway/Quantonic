@@ -26,24 +26,45 @@ namespace Managers {
     #endregion Summary
     public sealed class ControlManager : Manager<ControlManager>
     {
+        #region Fields/Properties
+        // player & clones (controllables)
+        [SerializeField] private GameObject _player;  // make it so that a spawnmanager handles spawning the player
+        public GameObject Player => _player;
+        public Rigidbody2D PlayerRB {get; private set;}
+        public BoxCollider2D PlayerBox {get; private set;}
+
+        [SerializeField] private GameObject _clonePrefab;
+        private List<GameObject> _clones; 
+
+        // platform layer
+        [SerializeField] private LayerMask _plaformLayerMask;
+        public LayerMask PlatformLayerMask => _plaformLayerMask;
+
         // inputs that the control manager handle
         private StageInputs _stageInputs; 
 
         // the control state machine it uses to affect the controllables
         private CSM _csm = new CSM();
         private JumpingState _jumpingState;
+        public JumpingState JumpingState => _jumpingState;
         private StandingState _standingState;
-        private DeadState _deadState;
+        public StandingState StandingState => _standingState;
+        #endregion Fields/Properties
 
+        #region Event Methods
         protected override void Awake()
         {
             base.Awake();
             GetStageInputs();
 
+            // cache & configure player components
+            PlayerRB = _player.GetComponent<Rigidbody2D>();
+            PlayerRB.constraints = RigidbodyConstraints2D.FreezeRotation;
+            PlayerBox = _player.GetComponent<BoxCollider2D>();
+
             // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);
             _standingState = new StandingState(this, _csm);
-            _deadState = new DeadState(this, _csm);
         }
 
         private async UniTaskVoid OnEnable() {
@@ -56,6 +77,28 @@ namespace Managers {
             _stageInputs?.Disable();
         }
 
+        private async UniTaskVoid Start() {
+            await _csm.InitializeState(_standingState);
+        }
+
+        private async UniTaskVoid Update() {
+            await _csm.CurrentState.HandleInput();
+            await _csm.CurrentState.LogicUpdate();
+        }
+
+        private async UniTaskVoid FixedUpdate() {
+            await _csm.CurrentState.PhysicsUpdate();
+        }
+        #endregion Event Methods
+
+        #region Input Values Getters
+        public float SidewaysInputValue() {
+            return _stageInputs?.Controllable.Movement.ReadValue<float>() ?? 0;
+        }
+        public bool JumpTriggered() {
+            return _stageInputs?.Controllable.Jump.triggered ?? false;
+        }
+        #endregion Input Values Getters
         /// <summary>
         /// Attempt to get the reference to GameManager's stage input.
         /// </summary>
