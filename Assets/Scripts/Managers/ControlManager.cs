@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
+using StateMachines.CSM;
+
 namespace Managers {
     #region Summary
     /// <summary>
@@ -24,15 +26,24 @@ namespace Managers {
     #endregion Summary
     public sealed class ControlManager : Manager<ControlManager>
     {
-        // TODO 
-        // track player and clones so that you can pass control between them using stageinput
-        // create controllablestate
-        private StageInputs _stageInputs;  
+        // inputs that the control manager handle
+        private StageInputs _stageInputs; 
+
+        // the control state machine it uses to affect the controllables
+        private CSM _csm = new CSM();
+        private JumpingState _jumpingState;
+        private StandingState _standingState;
+        private DeadState _deadState;
 
         protected override void Awake()
         {
             base.Awake();
             GetStageInputs();
+
+            // initalize the controllable states
+            _jumpingState = new JumpingState(this, _csm);
+            _standingState = new StandingState(this, _csm);
+            _deadState = new DeadState(this, _csm);
         }
 
         private async UniTaskVoid OnEnable() {

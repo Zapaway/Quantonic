@@ -17,7 +17,7 @@ namespace Managers {
         {
             base.Awake();
             StageInputs = new StageInputs();
-            ControlManager.Instance.GetStageInputs();
+            ControlManager.Instance?.GetStageInputs();
         }
     }
 }
