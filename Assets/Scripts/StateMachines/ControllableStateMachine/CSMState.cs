@@ -31,11 +31,8 @@ namespace StateMachines.CSM {
         public virtual async UniTask LogicUpdate() {
         } 
         public virtual async UniTask PhysicsUpdate() {
-            _ctrlManager.PlayerRB.MovePosition(
-                _ctrlManager.Player.transform.position + (
-                    Vector3.right * _sidewaysInput * Time.deltaTime * _moveSpeed
-                )
-            );
+            Rigidbody2D rigidbody = _ctrlManager.PlayerRB;
+            rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
         } 
         public virtual async UniTask Exit() {
         } 
