@@ -1,5 +1,6 @@
 using System.Numerics;
 using static MathNet.Numerics.Constants;
+using unity = UnityEngine;
 
 using Quantum.Operators;
 
@@ -71,6 +72,17 @@ namespace Quantum {
             ) ? 1 : Sqrt1Over2;
 
             return new QuantumState(ampliZero, ampliOne, scalarCoeff);
+        }
+
+        /// <summary>
+        /// Easily get Unity position of a quantum state.
+        /// </summary>
+        public static unity.Vector3 GetUnityPosition(QuantumState state) {
+            return state.ToUnityPosition(
+                pauliXOperator,
+                pauliYOperator,
+                pauliZOperator
+            );
         }
         #endregion State
     }

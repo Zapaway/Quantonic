@@ -28,6 +28,7 @@ namespace Managers {
     {
         #region Fields/Properties
         // player & clones (controllables)
+        // TODO: change _player type from GameObject to Player type
         [SerializeField] private GameObject _player;  // make it so that a spawnmanager handles spawning the player
         public GameObject Player => _player;
         public Rigidbody2D PlayerRB {get; private set;}
@@ -35,6 +36,8 @@ namespace Managers {
 
         [SerializeField] private GameObject _clonePrefab;
         private List<GameObject> _clones; 
+
+        public Controllable CurrentControllable {get; private set;}
 
         // platform layer
         [SerializeField] private LayerMask _plaformLayerMask;
@@ -61,6 +64,9 @@ namespace Managers {
             PlayerRB = _player.GetComponent<Rigidbody2D>();
             PlayerRB.constraints = RigidbodyConstraints2D.FreezeRotation;
             PlayerBox = _player.GetComponent<BoxCollider2D>();
+
+            // player should always be the default current controllable
+            CurrentControllable = Player.GetComponent<Player>();
 
             // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);
@@ -99,6 +105,7 @@ namespace Managers {
             return _stageInputs?.Controllable.Jump.triggered ?? false;
         }
         #endregion Input Values Getters
+
         /// <summary>
         /// Attempt to get the reference to GameManager's stage input.
         /// </summary>

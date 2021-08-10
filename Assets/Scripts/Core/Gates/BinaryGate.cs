@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using UnityEngine;
 
 using Quantum;
@@ -32,7 +31,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
         }
     }
 
-    protected override void _apply(ReadOnlyCollection<QuantumState> quantumStates)
+    protected override void _apply(Controllable controllable, int[] indices)
     {
         throw new System.NotImplementedException();
     }

@@ -1,6 +1,7 @@
-using System.Collections.ObjectModel;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
+using Managers;
 using Quantum;
 using Quantum.Operators;
 
@@ -41,10 +42,25 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         }
     }
 
-    protected override void _apply(ReadOnlyCollection<QuantumState> quantumStates)
-    {
-        throw new System.NotImplementedException();
+    /// <summary>
+    /// Apply the operator on the qubits selected.
+    /// </summary>
+    protected async override UniTaskVoid OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("Controllable")) {
+            Controllable controllable = ControlManager.Instance.CurrentControllable;
+            // TODO: ask the current controllable what qubit to use (for now, use the first qubit in the player)
+            int[] qubitIndex = new int[_capacity]{ controllable.AskForSingleQubitIndex() };
+
+            base.OnTriggerEnter2D(other).Forget();
+
+            _apply(controllable, qubitIndex);
+
+            await UniTask.Yield();
+        }
     }
 
-    // TODO: Override OnTriggerEnter
+    protected override void _apply(Controllable controllable, int[] indices)
+    {
+        controllable.ApplyUnaryOperator(_operator, indices[0]);
+    }
 }

@@ -12,7 +12,7 @@ namespace StateMachines.CSM {
     public sealed class CSM : StateMachine<CSMState>
     {
         private CSMState _currState;
-        public override CSMState CurrentState {get => _currState;}
+        public override CSMState CurrentState => _currState;
 
         public override async UniTask InitializeState(CSMState initState)
         {

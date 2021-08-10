@@ -2,17 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : Controllable
+public sealed class Player : Controllable
 {
-    // Start is called before the first frame update
-    void Start()
+    protected override void Awake()
     {
-        
-    }
+        base.Awake();
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        _addQubitFromPrefab(0);  // all players should start off with one qubit
     }
 }
