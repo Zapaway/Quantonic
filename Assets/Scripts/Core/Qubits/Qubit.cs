@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
+using Managers;
 using Quantum;
 using Quantum.Operators;
 
@@ -11,14 +13,20 @@ using Quantum.Operators;
 public sealed class Qubit : MonoBehaviour
 {
     [SerializeField] private BasisQuantumState _initialState;  // default is the ground state
-    private QuantumState _quantumState;
+    [SerializeField] private GameObject _quantumStateIndicator;  
+    [SerializeField] private GameObject _blochSphere; 
+    private Vector3 _blochSphereCoords;  // cache coords for determining bloch sphere pos -> unity pos 
+    [SerializeField] private Camera _camera;
+    [SerializeField] private RenderTexture _renderTexture;
     // temp; uses position to determine representation on bloch sphere
     // todo; use rotation to determine representation on bloch sphere
-    private GameObject _quantumStateIndicator;  
+    private QuantumState _quantumState;
+
 
     private void Awake() {
         _quantumState = QuantumFactory.MakeQuantumState(_initialState);
-        _quantumStateIndicator = transform.GetChild(0).gameObject;  // index 0 is the indicator
+        _camera.targetTexture = _renderTexture;
+        _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
     }
 
     /// <summary>
@@ -27,6 +35,6 @@ public sealed class Qubit : MonoBehaviour
     public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
         _quantumState.ApplyUnaryOperator(unaryOperator);
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
-        _quantumStateIndicator.transform.position += unityPos;
+        _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
     }
 }
