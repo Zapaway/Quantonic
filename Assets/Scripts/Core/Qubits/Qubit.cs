@@ -17,11 +17,11 @@ public sealed class Qubit : MonoBehaviour
     [SerializeField] private GameObject _blochSphere; 
     private Vector3 _blochSphereCoords;  // cache coords for determining bloch sphere pos -> unity pos 
     [SerializeField] private Camera _camera;
+    public Camera Camera => _camera;
     [SerializeField] private RenderTexture _renderTexture;
     // temp; uses position to determine representation on bloch sphere
     // todo; use rotation to determine representation on bloch sphere
     private QuantumState _quantumState;
-
 
     private void Awake() {
         _quantumState = QuantumFactory.MakeQuantumState(_initialState);

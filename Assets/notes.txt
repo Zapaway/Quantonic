@@ -1,0 +1,4 @@
+- (for qubit representation) use a special type of object pooling where the capacity
+    is the controllable with the most amount of qubits
+- (for quick qubit viewer) you can add a button component onto render images to get clickable actions and menu navigations
+    - to customize keys, create a new action map and reference it in "EventSystem" GameObject
