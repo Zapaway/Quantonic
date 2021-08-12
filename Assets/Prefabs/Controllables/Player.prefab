@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 748523834017275440}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Player
+  m_TagString: Controllable
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -144,4 +144,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 496eaa6e72481b546bf2659f83cdb21c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _qubitPrefab: {fileID: 967471473964972377, guid: 5900a4902699538418b7257815d71fdb, type: 3}

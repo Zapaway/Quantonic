@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
+using Nito.Collections;
 
 using StateMachines.CSM;
 
@@ -28,16 +29,13 @@ namespace Managers {
     {
         #region Fields/Properties
         // player & clones (controllables)
-        // TODO: change _player type from GameObject to Player type
-        [SerializeField] private GameObject _player;  // make it so that a spawnmanager handles spawning the player
-        public GameObject Player => _player;
+        public Player Player {get; private set;} 
         public Rigidbody2D PlayerRB {get; private set;}
         public BoxCollider2D PlayerBox {get; private set;}
 
-        [SerializeField] private GameObject _clonePrefab;
-        private List<GameObject> _clones; 
-
         public Controllable CurrentControllable {get; private set;}
+
+        private Deque<Controllable> _controllables = new Deque<Controllable>(); 
 
         // platform layer
         [SerializeField] private LayerMask _plaformLayerMask;
@@ -61,12 +59,17 @@ namespace Managers {
             GetStageInputs();
 
             // cache & configure player components
-            PlayerRB = _player.GetComponent<Rigidbody2D>();
+            Player player = SpawnManager.Instance.SpawnPlayer();  // this is the starting point of the stage
+            GameObject playerGameObj = player.gameObject;
+
+            Player = player;
+            PlayerRB = playerGameObj.GetComponent<Rigidbody2D>();
             PlayerRB.constraints = RigidbodyConstraints2D.FreezeRotation;
-            PlayerBox = _player.GetComponent<BoxCollider2D>();
+            PlayerBox = playerGameObj.GetComponent<BoxCollider2D>();
 
             // player should always be the default current controllable
-            CurrentControllable = Player.GetComponent<Player>();
+            CurrentControllable = player;
+            _controllables.AddToBack(player);
 
             // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);

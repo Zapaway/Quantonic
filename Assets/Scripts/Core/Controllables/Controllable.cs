@@ -44,7 +44,14 @@ public abstract class Controllable : MonoBehaviour
     /// Creates a qubit from prefab and adds it onto the list.
     /// </summary>
     protected void _addQubitFromPrefab(float xOffset) {
-        _qubits.Add(SpawnManager.MakeQubit(xOffset));
+        _qubits.Add(SpawnManager.Instance.MakeQubit(xOffset));
+    }
+
+    /// <summary>
+    /// Current amount of qubits.
+    /// </summary>
+    public int QubitAmount() {
+        return _qubits.Count;
     }
     #endregion Qubit List Manipulation
     
