@@ -83,13 +83,13 @@ public class @StageInputs : IInputActionCollection, IDisposable
             ]
         },
         {
-            ""name"": ""UI"",
-            ""id"": ""53fbd7b6-a3a5-479f-a290-5ec6c40c8867"",
+            ""name"": ""Stage UI"",
+            ""id"": ""666555d0-d593-427c-b673-7f87087fe934"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""Toggle QQV"",
                     ""type"": ""Button"",
-                    ""id"": ""573a4183-b1b3-4f1e-8321-41351427729a"",
+                    ""id"": ""9284bc9c-d39d-47fe-ae07-9f526cf9497e"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -98,7 +98,34 @@ public class @StageInputs : IInputActionCollection, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""28b47c00-f8ee-400d-85e6-246742895550"",
+                    ""id"": ""ef79dfe2-68e2-4f8e-b39d-43c76c6487b4"",
+                    ""path"": ""<Keyboard>/r"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Toggle QQV"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                }
+            ]
+        },
+        {
+            ""name"": ""Pause Menu UI"",
+            ""id"": ""1cfddcdf-7238-4473-9eb6-02696c8a9084"",
+            ""actions"": [
+                {
+                    ""name"": ""New action"",
+                    ""type"": ""Button"",
+                    ""id"": ""7117a6b5-d746-4596-8727-68ca6b015189"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                }
+            ],
+            ""bindings"": [
+                {
+                    ""name"": """",
+                    ""id"": ""23d3ba5c-b0ab-462d-8196-8af023aaca22"",
                     ""path"": """",
                     ""interactions"": """",
                     ""processors"": """",
@@ -128,9 +155,12 @@ public class @StageInputs : IInputActionCollection, IDisposable
         m_Controllable = asset.FindActionMap("Controllable", throwIfNotFound: true);
         m_Controllable_Movement = m_Controllable.FindAction("Movement", throwIfNotFound: true);
         m_Controllable_Jump = m_Controllable.FindAction("Jump", throwIfNotFound: true);
-        // UI
-        m_UI = asset.FindActionMap("UI", throwIfNotFound: true);
-        m_UI_Newaction = m_UI.FindAction("New action", throwIfNotFound: true);
+        // Stage UI
+        m_StageUI = asset.FindActionMap("Stage UI", throwIfNotFound: true);
+        m_StageUI_ToggleQQV = m_StageUI.FindAction("Toggle QQV", throwIfNotFound: true);
+        // Pause Menu UI
+        m_PauseMenuUI = asset.FindActionMap("Pause Menu UI", throwIfNotFound: true);
+        m_PauseMenuUI_Newaction = m_PauseMenuUI.FindAction("New action", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -218,29 +248,62 @@ public class @StageInputs : IInputActionCollection, IDisposable
     }
     public ControllableActions @Controllable => new ControllableActions(this);
 
-    // UI
-    private readonly InputActionMap m_UI;
-    private IUIActions m_UIActionsCallbackInterface;
-    private readonly InputAction m_UI_Newaction;
-    public struct UIActions
+    // Stage UI
+    private readonly InputActionMap m_StageUI;
+    private IStageUIActions m_StageUIActionsCallbackInterface;
+    private readonly InputAction m_StageUI_ToggleQQV;
+    public struct StageUIActions
     {
         private @StageInputs m_Wrapper;
-        public UIActions(@StageInputs wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_UI_Newaction;
-        public InputActionMap Get() { return m_Wrapper.m_UI; }
+        public StageUIActions(@StageInputs wrapper) { m_Wrapper = wrapper; }
+        public InputAction @ToggleQQV => m_Wrapper.m_StageUI_ToggleQQV;
+        public InputActionMap Get() { return m_Wrapper.m_StageUI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
         public bool enabled => Get().enabled;
-        public static implicit operator InputActionMap(UIActions set) { return set.Get(); }
-        public void SetCallbacks(IUIActions instance)
+        public static implicit operator InputActionMap(StageUIActions set) { return set.Get(); }
+        public void SetCallbacks(IStageUIActions instance)
         {
-            if (m_Wrapper.m_UIActionsCallbackInterface != null)
+            if (m_Wrapper.m_StageUIActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_UIActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_UIActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_UIActionsCallbackInterface.OnNewaction;
+                @ToggleQQV.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
+                @ToggleQQV.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
+                @ToggleQQV.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
             }
-            m_Wrapper.m_UIActionsCallbackInterface = instance;
+            m_Wrapper.m_StageUIActionsCallbackInterface = instance;
+            if (instance != null)
+            {
+                @ToggleQQV.started += instance.OnToggleQQV;
+                @ToggleQQV.performed += instance.OnToggleQQV;
+                @ToggleQQV.canceled += instance.OnToggleQQV;
+            }
+        }
+    }
+    public StageUIActions @StageUI => new StageUIActions(this);
+
+    // Pause Menu UI
+    private readonly InputActionMap m_PauseMenuUI;
+    private IPauseMenuUIActions m_PauseMenuUIActionsCallbackInterface;
+    private readonly InputAction m_PauseMenuUI_Newaction;
+    public struct PauseMenuUIActions
+    {
+        private @StageInputs m_Wrapper;
+        public PauseMenuUIActions(@StageInputs wrapper) { m_Wrapper = wrapper; }
+        public InputAction @Newaction => m_Wrapper.m_PauseMenuUI_Newaction;
+        public InputActionMap Get() { return m_Wrapper.m_PauseMenuUI; }
+        public void Enable() { Get().Enable(); }
+        public void Disable() { Get().Disable(); }
+        public bool enabled => Get().enabled;
+        public static implicit operator InputActionMap(PauseMenuUIActions set) { return set.Get(); }
+        public void SetCallbacks(IPauseMenuUIActions instance)
+        {
+            if (m_Wrapper.m_PauseMenuUIActionsCallbackInterface != null)
+            {
+                @Newaction.started -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
+                @Newaction.performed -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
+                @Newaction.canceled -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
+            }
+            m_Wrapper.m_PauseMenuUIActionsCallbackInterface = instance;
             if (instance != null)
             {
                 @Newaction.started += instance.OnNewaction;
@@ -249,7 +312,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
             }
         }
     }
-    public UIActions @UI => new UIActions(this);
+    public PauseMenuUIActions @PauseMenuUI => new PauseMenuUIActions(this);
     private int m_KeyboardSchemeIndex = -1;
     public InputControlScheme KeyboardScheme
     {
@@ -264,7 +327,11 @@ public class @StageInputs : IInputActionCollection, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
     }
-    public interface IUIActions
+    public interface IStageUIActions
+    {
+        void OnToggleQQV(InputAction.CallbackContext context);
+    }
+    public interface IPauseMenuUIActions
     {
         void OnNewaction(InputAction.CallbackContext context);
     }

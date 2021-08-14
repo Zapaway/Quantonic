@@ -10,7 +10,7 @@ namespace Managers {
     /// </summary>
     public sealed class SpawnManager : Manager<SpawnManager>
     {
-        [SerializeField] private GameObject _qubitPrefab;
+        [SerializeField] private GameObject _qubitPrefab;  // default is the ground state
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private GameObject _clonePrefab;
         

@@ -32,7 +32,7 @@ namespace Managers {
         public Player Player {get; private set;} 
         public Rigidbody2D PlayerRB {get; private set;}
         public BoxCollider2D PlayerBox {get; private set;}
-
+        
         public Controllable CurrentControllable {get; private set;}
 
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
@@ -80,6 +80,7 @@ namespace Managers {
             // reference is null when GameManager is instantiated, so wait
             await UniTask.WaitUntil(() => _stageInputs != null);
             _stageInputs.Controllable.Enable();
+            _stageInputs.StageUI.Enable();
         }
 
         private void OnDisable() {
@@ -91,6 +92,11 @@ namespace Managers {
         }
 
         private async UniTaskVoid Update() {
+            // toggle the quick qubit viewer panel
+            if (_stageInputs?.StageUI.ToggleQQV.triggered ?? false) {
+                StageUIManager.Instance.ToggleQuickQubitPanel();
+            }
+            
             await _csm.CurrentState.HandleInput();
             await _csm.CurrentState.LogicUpdate();
         }

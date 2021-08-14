@@ -70,13 +70,13 @@
             ]
         },
         {
-            "name": "UI",
-            "id": "53fbd7b6-a3a5-479f-a290-5ec6c40c8867",
+            "name": "Stage UI",
+            "id": "666555d0-d593-427c-b673-7f87087fe934",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "Toggle QQV",
                     "type": "Button",
-                    "id": "573a4183-b1b3-4f1e-8321-41351427729a",
+                    "id": "9284bc9c-d39d-47fe-ae07-9f526cf9497e",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -85,7 +85,34 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "28b47c00-f8ee-400d-85e6-246742895550",
+                    "id": "ef79dfe2-68e2-4f8e-b39d-43c76c6487b4",
+                    "path": "<Keyboard>/r",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Toggle QQV",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Pause Menu UI",
+            "id": "1cfddcdf-7238-4473-9eb6-02696c8a9084",
+            "actions": [
+                {
+                    "name": "New action",
+                    "type": "Button",
+                    "id": "7117a6b5-d746-4596-8727-68ca6b015189",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "23d3ba5c-b0ab-462d-8196-8af023aaca22",
                     "path": "",
                     "interactions": "",
                     "processors": "",

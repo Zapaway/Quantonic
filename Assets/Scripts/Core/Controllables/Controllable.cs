@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using UnityEngine;
 
 using Managers;
@@ -17,20 +19,21 @@ public abstract class Controllable : MonoBehaviour
 {
     // all qubits that the controllable has
     // - will always at least one unless specified
-    private List<Qubit> _qubits;   
+    private ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
 
     protected virtual void Awake() {
-        _qubits = new List<Qubit>();
     }
 
-    #region Qubit List Manipulation
+    #region Qubit Collection Manipulation
     /// <summary>
     /// Checks if the GameObject is a qubit and returns it. If true, it adds it onto the list.
     /// </summary>
     protected bool _addQubitSafe(GameObject possibleQubit) {
         bool isQubit = possibleQubit.CompareTag("Qubit");
         if (isQubit) {
-            _qubits.Add(possibleQubit.GetComponent<Qubit>());
+            var qubit = possibleQubit.GetComponent<Qubit>();
+
+            _qubits.Add(qubit);
         }
         return isQubit;
     }
@@ -38,13 +41,17 @@ public abstract class Controllable : MonoBehaviour
     /// Just adds the GameObject into the list without checking. Can result in null values being put.
     /// </summary>
     protected void _addQubitUnsafe(GameObject possibleQubit) {
-        _qubits.Add(possibleQubit.GetComponent<Qubit>());
+        var qubit = possibleQubit.GetComponent<Qubit>();
+
+        _qubits.Add(qubit);
     }
     /// <summary>
     /// Creates a qubit from prefab and adds it onto the list.
     /// </summary>
     protected void _addQubitFromPrefab(float xOffset) {
-        _qubits.Add(SpawnManager.Instance.MakeQubit(xOffset));
+        Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
+
+        _qubits.Add(qubit);
     }
 
     /// <summary>
@@ -53,7 +60,20 @@ public abstract class Controllable : MonoBehaviour
     public int QubitAmount() {
         return _qubits.Count;
     }
-    #endregion Qubit List Manipulation
+
+    /// <summary>
+    /// Add an event subscriber to the observable qubit collection.
+    /// </summary>
+    public void SubscribeToQubitCollection(NotifyCollectionChangedEventHandler eventHandler) {
+        _qubits.CollectionChanged += eventHandler;
+    }
+    /// <summary>
+    /// Remove an event subscriber from the observable qubit collection.
+    /// </summary>
+    public void UnsubscribeToQubitCollection(NotifyCollectionChangedEventHandler eventHandler) {
+        _qubits.CollectionChanged -= eventHandler;
+    }
+    #endregion Qubit Collection Manipulation
     
     #region Select Qubits
     /// <summary>
