@@ -35,6 +35,15 @@ namespace Managers {
 
             return qubit.GetComponent<Qubit>();
         }
+        public Qubit MakeQubit(Vector3 position) {
+            GameObject qubit = Instantiate(
+                _qubitPrefab,
+                position,
+                _qubitPrefab.transform.rotation
+            );
+
+            return qubit.GetComponent<Qubit>();
+        }
 
         /// <summary>
         /// Spawn the player. 

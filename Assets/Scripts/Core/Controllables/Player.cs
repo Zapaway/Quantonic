@@ -15,6 +15,7 @@ public sealed class Player : Controllable
     private void Start() {
         _addQubitFromPrefab(xTracker);  // all players should start off with one qubit
         Testing().Forget();
+        // Testing2().Forget();
     }
 
     private async UniTaskVoid Testing() {
@@ -23,5 +24,36 @@ public sealed class Player : Controllable
             xTracker += 5;
             _addQubitFromPrefab(xTracker);
         }
+    }
+    private async UniTaskVoid Testing2() {
+        /// add
+        xTracker += 5;
+        Qubit qubit1 = _addQubitFromPrefab(xTracker);
+        qubit1.name = "qubit1";
+        xTracker += 5;
+        Qubit qubit2 = _addQubitFromPrefab(xTracker);
+        qubit2.name = "qubit2";
+        xTracker += 5;
+        Qubit qubit3 = _addQubitFromPrefab(xTracker);
+        qubit3.name = "qubit3";
+
+        /// remove
+        await UniTask.Delay(TimeSpan.FromSeconds(2));
+        _qubits.RemoveAt(3);  // qubit3
+
+        /// replace 
+        await UniTask.Delay(TimeSpan.FromSeconds(2));
+        Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
+        newQubit2.name = "meow";
+        Destroy(qubit2.gameObject);
+        _qubits[2] = newQubit2;
+
+        /// move
+        await UniTask.Delay(TimeSpan.FromSeconds(2));
+        _qubits.Move(0, 1);
+
+        /// reset
+        await UniTask.Delay(TimeSpan.FromSeconds(2));
+        _qubits.Clear();
     }
 }

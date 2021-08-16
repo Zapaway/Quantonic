@@ -53,7 +53,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/a"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard"",
+                    ""groups"": ""KeyboardMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -64,7 +64,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/d"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard"",
+                    ""groups"": ""KeyboardMouse"",
                     ""action"": ""Movement"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": true
@@ -75,7 +75,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/space"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": ""Keyboard"",
+                    ""groups"": ""KeyboardMouse"",
                     ""action"": ""Jump"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
@@ -93,6 +93,54 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
+                },
+                {
+                    ""name"": ""Navigate"",
+                    ""type"": ""Value"",
+                    ""id"": ""431e038d-9322-4ab1-9c0c-b05e57746a06"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Submit"",
+                    ""type"": ""Button"",
+                    ""id"": ""2ae5f3ba-a415-409f-9d49-aba5b5402ae0"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Point"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""e8e50eb8-fcce-4790-a17f-8c6eef0b3267"",
+                    ""expectedControlType"": ""Vector2"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""Click"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""d37f7bac-e000-46be-b8a0-de10960a2b6a"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""MiddleClick"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""fbbfe76c-9c10-4270-860c-94a3f3eeeddd"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
+                    ""name"": ""RightClick"",
+                    ""type"": ""PassThrough"",
+                    ""id"": ""0ed8d6c1-f986-49a4-b096-25abcd22b141"",
+                    ""expectedControlType"": """",
+                    ""processors"": """",
+                    ""interactions"": """"
                 }
             ],
             ""bindings"": [
@@ -102,8 +150,129 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""path"": ""<Keyboard>/r"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
+                    ""groups"": ""KeyboardMouse"",
                     ""action"": ""Toggle QQV"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""Keyboard"",
+                    ""id"": ""1e598392-8407-43d5-9f44-43b0de35aecd"",
+                    ""path"": ""2DVector"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": """",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": true,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": ""up"",
+                    ""id"": ""da9c30fd-bc82-469f-87d1-362ee8823f8c"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""down"",
+                    ""id"": ""af3bb335-6729-4b15-b699-0ea34da52ed0"",
+                    ""path"": """",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""left"",
+                    ""id"": ""a62097e3-21d8-45c8-975a-0c23a7e536d2"",
+                    ""path"": ""<Keyboard>/q"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": ""right"",
+                    ""id"": ""4bda265a-75d5-4b1c-a7fa-81fc003ecc77"",
+                    ""path"": ""<Keyboard>/e"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Navigate"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": true
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""536f23cc-55f1-4a2a-8eb8-b54cb738c23d"",
+                    ""path"": ""<Keyboard>/enter"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Submit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""090b608a-3a3d-4458-ab80-e3ce7e75421e"",
+                    ""path"": ""<Keyboard>/w"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Submit"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""a631d716-78eb-4fe1-9561-a9c5904ce234"",
+                    ""path"": ""<Mouse>/position"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Point"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""809a5fa0-0edb-4984-a698-7417653dc1da"",
+                    ""path"": ""<Mouse>/leftButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Click"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""169d3216-5103-492c-a964-a7319157ddf9"",
+                    ""path"": ""<Mouse>/middleButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""MiddleClick"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""62bf0bc3-a86b-4072-b287-21a45f2a874d"",
+                    ""path"": ""<Mouse>/rightButton"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""RightClick"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -139,11 +308,16 @@ public class @StageInputs : IInputActionCollection, IDisposable
     ],
     ""controlSchemes"": [
         {
-            ""name"": ""Keyboard"",
-            ""bindingGroup"": ""Keyboard"",
+            ""name"": ""KeyboardMouse"",
+            ""bindingGroup"": ""KeyboardMouse"",
             ""devices"": [
                 {
                     ""devicePath"": ""<Keyboard>"",
+                    ""isOptional"": false,
+                    ""isOR"": false
+                },
+                {
+                    ""devicePath"": ""<Mouse>"",
                     ""isOptional"": false,
                     ""isOR"": false
                 }
@@ -158,6 +332,12 @@ public class @StageInputs : IInputActionCollection, IDisposable
         // Stage UI
         m_StageUI = asset.FindActionMap("Stage UI", throwIfNotFound: true);
         m_StageUI_ToggleQQV = m_StageUI.FindAction("Toggle QQV", throwIfNotFound: true);
+        m_StageUI_Navigate = m_StageUI.FindAction("Navigate", throwIfNotFound: true);
+        m_StageUI_Submit = m_StageUI.FindAction("Submit", throwIfNotFound: true);
+        m_StageUI_Point = m_StageUI.FindAction("Point", throwIfNotFound: true);
+        m_StageUI_Click = m_StageUI.FindAction("Click", throwIfNotFound: true);
+        m_StageUI_MiddleClick = m_StageUI.FindAction("MiddleClick", throwIfNotFound: true);
+        m_StageUI_RightClick = m_StageUI.FindAction("RightClick", throwIfNotFound: true);
         // Pause Menu UI
         m_PauseMenuUI = asset.FindActionMap("Pause Menu UI", throwIfNotFound: true);
         m_PauseMenuUI_Newaction = m_PauseMenuUI.FindAction("New action", throwIfNotFound: true);
@@ -252,11 +432,23 @@ public class @StageInputs : IInputActionCollection, IDisposable
     private readonly InputActionMap m_StageUI;
     private IStageUIActions m_StageUIActionsCallbackInterface;
     private readonly InputAction m_StageUI_ToggleQQV;
+    private readonly InputAction m_StageUI_Navigate;
+    private readonly InputAction m_StageUI_Submit;
+    private readonly InputAction m_StageUI_Point;
+    private readonly InputAction m_StageUI_Click;
+    private readonly InputAction m_StageUI_MiddleClick;
+    private readonly InputAction m_StageUI_RightClick;
     public struct StageUIActions
     {
         private @StageInputs m_Wrapper;
         public StageUIActions(@StageInputs wrapper) { m_Wrapper = wrapper; }
         public InputAction @ToggleQQV => m_Wrapper.m_StageUI_ToggleQQV;
+        public InputAction @Navigate => m_Wrapper.m_StageUI_Navigate;
+        public InputAction @Submit => m_Wrapper.m_StageUI_Submit;
+        public InputAction @Point => m_Wrapper.m_StageUI_Point;
+        public InputAction @Click => m_Wrapper.m_StageUI_Click;
+        public InputAction @MiddleClick => m_Wrapper.m_StageUI_MiddleClick;
+        public InputAction @RightClick => m_Wrapper.m_StageUI_RightClick;
         public InputActionMap Get() { return m_Wrapper.m_StageUI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -269,6 +461,24 @@ public class @StageInputs : IInputActionCollection, IDisposable
                 @ToggleQQV.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
                 @ToggleQQV.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
                 @ToggleQQV.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnToggleQQV;
+                @Navigate.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnNavigate;
+                @Navigate.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnNavigate;
+                @Navigate.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnNavigate;
+                @Submit.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnSubmit;
+                @Submit.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnSubmit;
+                @Submit.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnSubmit;
+                @Point.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnPoint;
+                @Point.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnPoint;
+                @Point.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnPoint;
+                @Click.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnClick;
+                @Click.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnClick;
+                @Click.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnClick;
+                @MiddleClick.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnMiddleClick;
+                @MiddleClick.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnMiddleClick;
+                @MiddleClick.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnMiddleClick;
+                @RightClick.started -= m_Wrapper.m_StageUIActionsCallbackInterface.OnRightClick;
+                @RightClick.performed -= m_Wrapper.m_StageUIActionsCallbackInterface.OnRightClick;
+                @RightClick.canceled -= m_Wrapper.m_StageUIActionsCallbackInterface.OnRightClick;
             }
             m_Wrapper.m_StageUIActionsCallbackInterface = instance;
             if (instance != null)
@@ -276,6 +486,24 @@ public class @StageInputs : IInputActionCollection, IDisposable
                 @ToggleQQV.started += instance.OnToggleQQV;
                 @ToggleQQV.performed += instance.OnToggleQQV;
                 @ToggleQQV.canceled += instance.OnToggleQQV;
+                @Navigate.started += instance.OnNavigate;
+                @Navigate.performed += instance.OnNavigate;
+                @Navigate.canceled += instance.OnNavigate;
+                @Submit.started += instance.OnSubmit;
+                @Submit.performed += instance.OnSubmit;
+                @Submit.canceled += instance.OnSubmit;
+                @Point.started += instance.OnPoint;
+                @Point.performed += instance.OnPoint;
+                @Point.canceled += instance.OnPoint;
+                @Click.started += instance.OnClick;
+                @Click.performed += instance.OnClick;
+                @Click.canceled += instance.OnClick;
+                @MiddleClick.started += instance.OnMiddleClick;
+                @MiddleClick.performed += instance.OnMiddleClick;
+                @MiddleClick.canceled += instance.OnMiddleClick;
+                @RightClick.started += instance.OnRightClick;
+                @RightClick.performed += instance.OnRightClick;
+                @RightClick.canceled += instance.OnRightClick;
             }
         }
     }
@@ -313,13 +541,13 @@ public class @StageInputs : IInputActionCollection, IDisposable
         }
     }
     public PauseMenuUIActions @PauseMenuUI => new PauseMenuUIActions(this);
-    private int m_KeyboardSchemeIndex = -1;
-    public InputControlScheme KeyboardScheme
+    private int m_KeyboardMouseSchemeIndex = -1;
+    public InputControlScheme KeyboardMouseScheme
     {
         get
         {
-            if (m_KeyboardSchemeIndex == -1) m_KeyboardSchemeIndex = asset.FindControlSchemeIndex("Keyboard");
-            return asset.controlSchemes[m_KeyboardSchemeIndex];
+            if (m_KeyboardMouseSchemeIndex == -1) m_KeyboardMouseSchemeIndex = asset.FindControlSchemeIndex("KeyboardMouse");
+            return asset.controlSchemes[m_KeyboardMouseSchemeIndex];
         }
     }
     public interface IControllableActions
@@ -330,6 +558,12 @@ public class @StageInputs : IInputActionCollection, IDisposable
     public interface IStageUIActions
     {
         void OnToggleQQV(InputAction.CallbackContext context);
+        void OnNavigate(InputAction.CallbackContext context);
+        void OnSubmit(InputAction.CallbackContext context);
+        void OnPoint(InputAction.CallbackContext context);
+        void OnClick(InputAction.CallbackContext context);
+        void OnMiddleClick(InputAction.CallbackContext context);
+        void OnRightClick(InputAction.CallbackContext context);
     }
     public interface IPauseMenuUIActions
     {

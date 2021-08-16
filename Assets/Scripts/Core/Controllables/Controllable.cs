@@ -19,7 +19,7 @@ public abstract class Controllable : MonoBehaviour
 {
     // all qubits that the controllable has
     // - will always at least one unless specified
-    private ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
+    protected readonly ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
 
     protected virtual void Awake() {
     }
@@ -48,19 +48,29 @@ public abstract class Controllable : MonoBehaviour
     /// <summary>
     /// Creates a qubit from prefab and adds it onto the list.
     /// </summary>
-    protected void _addQubitFromPrefab(float xOffset) {
+    protected Qubit _addQubitFromPrefab(float xOffset) {
         Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
 
         _qubits.Add(qubit);
+        return qubit;
+    }
+    protected Qubit _addQubitFromPrefab(Vector3 position) {
+        Qubit qubit = SpawnManager.Instance.MakeQubit(position);
+
+        _qubits.Add(qubit);
+        return qubit;
     }
 
     /// <summary>
-    /// Current amount of qubits.
+    /// Get a render texture of a qubit. Do note that it will not check if the index is out of bounds.
     /// </summary>
-    public int QubitAmount() {
-        return _qubits.Count;
+    public RenderTexture GetRenderTextureUnsafe(int index) {
+        return _qubits[index].RenderTexture;
     }
 
+    public int GetQubitCount() {
+        return _qubits.Count;
+    }
     /// <summary>
     /// Add an event subscriber to the observable qubit collection.
     /// </summary>

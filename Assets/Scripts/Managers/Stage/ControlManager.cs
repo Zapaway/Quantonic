@@ -7,7 +7,6 @@ using Nito.Collections;
 using StateMachines.CSM;
 
 namespace Managers {
-    #region Summary
     /// <summary>
     /// This is a stage manager. Does the following below...
     /// <list type="bullet">
@@ -24,7 +23,6 @@ namespace Managers {
     /// <description>Keeps track of composite quantum state </description>
     /// </item>
     /// </list></summary>
-    #endregion Summary
     public sealed class ControlManager : Manager<ControlManager>
     {
         #region Fields/Properties
@@ -94,7 +92,7 @@ namespace Managers {
         private async UniTaskVoid Update() {
             // toggle the quick qubit viewer panel
             if (_stageInputs?.StageUI.ToggleQQV.triggered ?? false) {
-                StageUIManager.Instance.ToggleQuickQubitPanel();
+                StageUIManager.Instance.ToggleQQVPanel();
             }
             
             await _csm.CurrentState.HandleInput();
