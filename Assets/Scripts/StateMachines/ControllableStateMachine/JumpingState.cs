@@ -73,7 +73,6 @@ namespace StateMachines.CSM {
                 0f, Vector2.down, Mathf.Infinity, 
                 _ctrlManager.PlatformLayerMask
             );
-            Debug.Log(hit.collider?.name);
 
             // adjust for player to "teleport on"
             return hit.collider == null 

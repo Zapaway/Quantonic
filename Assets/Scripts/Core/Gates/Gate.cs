@@ -19,10 +19,10 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// It should also play the simple lerp animation.
     /// Any gates deriving from this should focus on executing 
     /// </summary>
-    protected async virtual UniTaskVoid OnTriggerEnter2D(Collider2D other) {
-        if (other.CompareTag("Controllable")) {
+    protected async virtual UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.CompareTag("Controllable")) {
             GameManager.Instance.StageInputs.Controllable.Disable();
-            await _playAnimation(other.gameObject);
+            await _playAnimation(collision.gameObject);
             GameManager.Instance.StageInputs.Controllable.Enable();
         }
     }

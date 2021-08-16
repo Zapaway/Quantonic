@@ -41,9 +41,5 @@ namespace UIScripts.QQV {
                 }
             }
         }
-
-        private void OnEnable() {
-            Debug.Log("HI " + _moveDirection);
-        }
     }
 }
