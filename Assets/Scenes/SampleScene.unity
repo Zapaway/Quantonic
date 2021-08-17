@@ -1240,6 +1240,22 @@ PrefabInstance:
       propertyPath: m_Name
       value: 'QQV '
       objectReference: {fileID: 0}
+    - target: {fileID: 7930903299185034163, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Colors.m_SelectedColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7930903299185034163, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Colors.m_SelectedColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7930903299313860918, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Colors.m_SelectedColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7930903299313860918, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Colors.m_SelectedColor.g
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
 --- !u!1001 &8493753354009824669

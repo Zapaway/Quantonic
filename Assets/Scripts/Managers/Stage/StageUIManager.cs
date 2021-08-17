@@ -24,6 +24,9 @@ namespace Managers
         #region Quick Qubit Viewer (QQV) Data
         [SerializeField] private GameObject _QQV;
         private QQVScript _qqvScript;
+
+        // current selected representation 
+        private int _selectedRepresentationIndex = 0;
         
         // keep track of qubit index in the left qubit representation
         private int _qubitLeftIndex = 0;
@@ -34,7 +37,6 @@ namespace Managers
         private int _avalRightPresses = 0;
         private bool _isRightButtonActive = false;
 
-
         // used to toggle the QQV on and off
         private bool _isQQVDisplayed = false;
         #endregion Quick Qubit Viewer (QQV) Data
@@ -43,22 +45,22 @@ namespace Managers
         protected override void Awake()
         {
             base.Awake();    
+
+            // QQV
             _qqvScript = _QQV.GetComponent<QQVScript>();
-            _qqvScript.ButtonAction = MoveQQVRenderTextures;
+            _qqvScript.MoveExecAsyncFunc = MoveQQVRenderTextures;
+            _qqvScript.RepSelectedAsyncFunc = UpdateSelectedQubit;
         }
 
         private void Start() {
             // the current controllable on every stage is the player, which will spawn one qubit at start
             Controllable controllable = ControlManager.Instance.CurrentControllable;
-            SetQQVRenderTextures(controllable);
             
+            // QQV
+            SetQQVRenderTextures(controllable);
             _qqvScript.SetPanelActive(_isQQVDisplayed);
-            _qqvScript.SetArrowButtonActive(QQVArrowButtons.Left, _isLeftButtonActive);
-            _qqvScript.SetArrowButtonActive(QQVArrowButtons.Right, _isRightButtonActive);
-        }
-
-        private void OnEnable() {
-
+            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
+            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
         }
         #endregion Event Methods
 
@@ -68,33 +70,44 @@ namespace Managers
         /// </summary>
         public void ToggleQQVPanel() {
             _isQQVDisplayed = !_isQQVDisplayed;
+            if (_isQQVDisplayed) {
+                _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
+            }
             _qqvScript.SetPanelActive(_isQQVDisplayed);
         }
 
         /// <summary>
         /// Move the render textures left or right by one.
         /// <summary>
-        public async UniTask MoveQQVRenderTextures(QQVArrowButtons arrowButton) {
-            if (arrowButton == QQVArrowButtons.Left) {
-                _addQQVPressesAndActivate(QQVArrowButtons.Right);
+        public async UniTask MoveQQVRenderTextures(QQVMoveOptions moveAction) {
+            if (moveAction == QQVMoveOptions.Left) {
+                _addQQVPressesAndActivate(QQVMoveOptions.Right);
                 _qubitLeftIndex--;
-                _subQQVPressesAndDeactivate(QQVArrowButtons.Left);
+                _subQQVPressesAndDeactivate(QQVMoveOptions.Left);
                 await _updateAllQubitRepresentationsUnsafe();
             }
-            else if (arrowButton == QQVArrowButtons.Right) {
+            else if (moveAction == QQVMoveOptions.Right) {
                 // allow the person to go back
-                _addQQVPressesAndActivate(QQVArrowButtons.Left);
+                _addQQVPressesAndActivate(QQVMoveOptions.Left);
 
                 // moving right increases the leftmost qubit index by 1 
                 _qubitLeftIndex++;
 
                 // do not let the person continue if we reached the end of the collection
-                _subQQVPressesAndDeactivate(QQVArrowButtons.Right);
+                _subQQVPressesAndDeactivate(QQVMoveOptions.Right);
 
                 // update render textures 
                 await _updateAllQubitRepresentationsUnsafe();
             }
 
+            await UniTask.Yield();
+        }
+
+        /// <summary>
+        /// Update the selected representation index.
+        /// </summary>
+        public async UniTask UpdateSelectedQubit((int repIndex, int qubitIndex) qubitRep) {
+            _selectedRepresentationIndex = qubitRep.repIndex;
             await UniTask.Yield();
         }
 
@@ -136,7 +149,7 @@ namespace Managers
                             );
                         }
                         else {  
-                            _addQQVPressesAndActivate(QQVArrowButtons.Right);
+                            _addQQVPressesAndActivate(QQVMoveOptions.Right);
                         }
                     } 
                     break;
@@ -185,13 +198,13 @@ namespace Managers
         /// <summary>
         /// Add one arrow press and activate the respective arrow button if it hasn't been already.
         /// </summary>
-        private void _addQQVPressesAndActivate(QQVArrowButtons arrowButtons) {
-            switch (arrowButtons) {
-                case QQVArrowButtons.Left:
+        private void _addQQVPressesAndActivate(QQVMoveOptions moveAction) {
+            switch (moveAction) {
+                case QQVMoveOptions.Left:
                     _avalLeftPresses++;
                     if (!_isLeftButtonActive) _updateQQVLeftButtonActive(true);
                     break;
-                case QQVArrowButtons.Right:
+                case QQVMoveOptions.Right:
                     _avalRightPresses++;
                     if (!_isRightButtonActive) _updateQQVRightButtonActive(true);
                     break;
@@ -200,12 +213,12 @@ namespace Managers
         /// <summary>
         /// Subtract one arrow press and deactivate the respective arrow button if it hasn't been already.
         /// </summary>
-        private void _subQQVPressesAndDeactivate(QQVArrowButtons arrowButtons) {
-            switch (arrowButtons) {
-                case QQVArrowButtons.Left:
+        private void _subQQVPressesAndDeactivate(QQVMoveOptions moveAction) {
+            switch (moveAction) {
+                case QQVMoveOptions.Left:
                     if (--_avalLeftPresses == 0) _updateQQVLeftButtonActive(false);
                     break;
-                case QQVArrowButtons.Right:
+                case QQVMoveOptions.Right:
                     if (--_avalRightPresses == 0) _updateQQVRightButtonActive(false);
                     break;
             }
@@ -213,11 +226,11 @@ namespace Managers
 
         private void _updateQQVLeftButtonActive(bool isActive) {
             _isLeftButtonActive = isActive;
-            _qqvScript.SetArrowButtonActive(QQVArrowButtons.Left, _isLeftButtonActive);
+            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
         }
         private void _updateQQVRightButtonActive(bool isActive) {
             _isRightButtonActive = isActive;
-            _qqvScript.SetArrowButtonActive(QQVArrowButtons.Right, _isRightButtonActive);
+            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
         }
         #endregion QQV Methods
 

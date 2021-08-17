@@ -6,6 +6,22 @@ using TMPro;
 using Cysharp.Threading.Tasks;
 
 namespace UIScripts.QQV {
+    internal class QubitRepresentation {
+        internal readonly RawImage rawImage;
+        internal readonly Button rawImageButton;
+        internal readonly int representationIndex;
+        internal int qubitIndex; 
+        internal readonly TextMeshProUGUI qubitIndexText;
+
+        public QubitRepresentation(RawImage rawImage, Button rawImageButton, int repIndex, int qubitIndex, TextMeshProUGUI qubitIndexText) {
+            this.rawImage = rawImage;
+            this.rawImageButton = rawImageButton;
+            this.representationIndex = repIndex;
+            this.qubitIndex = qubitIndex;
+            this.qubitIndexText = qubitIndexText;
+        }
+    }
+
     /// <summary>
     /// The script for the entire QQV panel.
     /// </summary>
@@ -15,44 +31,71 @@ namespace UIScripts.QQV {
         [SerializeField] private Button _leftButton;
         [SerializeField] private Button _rightButton;
 
-        // delegate for executing actions based on arrow 
-        private Func<QQVArrowButtons, UniTask> _buttonAction; 
-        public Func<QQVArrowButtons, UniTask> ButtonAction {
-            set => _buttonAction = value;
-        }
-
-        // raw images
+        // qubit representations
         [SerializeField] private GameObject[] _qubitRepresentations;  
+        private Dictionary<int, QubitRepresentation> _qubitRepresentationsDict = new Dictionary<int, QubitRepresentation>();
         public int RawImageCapacity => _qubitRepresentations.Length;
-        private Dictionary<int, QubitRepresentation> _qubitRepresentationsDict;
-        private class QubitRepresentation {
-            public RawImage rawImage;
-            public int index; 
-            public TextMeshProUGUI indexText;
+
+        // delegate type
+        public delegate UniTask QubitRepresentationHandler((int repIndex, int qubitIndex) qubitRepInfo);
+
+        // all delegates that can be used for custom behavior on the QQV child componenets 
+        private Func<QQVMoveOptions, UniTask> _moveExecAsyncFunc; 
+        public Func<QQVMoveOptions, UniTask> MoveExecAsyncFunc {
+            set => _moveExecAsyncFunc = value;
+        }
+        private QubitRepresentationHandler _repSelectedAsyncFunc;
+        public QubitRepresentationHandler RepSelectedAsyncFunc {
+            set => _repSelectedAsyncFunc = value;
+        }
+        private QubitRepresentationHandler _repSubmittedAsyncFunc;
+        public QubitRepresentationHandler RepSubmittedAsyncFunc {
+            set => _repSubmittedAsyncFunc = value;
         }
 
         private void Awake() {
             /*
-            for every qubit representation, get its children components
-            index 0: raw image
-            index 1: textmeshpro
+            for every qubit representation, get its children components (default starts with 0-1-2 indices)
+            index 0 of getchild: raw image
+            index 1 of getchild: textmeshpro
             */
-            _qubitRepresentationsDict = new Dictionary<int, QubitRepresentation>();
-            int qubitIndex = 0;
-            foreach (GameObject qubitRep in _qubitRepresentations) {
-                _qubitRepresentationsDict[qubitRep.GetInstanceID()] = (
-                    new QubitRepresentation { 
-                        rawImage = qubitRep.transform.GetChild(0).GetComponent<RawImage>(),
-                        index = ++qubitIndex,
-                        indexText = qubitRep.transform.GetChild(1).GetComponent<TextMeshProUGUI>()
-                    }
+            for (int i = 0; i < RawImageCapacity; ++i) {
+                GameObject qubitRep = _qubitRepresentations[i];
+                int qubitRepID = qubitRep.GetInstanceID();
+
+                var rawImage = qubitRep.transform.GetChild(0).GetComponent<RawImage>();
+                var rawImageScript = rawImage.GetComponent<QQVQubitRawImageScript>();
+                var indexText = qubitRep.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
+
+                QubitRepresentation qubitRepData = new QubitRepresentation(
+                    rawImage, rawImageScript.Button, i, i, indexText
                 );
+                rawImageScript.qubitRepresentation = qubitRepData;
+                _qubitRepresentationsDict[qubitRepID] = qubitRepData;
             }
 
-            // for every arrow that is executed, invoke an action that uses these arrows
-            QQVArrowButtonScript.ArrowExecuted += async (object sender, QQVArrowButtonEventArgs e) => {
-                if (_buttonAction != null && !_buttonAction.Equals(null)) {
-                    await _buttonAction(e.Arrow);
+            // for every move that is executed, invoke a delegate that responds to this
+            QQVEvents.OnMoveExecuted += async (object sender, QQVMoveExecEventArgs e) => {
+                if (_moveExecAsyncFunc != null && !_moveExecAsyncFunc.Equals(null)) {
+                    await _moveExecAsyncFunc(e.Arrow);
+                }
+            };
+            
+            QQVEvents.OnRepresentationSelected += async (object sender, QQVRepresentationEventArgs e) => {
+                if (_repSelectedAsyncFunc != null && !_repSelectedAsyncFunc.Equals(null)) {
+                    await _repSelectedAsyncFunc((
+                        repIndex: e.RepresentationIndex,
+                        qubitIndex: e.QubitIndex
+                    ));
+                }
+            };
+            
+            QQVEvents.OnRepresentationSubmitted += async (object sender, QQVRepresentationEventArgs e) => {
+                if (_repSubmittedAsyncFunc != null && !_repSubmittedAsyncFunc.Equals(null)) {
+                    await _repSubmittedAsyncFunc((
+                        repIndex: e.RepresentationIndex,
+                        qubitIndex: e.QubitIndex
+                    ));
                 }
             };
         }
@@ -63,7 +106,7 @@ namespace UIScripts.QQV {
         /// </summary>
         public Tuple<Texture, int> GetQubitRepresentation(int representationIndex) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            return Tuple.Create(qubitRep.rawImage.texture, qubitRep.index);
+            return Tuple.Create(qubitRep.rawImage.texture, qubitRep.qubitIndex);
         }
 
         /// <summary>
@@ -77,8 +120,8 @@ namespace UIScripts.QQV {
         ) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
             qubitRep.rawImage.texture = rawImageTexture;
-            qubitRep.index = qubitIndex;
-            qubitRep.indexText.SetText($"[{qubitIndex}]");
+            qubitRep.qubitIndex = qubitIndex;
+            qubitRep.qubitIndexText.SetText($"[{qubitIndex}]");
         }
 
         /// <summary>
@@ -91,9 +134,9 @@ namespace UIScripts.QQV {
         /// <summary>
         /// Set an arrow button unactive or active.
         /// <summary>
-        public void SetArrowButtonActive(QQVArrowButtons arrowButton, bool isActive) {
+        public void SetArrowButtonActive(QQVMoveOptions moveAction, bool isActive) {
             Button button;
-            if (arrowButton == QQVArrowButtons.Left) {
+            if (moveAction == QQVMoveOptions.Left) {
                 button = _leftButton;
             }
             else {
@@ -103,8 +146,18 @@ namespace UIScripts.QQV {
         }
 
         /// <summary>
-        /// Select a qubit representation.
+        /// Set a qubit representation selected.
+        /// Do caution that it does not check if the representation index is out of bounds.
+        /// </summary>
+        public void SelectQubitRepresentation(int representationIndex) {
+            QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
+            qubitRep.rawImageButton.Select();
+            qubitRep.rawImageButton.OnSelect(null);  // forces the highlight
+        }
 
+        /// <summary>
+        /// Select a qubit representation.
+        /// </summary>
         private QubitRepresentation _getQubitRepresentation(int representationIndex) {
             int representationID = _qubitRepresentations[representationIndex].GetInstanceID();
             return _qubitRepresentationsDict[representationID];
