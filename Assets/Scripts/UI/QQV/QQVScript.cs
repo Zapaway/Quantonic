@@ -6,19 +6,29 @@ using TMPro;
 using Cysharp.Threading.Tasks;
 
 namespace UIScripts.QQV {
+    public delegate UniTask QubitRepresentationHandler((int repIndex, int qubitIndex) qubitRepInfo);
+    
+    /// <summary>
+    /// Holds information about a qubit representation.
+    /// </summary>
     internal class QubitRepresentation {
-        internal readonly RawImage rawImage;
-        internal readonly Button rawImageButton;
+        internal readonly QQVQubitRawImageScript rawImageScript;
+        internal readonly TextMeshProUGUI qubitIndexText;
         internal readonly int representationIndex;
         internal int qubitIndex; 
-        internal readonly TextMeshProUGUI qubitIndexText;
 
-        public QubitRepresentation(RawImage rawImage, Button rawImageButton, int repIndex, int qubitIndex, TextMeshProUGUI qubitIndexText) {
-            this.rawImage = rawImage;
-            this.rawImageButton = rawImageButton;
+        public QubitRepresentation(
+            QQVQubitRawImageScript rawImageScript,
+            TextMeshProUGUI qubitIndexText,
+            int repIndex, 
+            int qubitIndex
+        ) {
+            this.rawImageScript = rawImageScript;
+            this.qubitIndexText = qubitIndexText;
             this.representationIndex = repIndex;
             this.qubitIndex = qubitIndex;
-            this.qubitIndexText = qubitIndexText;
+
+            this.qubitIndexText.SetText("");  // ensure that there is no text in the beginning
         }
     }
 
@@ -35,9 +45,6 @@ namespace UIScripts.QQV {
         [SerializeField] private GameObject[] _qubitRepresentations;  
         private Dictionary<int, QubitRepresentation> _qubitRepresentationsDict = new Dictionary<int, QubitRepresentation>();
         public int RawImageCapacity => _qubitRepresentations.Length;
-
-        // delegate type
-        public delegate UniTask QubitRepresentationHandler((int repIndex, int qubitIndex) qubitRepInfo);
 
         // all delegates that can be used for custom behavior on the QQV child componenets 
         private Func<QQVMoveOptions, UniTask> _moveExecAsyncFunc; 
@@ -68,7 +75,7 @@ namespace UIScripts.QQV {
                 var indexText = qubitRep.transform.GetChild(1).GetComponent<TextMeshProUGUI>();
 
                 QubitRepresentation qubitRepData = new QubitRepresentation(
-                    rawImage, rawImageScript.Button, i, i, indexText
+                    rawImageScript, indexText, i, i
                 );
                 rawImageScript.qubitRepresentation = qubitRepData;
                 _qubitRepresentationsDict[qubitRepID] = qubitRepData;
@@ -106,22 +113,25 @@ namespace UIScripts.QQV {
         /// </summary>
         public Tuple<Texture, int> GetQubitRepresentation(int representationIndex) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            return Tuple.Create(qubitRep.rawImage.texture, qubitRep.qubitIndex);
+            return Tuple.Create(qubitRep.rawImageScript.Texture, qubitRep.qubitIndex);
         }
 
         /// <summary>
         /// Set the texture and index string of a qubit representation. 
+        /// If the render texture is null, then erase the text.
         /// Do caution that it does not check if the representation index is out of bounds.
         /// </summary>
         public void SetQubitRepresentation(
             int representationIndex, 
             int qubitIndex,
-            Texture rawImageTexture 
+            Texture rawImageTexture = null
         ) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            qubitRep.rawImage.texture = rawImageTexture;
+            qubitRep.rawImageScript.Texture = rawImageTexture;
             qubitRep.qubitIndex = qubitIndex;
-            qubitRep.qubitIndexText.SetText($"[{qubitIndex}]");
+            
+            string text = rawImageTexture != null ? $"[{qubitIndex}]" : "";
+            qubitRep.qubitIndexText.SetText(text);
         }
 
         /// <summary>
@@ -151,8 +161,8 @@ namespace UIScripts.QQV {
         /// </summary>
         public void SelectQubitRepresentation(int representationIndex) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            qubitRep.rawImageButton.Select();
-            qubitRep.rawImageButton.OnSelect(null);  // forces the highlight
+            qubitRep.rawImageScript.Button.Select();
+            qubitRep.rawImageScript.Button.OnSelect(null);  // forces the highlight
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -90,8 +91,7 @@ namespace Managers {
         }
 
         private async UniTaskVoid Update() {
-            // toggle the quick qubit viewer panel
-            if (_stageInputs?.StageUI.ToggleQQV.triggered ?? false) {
+            if (ToggleQVVTriggered()) {
                 StageUIManager.Instance.ToggleQQVPanel();
             }
             
@@ -104,14 +104,46 @@ namespace Managers {
         }
         #endregion Event Methods
 
-        #region Input Values Getters
+        #region Input Getters
         public float SidewaysInputValue() {
             return _stageInputs?.Controllable.Movement.ReadValue<float>() ?? 0;
         }
         public bool JumpTriggered() {
             return _stageInputs?.Controllable.Jump.triggered ?? false;
         }
-        #endregion Input Values Getters
+        public bool ToggleQVVTriggered() {
+            return _stageInputs?.StageUI.ToggleQQV.triggered ?? false;
+        }
+        public bool MovementOccured() {
+            return SidewaysInputValue() != 0 || JumpTriggered();
+        }
+        #endregion Input Getters
+
+        #region Input Setters 
+        public void SetControllableInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Enable();
+            else _stageInputs.Controllable.Disable();
+        }
+        public void SetStageUIInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Enable();
+            else _stageInputs.Controllable.Disable();
+        }
+        public void SetToggleQQVInputActive(bool isActive) {
+            if (isActive) _stageInputs.StageUI.ToggleQQV.Enable();
+            else _stageInputs.StageUI.ToggleQQV.Disable();
+        }
+        public void SetJumpInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Jump.Enable();
+            else _stageInputs.Controllable.Jump.Disable();
+        }
+        #endregion Input Setters
+
+        #region Control Modes
+        public void InQQVPanelMode(bool option) {
+            StageUIManager.Instance.SetQQVPanelActive(option);
+            ControlManager.Instance.SetToggleQQVInputActive(!option);
+        }
+        #endregion Control Modes
 
         /// <summary>
         /// Attempt to get the reference to GameManager's stage input.

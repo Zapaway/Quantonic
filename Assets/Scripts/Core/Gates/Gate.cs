@@ -17,16 +17,21 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// <summary>
     /// When a controllable enters the gate, all input for it should be disabled until they get out.
     /// It should also play the simple lerp animation.
-    /// Any gates deriving from this should focus on executing 
+    /// Any gates deriving from this should focus on executing their operations.
     /// </summary>
     protected async virtual UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable")) {
-            GameManager.Instance.StageInputs.Controllable.Disable();
+            StageInputs stageInputs = GameManager.Instance.StageInputs;
+            stageInputs.Controllable.Disable();
+            stageInputs.StageUI.Disable();
+
             await _playAnimation(collision.gameObject);
-            GameManager.Instance.StageInputs.Controllable.Enable();
+
+            stageInputs.StageUI.Enable();
+            stageInputs.Controllable.Enable();
         }
     }
-
+    
     #region Abstract Properties and Methods
     /// <value>
     /// How many qubits needed to use this gate. 

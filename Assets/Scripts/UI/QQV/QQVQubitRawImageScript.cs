@@ -15,14 +15,28 @@ namespace UIScripts.QQV {
         // keep a reference to the qubit representation
         internal QubitRepresentation qubitRepresentation; 
 
+        // raw image and its texture reference
+        private RawImage _rawImage;
+        public Texture Texture {
+            get => _rawImage.texture;
+            set {
+                gameObject.SetActive(value != null);
+                _rawImage.texture = value;
+            }
+        }
+
         // button reference
         private Button _button;
         internal Button Button => _button;
 
         private void Awake() {
             _button = GetComponent<Button>();
+            _rawImage = GetComponent<RawImage>();
+
+            gameObject.SetActive(false);  // since texture will be null, dont show the image
         }
 
+        #region Button Events
         public void OnMove(AxisEventData eventData) {
             MoveDirection eventDir = eventData.moveDir;
             
@@ -57,7 +71,9 @@ namespace UIScripts.QQV {
                 _invokeRepresentationSubmitted();
             }
         }
+        #endregion Button Events
 
+        #region Helper Methods
         private QQVRepresentationEventArgs _createQQVRepresentationEventArgs() {
             var eventArgs = new QQVRepresentationEventArgs {
                 RepresentationIndex = qubitRepresentation.representationIndex,
@@ -71,5 +87,6 @@ namespace UIScripts.QQV {
         private void _invokeRepresentationSubmitted() {
             QQVEvents.InvokeRepresentationSubmitted(this, _createQQVRepresentationEventArgs());
         }
+        #endregion Helper Methods
     }
 }

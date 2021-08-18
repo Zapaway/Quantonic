@@ -1,7 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Threading;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 using Managers;
 using Quantum.Operators;
@@ -17,11 +20,33 @@ TODO:
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
-    // all qubits that the controllable has
-    // - will always at least one unless specified
     protected readonly ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
 
+    private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
+    private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
+    public bool reachedOtherSideOfGate = false;
+
     protected virtual void Awake() {
+    }
+
+    protected virtual void Update() {
+        if (ControlManager.Instance.JumpTriggered()) {
+            CancelForNotBeingNearGate();
+        }
+    }
+
+    protected virtual void OnEnable() {
+        if (_notNearGateCancellationSource != null) _notNearGateCancellationSource.Dispose();
+        _notNearGateCancellationSource = new CancellationTokenSource();
+    }
+
+    protected virtual void OnDisable() {
+        _notNearGateCancellationSource.Cancel();
+    }
+
+    protected virtual void OnDestroy() {
+        _notNearGateCancellationSource.Cancel();
+        _notNearGateCancellationSource.Dispose();
     }
 
     #region Qubit Collection Manipulation
@@ -90,8 +115,33 @@ public abstract class Controllable : MonoBehaviour
     /// Ask the controllable what single qubit to use.
     /// (For now, use the first qubit in the controllable)
     /// </summary>
-    public int AskForSingleQubitIndex() {
-        return 0;
+    public async UniTask<int> AskForSingleQubitIndex() {
+        StageUIManager ui = StageUIManager.Instance;
+
+        _listenForNotNearGateCancellation = true;
+        var (isCancelled, res) = await ui.WaitForSubmitResults(
+            StageUIManager.QQVSubmitMode.Single, 
+            _notNearGateCancellationSource.Token
+        );
+        if (!isCancelled) {
+            reachedOtherSideOfGate = true;
+            _listenForNotNearGateCancellation = false;  
+        }
+
+        _notNearGateCancellationSource.Dispose();
+        _notNearGateCancellationSource = new CancellationTokenSource();
+
+        return isCancelled ? -1 : res[0];
+    }
+
+    /// <summary>
+    /// Cancels the not-being-near-gate source ONLY if it is being listened to.
+    /// </summary>
+    public void CancelForNotBeingNearGate() {
+        if (_listenForNotNearGateCancellation) { 
+            _listenForNotNearGateCancellation = false;
+            _notNearGateCancellationSource.Cancel();
+        }
     }
     #endregion Select Qubits
 

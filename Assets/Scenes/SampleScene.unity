@@ -358,6 +358,22 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1113739330 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 584875585068679778, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+  m_PrefabInstance: {fileID: 7930903298110802901}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!1 &1308593858 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7930903299313860916, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+  m_PrefabInstance: {fileID: 7930903298110802901}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1438347122
 GameObject:
   m_ObjectHideFlags: 0
@@ -458,6 +474,11 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!1 &1599736980 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 7930903299185034161, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+  m_PrefabInstance: {fileID: 7930903298110802901}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1603421701
 GameObject:
   m_ObjectHideFlags: 0
@@ -1152,6 +1173,22 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1438347126}
     m_Modifications:
+    - target: {fileID: 2486309234100690828, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Navigation.m_SelectOnLeft
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2486309234100690828, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: m_Navigation.m_SelectOnRight
+      value: 
+      objectReference: {fileID: 1113739330}
+    - target: {fileID: 2532807226466870333, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: _indicator
+      value: 
+      objectReference: {fileID: 1599736980}
+    - target: {fileID: 5570774203551180985, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+      propertyPath: _indicator
+      value: 
+      objectReference: {fileID: 1308593858}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

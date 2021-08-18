@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -22,6 +23,8 @@ public sealed class UnaryGate : Gate<UnaryOperator>
     
     private const int _capacity = 1;
     public override int Capacity => _capacity;
+
+    private Controllable _occupiedControllable;
     #endregion Fields/Properties
 
     private void Awake() {
@@ -42,21 +45,36 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         }
     }
 
-    /// <summary>
-    /// Apply the operator on the qubits selected.
-    /// </summary>
     protected async override UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable")) {
-            Controllable controllable = ControlManager.Instance.CurrentControllable;
-            // TODO: ask the current controllable what qubit to use (for now, use the first qubit in the player)
-            int[] qubitIndex = new int[_capacity]{ controllable.AskForSingleQubitIndex() };
-
-            base.OnCollisionEnter2D(collision).Forget();
-
-            _apply(controllable, qubitIndex);
-
-            await UniTask.Yield();
+            _occupiedControllable = ControlManager.Instance.CurrentControllable;
+            GateCollisionAction(collision).Forget();
         }
+
+        await UniTask.Yield();
+    }
+
+    private void OnCollisionExit2D(Collision2D collision) {
+        // if the controllable exits without going onto the other side, they had definitely canceled the prompt
+        if (!_occupiedControllable.reachedOtherSideOfGate) { 
+            _occupiedControllable.CancelForNotBeingNearGate();
+        }
+
+        _occupiedControllable.reachedOtherSideOfGate = false;
+    }
+
+    private async UniTaskVoid GateCollisionAction(Collision2D collision) {
+        ControlManager.Instance.InQQVPanelMode(true);
+
+        int res = await _occupiedControllable.AskForSingleQubitIndex();
+
+        if (res >= 0) {
+            int[] qubitIndex = new int[_capacity]{ res };
+            base.OnCollisionEnter2D(collision).Forget();
+            _apply(_occupiedControllable, qubitIndex);
+        } 
+
+        ControlManager.Instance.InQQVPanelMode(false);
     }
 
     protected override void _apply(Controllable controllable, int[] indices)

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
@@ -22,13 +23,23 @@ namespace Managers
     public sealed class StageUIManager : Manager<StageUIManager>
     {   
         #region Quick Qubit Viewer (QQV) Data
+        /// <summary>
+        /// Different submit modes that the QQV can be in.
+        /// </summary>
+        public enum QQVSubmitMode {
+            Default, 
+            Single,
+            Multi
+        }
+        private int[] _submittedQubitIndex;  // used for knowing when to stop awaiting submission
+
         [SerializeField] private GameObject _QQV;
         private QQVScript _qqvScript;
 
         // current selected representation 
         private int _selectedRepresentationIndex = 0;
         
-        // keep track of qubit index in the left qubit representation
+        // keep track of qubit index of the leftmost qubit representation
         private int _qubitLeftIndex = 0;
 
         // keep track of how many lefts and rights may be pressed
@@ -50,6 +61,7 @@ namespace Managers
             _qqvScript = _QQV.GetComponent<QQVScript>();
             _qqvScript.MoveExecAsyncFunc = MoveQQVRenderTextures;
             _qqvScript.RepSelectedAsyncFunc = UpdateSelectedQubit;
+            WaitForSubmitResults().Forget();  // set to default
         }
 
         private void Start() {
@@ -70,12 +82,16 @@ namespace Managers
         /// </summary>
         public void ToggleQQVPanel() {
             _isQQVDisplayed = !_isQQVDisplayed;
-            if (_isQQVDisplayed) {
+            SetQQVPanelActive(_isQQVDisplayed);
+        }
+        public void SetQQVPanelActive(bool isActive) {
+            if (isActive) {
                 _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
             }
-            _qqvScript.SetPanelActive(_isQQVDisplayed);
+            _qqvScript.SetPanelActive(isActive);
         }
 
+        // subscriber methods to QQV
         /// <summary>
         /// Move the render textures left or right by one.
         /// <summary>
@@ -102,13 +118,84 @@ namespace Managers
 
             await UniTask.Yield();
         }
-
         /// <summary>
         /// Update the selected representation index.
         /// </summary>
         public async UniTask UpdateSelectedQubit((int repIndex, int qubitIndex) qubitRep) {
             _selectedRepresentationIndex = qubitRep.repIndex;
             await UniTask.Yield();
+        }
+        /// <summary>
+        /// <para>
+        /// When submitting, use a certain mode and automatically subscribe to the event handler 
+        /// with the respective subscriber. 
+        /// </para>
+        /// <para>
+        /// If it is in default mode, it will skip the waiting. Otherwise, it will
+        /// automatically wait for a result if a cancellation token is passed.
+        /// </para>
+        /// </summary>
+        public async UniTask<(bool isCanceled, int[] indices)> WaitForSubmitResults(
+            QQVSubmitMode mode = QQVSubmitMode.Default, 
+            CancellationToken token = default
+        ) {
+            // default results
+            (bool isCanceled, int[] indices) results = (false, null);
+
+            // Default subscriber to the representation submit event. All it does is turn off the panel.
+            async UniTask SubmitDefaultMode((int repIndex, int qubitIndex) qubitRep) {
+                ToggleQQVPanel();
+                await UniTask.Yield();
+            }  
+            /* Single-mode subscriber to the representation submit event.
+            Updates the submitted qubit index array with one qubit index. */
+            async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
+                _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
+                ToggleQQVPanel();
+                await UniTask.Yield();
+            }  
+            /* Multi-mode subscriber to the representation submit event.
+            Updates the submitted qubit index array with qubit indices. */
+            async UniTask SubmitMultiMode((int repIndex, int qubitIndex) qubitRep) {
+                await UniTask.Yield();
+                throw new NotImplementedException();
+            }  
+
+            // get the submit subscriber respective to a mode
+            QubitRepresentationHandler submitSubscriber = null;
+            switch (mode) {
+                case QQVSubmitMode.Default:
+                    submitSubscriber = SubmitDefaultMode;
+                    break;
+                case QQVSubmitMode.Single:
+                    submitSubscriber = SubmitSingleMode;
+                    break;
+                case QQVSubmitMode.Multi:
+                    submitSubscriber = SubmitMultiMode;
+                    break;
+            }
+            _qqvScript.RepSubmittedAsyncFunc = submitSubscriber;
+
+            // if not default, wait for the appropiate results
+            switch (mode) {
+                case QQVSubmitMode.Single:
+                case QQVSubmitMode.Multi:
+                    if (token == default) {
+                        throw new ArgumentException("Must use cancellation token if not using default subscriber");
+                    }
+
+                    results.isCanceled = await UniTask
+                    .WaitUntil(() => _submittedQubitIndex != null, cancellationToken: token)
+                    .SuppressCancellationThrow();
+
+                    results.indices = _submittedQubitIndex?.ToArray();
+                    _submittedQubitIndex = null;
+
+                    _qqvScript.RepSubmittedAsyncFunc = SubmitDefaultMode;
+                    break;
+            }
+            
+            return results;
         }
 
         // render texture methods
