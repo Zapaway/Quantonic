@@ -9,12 +9,4 @@
     - *toggle ESC*: switch between (Controllable w/ StageUI) | (PauseUI) action maps
 
 TODO:
-
-
-FUTURE GOAL:
-    - with key input, only allow moving between qubit representations
-        - the leftmost qubit representation acts like a left arrow button when pressing left on it
-        it should still have the leftmost qubit representation selected after pressing
-        - same with right
-    - with mouse input, the arrow buttons can be clicked on to move between 
-        - clicking on a qubit representation should submit unless if in multi-select mode
+    - replace QubitStateMachine with something simpler (like a QuantumSystemInfo class)
