@@ -1,17 +1,28 @@
 using sys = System;
 using sysnum = System.Numerics;
+using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using UnityEngine;
 
 using Quantum.Operators;
 
 namespace Quantum {
+    public enum QuantumStateDescription {
+        Ground, 
+        Excited,
+        Superposition,
+        MaxSuperposition
+    }
+
     /// <summary>
     /// A single quantum state stored in a 2D complex vector. 
     /// </summary> 
     public sealed class QuantumState
     {  
         #region Fields/Properties
+        private QuantumStateDescription _desc;
+        public QuantumStateDescription Description => _desc;
+
         private Vector<sysnum.Complex> _state;
         public Vector<sysnum.Complex> State => _state;
 
@@ -33,14 +44,29 @@ namespace Quantum {
         #endregion Constructors
         
         #region Operations
-        public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
+        public QuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
             _state *= unaryOperator.Matrix;
             UpdateProbabilities();
+
+            return _desc;
         }
 
         public void UpdateProbabilities() {
-            var ampliZero = _state[0].Real; var ampliOne = _state[1].Real;
-            _probsZero = sys.Math.Pow(ampliZero, 2); _probsOne = sys.Math.Pow(ampliOne, 2);
+            _probsZero = ComplexExtensions.MagnitudeSquared(_state[0]); 
+            _probsOne = ComplexExtensions.MagnitudeSquared(_state[1]);
+
+            if (_probsZero == 1) {
+                _desc = QuantumStateDescription.Ground;
+            }
+            else if (_probsOne == 1) {
+                _desc = QuantumStateDescription.Excited;
+            }
+            else if (_probsZero == 0.5) {
+                _desc = QuantumStateDescription.MaxSuperposition;
+            }
+            else {
+                _desc = QuantumStateDescription.Superposition;
+            }
         }
         #endregion Operations
         
@@ -76,6 +102,21 @@ namespace Quantum {
                 toString(_probsZero),
                 toString(_probsOne)
             );
+        }
+
+        public string DescriptionToString() {
+            switch (_desc) {
+                case QuantumStateDescription.Ground:
+                    return "Ground";
+                case QuantumStateDescription.Excited:
+                    return "Excited";
+                case QuantumStateDescription.Superposition:
+                    return "Superposition";
+                case QuantumStateDescription.MaxSuperposition:
+                    return "Max Superposition";
+                default:
+                    return "";
+            }
         }
         #endregion String Representations
 

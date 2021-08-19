@@ -26,11 +26,15 @@ public sealed class Qubit : MonoBehaviour
     [SerializeField] private GameObject _blochSphere; 
     [SerializeField] private Camera _camera;
 
-    private Vector3 _blochSphereCoords;  // cache coords for determining bloch sphere pos -> unity pos 
+    // cache coords for determining bloch sphere pos -> unity pos 
+    // will always be in the form (x, 0, 0)
+    private Vector3 _coords;  
     public Camera Camera => _camera;
+
     // temp; uses position to determine representation on bloch sphere
     // todo; use rotation to determine representation on bloch sphere
     private QuantumState _quantumState;
+    public QuantumStateDescription Description {get; private set;}
 
     private void Awake() {
         // initalize render texture
@@ -38,16 +42,16 @@ public sealed class Qubit : MonoBehaviour
         _camera.targetTexture = _renderTexture;
         
         // initalize rest of qubit information
-        _quantumState = QuantumFactory.MakeQuantumState(_initialState);
-        _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
+        (_quantumState, Description) = QuantumFactory.MakeQuantumState(_initialState);
+        _coords = Vector3.right * _blochSphere.transform.position.x;  
     }
 
     /// <summary>
     /// After applying the unary operator, update its position. This does not notify Controllable of any changes.
     /// </summary>
     public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
-        _quantumState.ApplyUnaryOperator(unaryOperator);
+        Description = _quantumState.ApplyUnaryOperator(unaryOperator);
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
-        _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
+        _quantumStateIndicator.transform.position = unityPos + _coords;
     }
 }

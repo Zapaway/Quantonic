@@ -9,7 +9,7 @@ namespace Quantum {
     /// Use these to quickly make a basis state via factory.
     /// </summary>
     public enum BasisQuantumState : ushort {
-        Ground = 0,
+        Ground,
         Excited,
         Plus,
         Minus,
@@ -31,15 +31,16 @@ namespace Quantum {
         #endregion Operators
         
         #region State
-        public static QuantumState MakeQuantumState(
+        public static (QuantumState, QuantumStateDescription) MakeQuantumState(
             Complex ampliZero, 
             Complex ampliOne, 
             double scalarCoeff = 1
         ) 
         {
-            return new QuantumState(ampliZero, ampliOne, scalarCoeff);
+            QuantumState qa = new QuantumState(ampliZero, ampliOne, scalarCoeff);
+            return (qa, qa.Description);
         }
-        public static QuantumState MakeQuantumState(BasisQuantumState basis) {
+        public static (QuantumState, QuantumStateDescription) MakeQuantumState(BasisQuantumState basis) {
             // set up amplitudes
             Complex ampliZero = (
                 basis == BasisQuantumState.Excited ? 
@@ -71,7 +72,8 @@ namespace Quantum {
                 basis == BasisQuantumState.Excited
             ) ? 1 : Sqrt1Over2;
 
-            return new QuantumState(ampliZero, ampliOne, scalarCoeff);
+            QuantumState qa = new QuantumState(ampliZero, ampliOne, scalarCoeff);
+            return (qa, qa.Description);
         }
 
         /// <summary>
