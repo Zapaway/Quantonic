@@ -21,14 +21,11 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// </summary>
     protected async virtual UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable")) {
-            StageInputs stageInputs = GameManager.Instance.StageInputs;
-            stageInputs.Controllable.Disable();
-            stageInputs.StageUI.Disable();
+            ControlManager.Instance.SetPlayingControlsActive(false);
 
             await _playAnimation(collision.gameObject);
 
-            stageInputs.StageUI.Enable();
-            stageInputs.Controllable.Enable();
+            ControlManager.Instance.SetPlayingControlsActive(true);
         }
     }
     
@@ -40,9 +37,11 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
 
     /// <summary>
     /// Apply the operator onto the QuantumState(s) via controllable methods.
-    /// Indices represent the specific qubits on the controllable.
+    /// Indices in the arrya represent the specific qubits on the controllable.
     /// </summary>
     protected abstract void _apply(Controllable controllable, int[] indices);
+
+    protected abstract UniTaskVoid GateCollisionAction(Collision2D collision);
     #endregion Abstract Properties and Methods
 
     /// <summary>

@@ -2,6 +2,7 @@ using UnityEngine;
 
 using Quantum;
 using Quantum.Operators;
+using Cysharp.Threading.Tasks;
 
 /// <summary> 
 /// GameObject that applies a binary quantum operator onto a Qubit.
@@ -31,10 +32,14 @@ public sealed class BinaryGate : Gate<BinaryOperator>
         }
     }
 
+    protected override async UniTaskVoid GateCollisionAction(Collision2D collision)
+    {
+        await UniTask.Yield();
+        throw new System.NotImplementedException();
+    }
+
     protected override void _apply(Controllable controllable, int[] indices)
     {
         throw new System.NotImplementedException();
     }
-
-    // TODO: Override OnTriggerEnter
 }

@@ -46,7 +46,7 @@ public sealed class UnaryGate : Gate<UnaryOperator>
     }
 
     protected async override UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("Controllable")) {
+        if (collision.gameObject.CompareTag("Controllable") && _occupiedControllable == null) {
             _occupiedControllable = ControlManager.Instance.CurrentControllable;
             GateCollisionAction(collision).Forget();
         }
@@ -61,9 +61,10 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         }
 
         _occupiedControllable.reachedOtherSideOfGate = false;
+        _occupiedControllable = null;
     }
 
-    private async UniTaskVoid GateCollisionAction(Collision2D collision) {
+    protected override async UniTaskVoid GateCollisionAction(Collision2D collision) {
         ControlManager.Instance.InQQVPanelMode(true);
 
         int res = await _occupiedControllable.AskForSingleQubitIndex();

@@ -109,7 +109,7 @@ public abstract class Controllable : MonoBehaviour
         _qubits.CollectionChanged -= eventHandler;
     }
     #endregion Qubit Collection Manipulation
-    
+
     #region Select Qubits
     /// <summary>
     /// Ask the controllable what single qubit to use.
@@ -133,17 +133,16 @@ public abstract class Controllable : MonoBehaviour
 
         return isCancelled ? -1 : res[0];
     }
+    #endregion Select Qubits
 
-    /// <summary>
-    /// Cancels the not-being-near-gate source ONLY if it is being listened to.
-    /// </summary>
+    #region Cancellation Methods
     public void CancelForNotBeingNearGate() {
         if (_listenForNotNearGateCancellation) { 
             _listenForNotNearGateCancellation = false;
             _notNearGateCancellationSource.Cancel();
         }
     }
-    #endregion Select Qubits
+    #endregion Cancellation Methods
 
     // using these methods will automatically notify the controllable to check its qubit state
     #region Applying Methods

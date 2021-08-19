@@ -55,7 +55,9 @@ namespace Managers {
         protected override void Awake()
         {
             base.Awake();
-            GetStageInputs();
+
+            // create stage inputs
+            _stageInputs = new StageInputs();
 
             // cache & configure player components
             Player player = SpawnManager.Instance.SpawnPlayer();  // this is the starting point of the stage
@@ -75,9 +77,7 @@ namespace Managers {
             _standingState = new StandingState(this, _csm);
         }
 
-        private async UniTaskVoid OnEnable() {
-            // reference is null when GameManager is instantiated, so wait
-            await UniTask.WaitUntil(() => _stageInputs != null);
+        private void OnEnable() {
             _stageInputs.Controllable.Enable();
             _stageInputs.StageUI.Enable();
         }
@@ -114,6 +114,7 @@ namespace Managers {
         public bool ToggleQVVTriggered() {
             return _stageInputs?.StageUI.ToggleQQV.triggered ?? false;
         }
+        
         public bool MovementOccured() {
             return SidewaysInputValue() != 0 || JumpTriggered();
         }
@@ -136,20 +137,21 @@ namespace Managers {
             if (isActive) _stageInputs.Controllable.Jump.Enable();
             else _stageInputs.Controllable.Jump.Disable();
         }
+
+        /// <summary>
+        /// Playing controls are the inputs from Controllable and Stage UI action maps.
+        /// </summary>
+        public void SetPlayingControlsActive(bool isActive) {
+            SetControllableInputActive(isActive);
+            SetStageUIInputActive(isActive);
+        }
         #endregion Input Setters
 
         #region Control Modes
         public void InQQVPanelMode(bool option) {
             StageUIManager.Instance.SetQQVPanelActive(option);
-            ControlManager.Instance.SetToggleQQVInputActive(!option);
+            SetToggleQQVInputActive(!option);
         }
         #endregion Control Modes
-
-        /// <summary>
-        /// Attempt to get the reference to GameManager's stage input.
-        /// </summary>
-        public void GetStageInputs() {
-            _stageInputs = GameManager.Instance?.StageInputs;
-        } 
     }
 }
