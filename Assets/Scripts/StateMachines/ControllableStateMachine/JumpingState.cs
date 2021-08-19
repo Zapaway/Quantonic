@@ -7,10 +7,8 @@ using Managers;
 /*
 TODO: 
     Jump()
-    - fix issue where player can teleport out of stage when teleporting up/jumping
-    - figure out a way to kill the player if they are not above ground
-
-    - go into CSMState and put _isGrounded there instead of here (also bring the function over)
+    - fix issue where controllable can teleport out of stage when teleporting up/jumping
+    - figure out a way to kill the controllable if they are not above ground
 */
 
 namespace StateMachines.CSM {
@@ -19,7 +17,7 @@ namespace StateMachines.CSM {
     /// </summary>
     public sealed class JumpingState : CSMState
     { 
-        private float _jumpHeight = 5;  // how far does the player teleport up (DO NOT SET THIS TO ZERO)
+        private float _jumpHeight = 5;  // how far does the controllable teleport up (DO NOT SET THIS TO ZERO)
         private float _jumpDuration = 5;
 
         public JumpingState(ControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
@@ -47,8 +45,8 @@ namespace StateMachines.CSM {
         } 
 
         private async UniTaskVoid Jump() {
-            Transform transform = _ctrlManager.Player.transform;
-            Rigidbody2D rigidbody = _ctrlManager.PlayerRB;
+            Transform transform = _ctrlManager.CurrentControllable.transform;
+            Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
             
             rigidbody.gravityScale = 0f;  // allow the object to stay up in the air 
 
@@ -67,17 +65,17 @@ namespace StateMachines.CSM {
         }
         
         private float CheckIfAboveGround() {
-            BoxCollider2D col = _ctrlManager.PlayerBox;
+            BoxCollider2D col = _ctrlManager.CurrentBox;
             RaycastHit2D hit = Physics2D.BoxCast(
                 col.bounds.center, col.bounds.size, 
                 0f, Vector2.down, Mathf.Infinity, 
                 _ctrlManager.PlatformLayerMask
             );
 
-            // adjust for player to "teleport on"
+            // adjust for controllable to "teleport on"
             return hit.collider == null 
                 ? 0f 
-                : hit.transform.position.y + _ctrlManager.Player.transform.localScale.y; 
+                : hit.transform.position.y + _ctrlManager.CurrentControllable.transform.localScale.y; 
         }
     }
 }

@@ -27,12 +27,12 @@ namespace Managers {
     public sealed class ControlManager : Manager<ControlManager>
     {
         #region Fields/Properties
-        // player & clones (controllables)
-        public Player Player {get; private set;} 
-        public Rigidbody2D PlayerRB {get; private set;}
-        public BoxCollider2D PlayerBox {get; private set;}
-        
+        private StageInputs _stageInputs; 
+
+        // controllables        
         public Controllable CurrentControllable {get; private set;}
+        public Rigidbody2D CurrentRB {get; private set;}
+        public BoxCollider2D CurrentBox {get; private set;}
 
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
 
@@ -40,10 +40,7 @@ namespace Managers {
         [SerializeField] private LayerMask _plaformLayerMask;
         public LayerMask PlatformLayerMask => _plaformLayerMask;
 
-        // inputs that the control manager handle
-        private StageInputs _stageInputs; 
-
-        // the control state machine it uses to affect the controllables
+        // uses it to affect the controllable movement
         private CSM _csm = new CSM();
         private JumpingState _jumpingState;
         public JumpingState JumpingState => _jumpingState;
@@ -59,18 +56,11 @@ namespace Managers {
             // create stage inputs
             _stageInputs = new StageInputs();
 
-            // cache & configure player components
-            Player player = SpawnManager.Instance.SpawnPlayer();  // this is the starting point of the stage
-            GameObject playerGameObj = player.gameObject;
-
-            Player = player;
-            PlayerRB = playerGameObj.GetComponent<Rigidbody2D>();
-            PlayerRB.constraints = RigidbodyConstraints2D.FreezeRotation;
-            PlayerBox = playerGameObj.GetComponent<BoxCollider2D>();
-
             // player should always be the default current controllable
-            CurrentControllable = player;
-            _controllables.AddToBack(player);
+            CurrentControllable = SpawnManager.Instance.SpawnPlayer();;
+            CurrentRB = CurrentControllable.GetComponent<Rigidbody2D>();
+            CurrentBox = CurrentControllable.GetComponent<BoxCollider2D>();
+            _controllables.AddToBack(CurrentControllable);
 
             // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);
@@ -91,7 +81,7 @@ namespace Managers {
         }
 
         private async UniTaskVoid Update() {
-            if (ToggleQVVTriggered()) {
+            if (IsToggleQVVTriggered()) {
                 StageUIManager.Instance.ToggleQQVPanel();
             }
             
@@ -108,15 +98,15 @@ namespace Managers {
         public float SidewaysInputValue() {
             return _stageInputs?.Controllable.Movement.ReadValue<float>() ?? 0;
         }
-        public bool JumpTriggered() {
+        public bool IsJumpTriggered() {
             return _stageInputs?.Controllable.Jump.triggered ?? false;
         }
-        public bool ToggleQVVTriggered() {
+        public bool IsToggleQVVTriggered() {
             return _stageInputs?.StageUI.ToggleQQV.triggered ?? false;
         }
         
         public bool MovementOccured() {
-            return SidewaysInputValue() != 0 || JumpTriggered();
+            return SidewaysInputValue() != 0 || IsJumpTriggered();
         }
         #endregion Input Getters
 

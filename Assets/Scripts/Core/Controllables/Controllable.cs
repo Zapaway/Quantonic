@@ -30,7 +30,7 @@ public abstract class Controllable : MonoBehaviour
     }
 
     protected virtual void Update() {
-        if (ControlManager.Instance.JumpTriggered()) {
+        if (ControlManager.Instance.IsJumpTriggered()) {
             CancelForNotBeingNearGate();
         }
     }

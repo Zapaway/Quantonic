@@ -36,7 +36,7 @@ namespace StateMachines.CSM {
             await UniTask.Yield();
         } 
         public virtual async UniTask PhysicsUpdate() {
-            Rigidbody2D rigidbody = _ctrlManager.PlayerRB;
+            Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
             rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
             await UniTask.Yield();
         } 
@@ -45,7 +45,7 @@ namespace StateMachines.CSM {
         } 
 
         private bool CheckIfGrounded() {
-            BoxCollider2D col = _ctrlManager.PlayerBox;
+            BoxCollider2D col = _ctrlManager.CurrentBox;
             Collider2D overlap = Physics2D.OverlapBox(
                 col.bounds.center, col.bounds.size, 
                 0f, _ctrlManager.PlatformLayerMask

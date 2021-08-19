@@ -21,7 +21,7 @@ namespace StateMachines.CSM {
         } 
         public override async UniTask HandleInput() {
             await base.HandleInput();
-            _isJump = _ctrlManager.JumpTriggered();
+            _isJump = _ctrlManager.IsJumpTriggered();
         } 
         public override async UniTask LogicUpdate() {
             await base.LogicUpdate();
