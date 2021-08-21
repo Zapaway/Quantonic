@@ -7,7 +7,7 @@ using UnityEngine;
 using Quantum.Operators;
 
 namespace Quantum {
-    public enum QuantumStateDescription {
+    public enum UnaryQuantumStateDescription {
         Ground, 
         Excited,
         Superposition,
@@ -20,8 +20,12 @@ namespace Quantum {
     public sealed class QuantumState
     {  
         #region Fields/Properties
-        private QuantumStateDescription _desc;
-        public QuantumStateDescription Description => _desc;
+        // used to describe its quantum state by itself
+        private UnaryQuantumStateDescription _desc;
+        public UnaryQuantumStateDescription Description => _desc;
+        
+        // used to describe its quantum state in correlation to other quantum states in a quantum system
+        public bool IsEntangled {get; private set;}
 
         private Vector<sysnum.Complex> _state;
         public Vector<sysnum.Complex> State => _state;
@@ -39,12 +43,13 @@ namespace Quantum {
         /// </summary>
         public QuantumState(sysnum.Complex ampliZero, sysnum.Complex ampliOne, double scalarCoeff = 1) {
             _state = scalarCoeff * Vector<sysnum.Complex>.Build.Dense(new[] {ampliZero, ampliOne});
+            IsEntangled = false;
             UpdateProbabilities();
         }
         #endregion Constructors
         
         #region Operations
-        public QuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
+        public UnaryQuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
             _state *= unaryOperator.Matrix;
             UpdateProbabilities();
 
@@ -56,16 +61,16 @@ namespace Quantum {
             _probsOne = ComplexExtensions.MagnitudeSquared(_state[1]);
 
             if (_probsZero == 1) {
-                _desc = QuantumStateDescription.Ground;
+                _desc = UnaryQuantumStateDescription.Ground;
             }
             else if (_probsOne == 1) {
-                _desc = QuantumStateDescription.Excited;
+                _desc = UnaryQuantumStateDescription.Excited;
             }
             else if (_probsZero == 0.5) {
-                _desc = QuantumStateDescription.MaxSuperposition;
+                _desc = UnaryQuantumStateDescription.MaxSuperposition;
             }
             else {
-                _desc = QuantumStateDescription.Superposition;
+                _desc = UnaryQuantumStateDescription.Superposition;
             }
         }
         #endregion Operations
@@ -106,13 +111,13 @@ namespace Quantum {
 
         public string DescriptionToString() {
             switch (_desc) {
-                case QuantumStateDescription.Ground:
+                case UnaryQuantumStateDescription.Ground:
                     return "Ground";
-                case QuantumStateDescription.Excited:
+                case UnaryQuantumStateDescription.Excited:
                     return "Excited";
-                case QuantumStateDescription.Superposition:
+                case UnaryQuantumStateDescription.Superposition:
                     return "Superposition";
-                case QuantumStateDescription.MaxSuperposition:
+                case UnaryQuantumStateDescription.MaxSuperposition:
                     return "Max Superposition";
                 default:
                     return "";

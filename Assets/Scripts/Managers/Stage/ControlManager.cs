@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Nito.Collections;
@@ -8,6 +9,11 @@ using Nito.Collections;
 using StateMachines.CSM;
 
 namespace Managers {
+    public sealed class OnCurrentControllableChangedEventArgs : EventArgs {
+        public Controllable OldValue {get; set;}
+        public Controllable NewValue {get; set;}
+    }
+
     /// <summary>
     /// This is a stage manager. Does the following below...
     /// <list type="bullet">
@@ -29,8 +35,28 @@ namespace Managers {
         #region Fields/Properties
         private StageInputs _stageInputs; 
 
-        // controllables        
-        public Controllable CurrentControllable {get; private set;}
+        // qubit tracker
+        public readonly QubitCircuit circ = new QubitCircuit();
+
+        // events & delegates
+        public event EventHandler<OnCurrentControllableChangedEventArgs> OnCurrentControllableChanged;
+
+
+        // controllables      
+        private Controllable _currControllable = null;  
+        public Controllable CurrentControllable {
+            get => _currControllable;
+            private set {
+                OnCurrentControllableChanged?.Invoke(this, 
+                    new OnCurrentControllableChangedEventArgs(){
+                        OldValue = _currControllable,
+                        NewValue = value
+                    }
+                );
+
+                _currControllable = value;
+            }
+        }
         public Rigidbody2D CurrentRB {get; private set;}
         public BoxCollider2D CurrentBox {get; private set;}
 
@@ -56,8 +82,11 @@ namespace Managers {
             // create stage inputs
             _stageInputs = new StageInputs();
 
+            // set up qubit circuit to listen to the current controllable changed event
+            circ.InitQubitCircuit(this);
+
             // player should always be the default current controllable
-            CurrentControllable = SpawnManager.Instance.SpawnPlayer();;
+            CurrentControllable = SpawnManager.Instance.SpawnPlayer();
             CurrentRB = CurrentControllable.GetComponent<Rigidbody2D>();
             CurrentBox = CurrentControllable.GetComponent<BoxCollider2D>();
             _controllables.AddToBack(CurrentControllable);

@@ -1,5 +1,3 @@
-using Cysharp.Threading.Tasks;
-
 namespace StateMachines.CSM {
     /// <summary>
     /// Handles movement state of controllables. 

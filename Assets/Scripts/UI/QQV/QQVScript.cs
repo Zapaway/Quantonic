@@ -83,13 +83,13 @@ namespace UIScripts.QQV {
 
             // for every move that is executed, invoke a delegate that responds to this
             QQVEvents.OnMoveExecuted += async (object sender, QQVMoveExecEventArgs e) => {
-                if (_moveExecAsyncFunc != null && !_moveExecAsyncFunc.Equals(null)) {
+                if (_moveExecAsyncFunc != null) {
                     await _moveExecAsyncFunc(e.Arrow);
                 }
             };
             
             QQVEvents.OnRepresentationSelected += async (object sender, QQVRepresentationEventArgs e) => {
-                if (_repSelectedAsyncFunc != null && !_repSelectedAsyncFunc.Equals(null)) {
+                if (_repSelectedAsyncFunc != null) {
                     await _repSelectedAsyncFunc((
                         repIndex: e.RepresentationIndex,
                         qubitIndex: e.QubitIndex
@@ -98,7 +98,7 @@ namespace UIScripts.QQV {
             };
             
             QQVEvents.OnRepresentationSubmitted += async (object sender, QQVRepresentationEventArgs e) => {
-                if (_repSubmittedAsyncFunc != null && !_repSubmittedAsyncFunc.Equals(null)) {
+                if (_repSubmittedAsyncFunc != null) {
                     await _repSubmittedAsyncFunc((
                         repIndex: e.RepresentationIndex,
                         qubitIndex: e.QubitIndex

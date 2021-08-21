@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
 using Managers;
+using Quantum;
 using Quantum.Operators;
 
 /*
@@ -20,6 +22,7 @@ TODO:
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
+    protected readonly IQubitSubcircuit _testing;
     protected readonly ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
 
     private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
@@ -27,6 +30,7 @@ public abstract class Controllable : MonoBehaviour
     public bool reachedOtherSideOfGate = false;
 
     protected virtual void Awake() {
+
     }
 
     protected virtual void Update() {
@@ -91,6 +95,10 @@ public abstract class Controllable : MonoBehaviour
     /// </summary>
     public RenderTexture GetRenderTextureUnsafe(int index) {
         return _qubits[index].RenderTexture;
+    }
+
+    public List<UnaryQuantumStateDescription> GetQuantumStateDescriptions() {
+        return (from qubit in _qubits select qubit.Description).ToList();
     }
 
     public int GetQubitCount() {

@@ -2,16 +2,35 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using sysnum = System.Numerics;
+using mathnetl = MathNet.Numerics.LinearAlgebra;
 
 using Managers;
 using Quantum;
 using Quantum.Operators;
 
+/*
+TODO:
+    // temp; uses position to determine representation on bloch sphere
+    // todo; use rotation to determine representation on bloch sphere
+*/
+
 /// <summary>
-/// Represents a quantum state on a Bloch sphere.
+/// Represents a single quantum state on a Bloch sphere.
 /// </summary>
 public sealed class Qubit : MonoBehaviour
 {
+    // gameobjects & unity data
+    [SerializeField] private BasisQuantumState _initialState;  // default is the ground state
+    [SerializeField] private GameObject _quantumStateIndicator;  
+    [SerializeField] private GameObject _blochSphere; 
+    [SerializeField] private Camera _camera;
+    /* cache coords for determining bloch sphere pos -> unity pos 
+     will always be in the form (x, 0, 0) */
+    private Vector3 _blochSphereCoords;  
+    public Camera Camera => _camera;
+
+    // render texture
     private static RenderTextureDescriptor _renderTextureDesc = new RenderTextureDescriptor(
         256,
         256,
@@ -21,20 +40,11 @@ public sealed class Qubit : MonoBehaviour
     private RenderTexture _renderTexture;
     public RenderTexture RenderTexture => _renderTexture;
 
-    [SerializeField] private BasisQuantumState _initialState;  // default is the ground state
-    [SerializeField] private GameObject _quantumStateIndicator;  
-    [SerializeField] private GameObject _blochSphere; 
-    [SerializeField] private Camera _camera;
 
-    // cache coords for determining bloch sphere pos -> unity pos 
-    // will always be in the form (x, 0, 0)
-    private Vector3 _coords;  
-    public Camera Camera => _camera;
-
-    // temp; uses position to determine representation on bloch sphere
-    // todo; use rotation to determine representation on bloch sphere
+    // quantum state data
     private QuantumState _quantumState;
-    public QuantumStateDescription Description {get; private set;}
+    public mathnetl.Vector<sysnum.Complex> QuantumStateVector => _quantumState.State;
+    public UnaryQuantumStateDescription Description {get; private set;}
 
     private void Awake() {
         // initalize render texture
@@ -43,7 +53,7 @@ public sealed class Qubit : MonoBehaviour
         
         // initalize rest of qubit information
         (_quantumState, Description) = QuantumFactory.MakeQuantumState(_initialState);
-        _coords = Vector3.right * _blochSphere.transform.position.x;  
+        _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
     }
 
     /// <summary>
@@ -52,6 +62,6 @@ public sealed class Qubit : MonoBehaviour
     public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
         Description = _quantumState.ApplyUnaryOperator(unaryOperator);
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
-        _quantumStateIndicator.transform.position = unityPos + _coords;
+        _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
     }
 }
