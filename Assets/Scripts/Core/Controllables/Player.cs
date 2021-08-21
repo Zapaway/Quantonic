@@ -39,21 +39,21 @@ public sealed class Player : Controllable
 
         /// remove
         await UniTask.Delay(TimeSpan.FromSeconds(2));
-        _qubits.RemoveAt(3);  // qubit3
+        _subcirc.RemoveAt(3, isQCIndex: false);  // qubit3
 
-        /// replace 
-        await UniTask.Delay(TimeSpan.FromSeconds(2));
-        Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
-        newQubit2.name = "meow";
-        Destroy(qubit2.gameObject);
-        _qubits[2] = newQubit2;
+        // /// replace 
+        // await UniTask.Delay(TimeSpan.FromSeconds(2));
+        // Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
+        // newQubit2.name = "meow";
+        // Destroy(qubit2.gameObject);
+        // _subcirc[2] = newQubit2;
 
-        /// move
-        await UniTask.Delay(TimeSpan.FromSeconds(2));
-        _qubits.Move(0, 1);
+        // /// move
+        // await UniTask.Delay(TimeSpan.FromSeconds(2));
+        // _subcirc.Move(0, 1);
 
         /// reset
         await UniTask.Delay(TimeSpan.FromSeconds(2));
-        _qubits.Clear();
+        _subcirc.Clear();
     }
 }

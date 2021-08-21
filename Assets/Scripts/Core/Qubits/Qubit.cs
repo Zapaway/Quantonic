@@ -44,7 +44,7 @@ public sealed class Qubit : MonoBehaviour
     // quantum state data
     private QuantumState _quantumState;
     public mathnetl.Vector<sysnum.Complex> QuantumStateVector => _quantumState.State;
-    public UnaryQuantumStateDescription Description {get; private set;}
+    public QuantumStateDescription Description {get; private set;}
 
     private void Awake() {
         // initalize render texture

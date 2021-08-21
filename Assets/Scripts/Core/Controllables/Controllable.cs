@@ -22,15 +22,15 @@ TODO:
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
-    protected readonly IQubitSubcircuit _testing;
-    protected readonly ObservableCollection<Qubit> _qubits = new ObservableCollection<Qubit>();   
+    protected IQubitSubcircuit _subcirc;   
+    public int QubitCount => _subcirc.Count;
 
     private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
     private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
     public bool reachedOtherSideOfGate = false;
 
     protected virtual void Awake() {
-
+        _subcirc = ControlManager.Instance.circ.CreateQubitSubcircuit(this);
     }
 
     protected virtual void Update() {
@@ -53,7 +53,7 @@ public abstract class Controllable : MonoBehaviour
         _notNearGateCancellationSource.Dispose();
     }
 
-    #region Qubit Collection Manipulation
+    #region Subcircuit Manipulation
     /// <summary>
     /// Checks if the GameObject is a qubit and returns it. If true, it adds it onto the list.
     /// </summary>
@@ -62,7 +62,7 @@ public abstract class Controllable : MonoBehaviour
         if (isQubit) {
             var qubit = possibleQubit.GetComponent<Qubit>();
 
-            _qubits.Add(qubit);
+            _subcirc.Add(qubit);
         }
         return isQubit;
     }
@@ -72,7 +72,7 @@ public abstract class Controllable : MonoBehaviour
     protected void _addQubitUnsafe(GameObject possibleQubit) {
         var qubit = possibleQubit.GetComponent<Qubit>();
 
-        _qubits.Add(qubit);
+        _subcirc.Add(qubit);
     }
     /// <summary>
     /// Creates a qubit from prefab and adds it onto the list.
@@ -80,43 +80,30 @@ public abstract class Controllable : MonoBehaviour
     protected Qubit _addQubitFromPrefab(float xOffset) {
         Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
 
-        _qubits.Add(qubit);
+        _subcirc.Add(qubit);
         return qubit;
     }
     protected Qubit _addQubitFromPrefab(Vector3 position) {
         Qubit qubit = SpawnManager.Instance.MakeQubit(position);
 
-        _qubits.Add(qubit);
+        _subcirc.Add(qubit);
         return qubit;
     }
 
     /// <summary>
     /// Get a render texture of a qubit. Do note that it will not check if the index is out of bounds.
     /// </summary>
-    public RenderTexture GetRenderTextureUnsafe(int index) {
-        return _qubits[index].RenderTexture;
+    public RenderTexture GetRenderTextureUnsafe(int qsIndex) {
+        return _subcirc.GetRenderTexture(qsIndex, isQCIndex: false);
     }
 
-    public List<UnaryQuantumStateDescription> GetQuantumStateDescriptions() {
-        return (from qubit in _qubits select qubit.Description).ToList();
-    }
-
-    public int GetQubitCount() {
-        return _qubits.Count;
-    }
-    /// <summary>
-    /// Add an event subscriber to the observable qubit collection.
-    /// </summary>
     public void SubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
-        _qubits.CollectionChanged += eventHandler;
+        _subcirc.Subscribe(eventHandler);
     }
-    /// <summary>
-    /// Remove an event subscriber from the observable qubit collection.
-    /// </summary>
     public void UnsubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
-        _qubits.CollectionChanged -= eventHandler;
+        _subcirc.Unsubscribe(eventHandler);
     }
-    #endregion Qubit Collection Manipulation
+    #endregion Subcircuit Manipulation
 
     #region Select Qubits
     /// <summary>
@@ -154,10 +141,8 @@ public abstract class Controllable : MonoBehaviour
 
     // using these methods will automatically notify the controllable to check its qubit state
     #region Applying Methods
-    public void ApplyUnaryOperator(UnaryOperator unaryOperator, int index) {
-        _qubits[index].ApplyUnaryOperator(unaryOperator);
-
-        // TODO: update qubitstatemachine
+    public void ApplyUnaryOperator(UnaryOperator unaryOperator, int qsIndex) {
+        _subcirc.ApplyUnaryOperator(unaryOperator, qsIndex, isQCIndex: false);
     }
     #endregion Applying Methods
 }

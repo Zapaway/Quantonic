@@ -7,7 +7,7 @@ using UnityEngine;
 using Quantum.Operators;
 
 namespace Quantum {
-    public enum UnaryQuantumStateDescription {
+    public enum QuantumStateDescription {
         Ground, 
         Excited,
         Superposition,
@@ -21,8 +21,8 @@ namespace Quantum {
     {  
         #region Fields/Properties
         // used to describe its quantum state by itself
-        private UnaryQuantumStateDescription _desc;
-        public UnaryQuantumStateDescription Description => _desc;
+        private QuantumStateDescription _desc;
+        public QuantumStateDescription Description => _desc;
         
         // used to describe its quantum state in correlation to other quantum states in a quantum system
         public bool IsEntangled {get; private set;}
@@ -49,7 +49,7 @@ namespace Quantum {
         #endregion Constructors
         
         #region Operations
-        public UnaryQuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
+        public QuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
             _state *= unaryOperator.Matrix;
             UpdateProbabilities();
 
@@ -61,16 +61,16 @@ namespace Quantum {
             _probsOne = ComplexExtensions.MagnitudeSquared(_state[1]);
 
             if (_probsZero == 1) {
-                _desc = UnaryQuantumStateDescription.Ground;
+                _desc = QuantumStateDescription.Ground;
             }
             else if (_probsOne == 1) {
-                _desc = UnaryQuantumStateDescription.Excited;
+                _desc = QuantumStateDescription.Excited;
             }
             else if (_probsZero == 0.5) {
-                _desc = UnaryQuantumStateDescription.MaxSuperposition;
+                _desc = QuantumStateDescription.MaxSuperposition;
             }
             else {
-                _desc = UnaryQuantumStateDescription.Superposition;
+                _desc = QuantumStateDescription.Superposition;
             }
         }
         #endregion Operations
@@ -111,13 +111,13 @@ namespace Quantum {
 
         public string DescriptionToString() {
             switch (_desc) {
-                case UnaryQuantumStateDescription.Ground:
+                case QuantumStateDescription.Ground:
                     return "Ground";
-                case UnaryQuantumStateDescription.Excited:
+                case QuantumStateDescription.Excited:
                     return "Excited";
-                case UnaryQuantumStateDescription.Superposition:
+                case QuantumStateDescription.Superposition:
                     return "Superposition";
-                case UnaryQuantumStateDescription.MaxSuperposition:
+                case QuantumStateDescription.MaxSuperposition:
                     return "Max Superposition";
                 default:
                     return "";

@@ -47,12 +47,14 @@ namespace Managers {
         public Controllable CurrentControllable {
             get => _currControllable;
             private set {
-                OnCurrentControllableChanged?.Invoke(this, 
-                    new OnCurrentControllableChangedEventArgs(){
-                        OldValue = _currControllable,
-                        NewValue = value
-                    }
-                );
+                if (_currControllable != value) {
+                        OnCurrentControllableChanged?.Invoke(this, 
+                        new OnCurrentControllableChangedEventArgs(){
+                            OldValue = _currControllable,
+                            NewValue = value
+                        }
+                    );
+                }
 
                 _currControllable = value;
             }

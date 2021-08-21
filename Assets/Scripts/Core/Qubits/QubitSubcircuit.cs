@@ -9,6 +9,7 @@ using MathNet.Numerics.LinearAlgebra;
 using UnityEngine;
 
 using Quantum;
+using Quantum.Operators;
 
 /// <summary>
 /// Any classes outside of QubitCircuit only has access to these QubitSubcircuit's properties and methods.
@@ -31,11 +32,15 @@ public interface IQubitSubcircuit {
 
     void Subscribe(NotifyCollectionChangedEventHandler handler);
     void Unsubscribe(NotifyCollectionChangedEventHandler handler);
+
+    void ApplyUnaryOperator(UnaryOperator unaryOperator, int index, bool isQCIndex);
 }
 
 public sealed partial class QubitCircuit {
     /// <summary>
     /// Represents part of the circuit that a controllable has.
+    /// Qubit subcircuit indices are the perferred way to access the qubits,
+    /// but qubit circuit indices work too.
     /// </summary>
     private sealed class QubitSubcircuit : IQubitSubcircuit {
         private readonly QubitCircuit _qc;
@@ -46,10 +51,16 @@ public sealed partial class QubitCircuit {
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
         private readonly Dictionary<int, int> _QCIndexToQSIndex; 
 
+        // quantum data of the subcircuit
+        private Vector<sysnum.Complex> _compositeQuantumState = Vector<sysnum.Complex>.Build.Dense(
+            1, sysnum.Complex.One
+        );  // act as a scalar
+
         public QubitSubcircuit(QubitCircuit qubitCircuit, Controllable ctrlable) { 
             _qc = qubitCircuit;
             _controllable = ctrlable; 
             _qubits = new ObservableCollection<(int, Qubit)>();
+            _QCIndexToQSIndex = new Dictionary<int, int>();
         }
 
         #region Qubit Subcircuit Manipulation
@@ -59,6 +70,7 @@ public sealed partial class QubitCircuit {
             _qubits.Add((qcIndex, newQubit));
             _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
 
+            _compositeQuantumState = _tensorProduct(_compositeQuantumState, newQubit.QuantumStateVector);
             return this;
         }
 
@@ -109,6 +121,23 @@ public sealed partial class QubitCircuit {
         }
         #endregion Getters and Setters
 
+        #region Quantum Operations
+        public void ApplyUnaryOperator(UnaryOperator unaryOperator, int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            qubit.ApplyUnaryOperator(unaryOperator);
+        }
+
+        
+        private Vector<sysnum.Complex> _tensorProduct(Vector<sysnum.Complex> a, Vector<sysnum.Complex> b) {
+            var resList = new List<sysnum.Complex[]>(a.Count);
+
+            foreach (var element in a) {
+                resList.Add(b.Multiply(element).ToArray());                
+            }
+
+            return Vector<sysnum.Complex>.Build.DenseOfEnumerable(resList.SelectMany(e => e));
+        }
+        #endregion Quantum Operations
         /// <summary>
         /// Get all information about a qubit, which includes itself, its index in the subcirc,
         /// and its index in the circ.

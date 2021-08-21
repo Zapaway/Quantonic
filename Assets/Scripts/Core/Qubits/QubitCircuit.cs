@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using UnityEngine;
 
 using Managers;
 
@@ -33,15 +34,12 @@ public sealed partial class QubitCircuit
     }
     public void InitQubitCircuit(ControlManager controlManager) {
         // set up the events
+        StageUIManager.Instance.SetQQVRenderTextures();
+
         controlManager.OnCurrentControllableChanged += (object sender, OnCurrentControllableChangedEventArgs e) => {
             Controllable oldCtrllable = e.OldValue, newCtrllable = e.NewValue;
-
-            if (oldCtrllable != null) {
-                oldCtrllable.UnsubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
-            }
-            if (newCtrllable != null) {
-                newCtrllable.SubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
-            }
+            oldCtrllable?.UnsubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
+            newCtrllable?.SubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
         };
     }
 
@@ -105,14 +103,4 @@ public sealed partial class QubitCircuit
         _allQubits[qcIndex] = null;
     }
     #endregion Qubit Subcircuit Helpers
-
-    // private Vector<sysnum.Complex> _tensorProduct(Vector<sysnum.Complex> a, Vector<sysnum.Complex> b) {
-    //     var resList = new List<sysnum.Complex[]>(a.Count);
-
-    //     foreach (var element in a) {
-    //         resList.Add(b.Multiply(element).ToArray());                
-    //     }
-
-    //     return Vector<sysnum.Complex>.Build.DenseOfEnumerable(resList.SelectMany(e => e));
-    // }
 }

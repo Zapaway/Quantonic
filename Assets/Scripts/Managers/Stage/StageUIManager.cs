@@ -69,7 +69,6 @@ namespace Managers
             Controllable controllable = ControlManager.Instance.CurrentControllable;
             
             // QQV
-            SetQQVRenderTextures(controllable);
             _qqvScript.SetPanelActive(_isQQVDisplayed);
             _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
             _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
@@ -199,15 +198,8 @@ namespace Managers
         }
 
         // render texture methods
-        public void SetQQVRenderTextures(Controllable controllable) {
-            controllable.SubscribeToSubcircuitCollection(_qqvHandleChange);
-        }
-        public void RemoveQQVRenderTextures(Controllable controllable) {
-            controllable.UnsubscribeToSubcircuitCollection(_qqvHandleChange);
-        }
-        public void ChangeQQVRenderTextures(Controllable oldControllable, Controllable newControllable) {
-            RemoveQQVRenderTextures(oldControllable);
-            SetQQVRenderTextures(newControllable);
+        public void SetQQVRenderTextures() {  // used in init of qubit circuit
+            ControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
         }
         /// <summary>
         /// Observe any changes in the controllable's qubit collection and reflect it onto the
@@ -215,23 +207,27 @@ namespace Managers
         /// </summary>
         private void _qqvHandleChange(object sender, NotifyCollectionChangedEventArgs e) {
             Controllable ctrlable = ControlManager.Instance.CurrentControllable;
+            
 
             switch (e.Action) {
                 // newStartingIndex: index of added element on collection
                 // newItems: added element
                 case NotifyCollectionChangedAction.Add: 
-                    bool wasInserted = (e.NewStartingIndex != ctrlable.GetQubitCount() - 1);
-                    int currentQubitCount = ctrlable.GetQubitCount();
+                    bool wasInserted = (e.NewStartingIndex != ctrlable.QubitCount - 1);
+                    int currentQubitCount = ctrlable.QubitCount;
 
                     // if added
-                    if (!wasInserted) {  
-                        RenderTexture renderTexture = (e.NewItems[0] as Qubit).RenderTexture;
+                    if (!wasInserted) { 
+                        // note that this will never have a null value as the subcirc only accepts value tuples
+                        (_, Qubit qubit) = e.NewItems[0] as (int, Qubit)? ?? default; 
+
+                        RenderTexture renderTexture = qubit.RenderTexture;
 
                         // if there is an available raw image
                         if (currentQubitCount <= _qqvScript.RawImageCapacity) {   
                             _qqvScript.SetQubitRepresentation(
                                 currentQubitCount - 1,  // convert to index
-                                e.NewStartingIndex,
+                                e.NewStartingIndex,  // qsIndex
                                 renderTexture
                             );
                         }
