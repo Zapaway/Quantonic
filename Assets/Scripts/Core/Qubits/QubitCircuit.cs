@@ -21,7 +21,9 @@ public sealed partial class QubitCircuit
 
     // use a controllable's ID to access its subcircuit (their qubits)
     private readonly Dictionary<int, QubitSubcircuit> _allSubcircuits;
-    public NotifyCollectionChangedEventHandler SubcircuitCollectionChangedHandler;
+
+    // allows the same handler to be used across any current controllable's subcirc
+    private NotifyCollectionChangedEventHandler _subcircuitCollectionChangedHandler;
 
     #endregion Fields/Properties
 
@@ -35,10 +37,10 @@ public sealed partial class QubitCircuit
             Controllable oldCtrllable = e.OldValue, newCtrllable = e.NewValue;
 
             if (oldCtrllable != null) {
-                oldCtrllable.UnsubscribeToQubitCollection(SubcircuitCollectionChangedHandler);
+                oldCtrllable.UnsubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
             }
             if (newCtrllable != null) {
-                newCtrllable.SubscribeToQubitCollection(SubcircuitCollectionChangedHandler);
+                newCtrllable.SubscribeToSubcircuitCollection(_subcircuitCollectionChangedHandler);
             }
         };
     }
@@ -64,6 +66,13 @@ public sealed partial class QubitCircuit
         if (controllable == null) controllable = CurrentControllable;
 
         return _allSubcircuits[controllable.GetHashCode()];
+    }
+
+    public void AddSubcircuitHandler(NotifyCollectionChangedEventHandler handler) {
+        _subcircuitCollectionChangedHandler += handler;
+    }
+    public void RemoveSubcircuitHandler(NotifyCollectionChangedEventHandler handler) {
+        _subcircuitCollectionChangedHandler -= handler;
     }
 
     #region Qubit Circuit Manipulation

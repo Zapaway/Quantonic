@@ -200,10 +200,10 @@ namespace Managers
 
         // render texture methods
         public void SetQQVRenderTextures(Controllable controllable) {
-            controllable.SubscribeToQubitCollection(_qqvHandleChange);
+            controllable.SubscribeToSubcircuitCollection(_qqvHandleChange);
         }
         public void RemoveQQVRenderTextures(Controllable controllable) {
-            controllable.UnsubscribeToQubitCollection(_qqvHandleChange);
+            controllable.UnsubscribeToSubcircuitCollection(_qqvHandleChange);
         }
         public void ChangeQQVRenderTextures(Controllable oldControllable, Controllable newControllable) {
             RemoveQQVRenderTextures(oldControllable);

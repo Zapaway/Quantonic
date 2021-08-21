@@ -107,13 +107,13 @@ public abstract class Controllable : MonoBehaviour
     /// <summary>
     /// Add an event subscriber to the observable qubit collection.
     /// </summary>
-    public void SubscribeToQubitCollection(NotifyCollectionChangedEventHandler eventHandler) {
+    public void SubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _qubits.CollectionChanged += eventHandler;
     }
     /// <summary>
     /// Remove an event subscriber from the observable qubit collection.
     /// </summary>
-    public void UnsubscribeToQubitCollection(NotifyCollectionChangedEventHandler eventHandler) {
+    public void UnsubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _qubits.CollectionChanged -= eventHandler;
     }
     #endregion Qubit Collection Manipulation

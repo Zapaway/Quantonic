@@ -3,8 +3,10 @@ using sysnum = System.Numerics;
 using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
+using UnityEngine;
 
 using Quantum;
 
@@ -12,6 +14,9 @@ using Quantum;
 /// Any classes outside of QubitCircuit only has access to these QubitSubcircuit's properties and methods.
 /// </summary>
 public interface IQubitSubcircuit {
+    int Count {get;}
+    RenderTexture GetRenderTexture(int index, bool isQCIndex);
+
     IQubitSubcircuit Add(Qubit newQubit);
 
     /// <summary>
@@ -23,6 +28,9 @@ public interface IQubitSubcircuit {
     /// Remove a specific qubit from the subcircuit and set it inactive on the qubit circuit. 
     /// </summary>
     IQubitSubcircuit RemoveAt(int index, bool isQCIndex);
+
+    void Subscribe(NotifyCollectionChangedEventHandler handler);
+    void Unsubscribe(NotifyCollectionChangedEventHandler handler);
 }
 
 public sealed partial class QubitCircuit {
@@ -33,6 +41,7 @@ public sealed partial class QubitCircuit {
         private readonly QubitCircuit _qc;
         private readonly Controllable _controllable;
         private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;
+        public int Count => _qubits.Count;
 
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
         private readonly Dictionary<int, int> _QCIndexToQSIndex; 
@@ -61,15 +70,7 @@ public sealed partial class QubitCircuit {
         }
 
         public IQubitSubcircuit RemoveAt(int index, bool isQCIndex) {
-            int qsIndex, qcIndex;
-            if (isQCIndex) {
-                qsIndex = _QCIndexToQSIndex[index];
-                qcIndex = index;
-            }
-            else {
-                qsIndex = index;
-                (qcIndex, _) = _qubits[qsIndex];
-            }
+            (int qsIndex, int qcIndex, _) = _getQubitInfo(index, isQCIndex);
             
             return _removeAt(qsIndex, qcIndex);
         }
@@ -92,7 +93,42 @@ public sealed partial class QubitCircuit {
 
             return this;
         }
+
+        public void Subscribe(NotifyCollectionChangedEventHandler handler) {
+            _qubits.CollectionChanged += handler;
+        }
+        public void Unsubscribe(NotifyCollectionChangedEventHandler handler) {
+            _qubits.CollectionChanged -= handler;
+        }
         #endregion Qubit Subcircuit Manipulation
+
+        #region Getters and Setters
+        public RenderTexture GetRenderTexture(int index, bool isQCIndex) {
+            (int qsIndex, int qcIndex, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return qubit.RenderTexture;
+        }
+        #endregion Getters and Setters
+
+        /// <summary>
+        /// Get all information about a qubit, which includes itself, its index in the subcirc,
+        /// and its index in the circ.
+        /// </summary>
+        private (int qsIndex, int qcIndex, Qubit qubit) _getQubitInfo(int index, bool isQCIndex) {
+            int qsIndex, qcIndex;
+            Qubit qubit;
+
+            if (isQCIndex) {
+                qsIndex = _QCIndexToQSIndex[index];
+                qcIndex = index;
+                (_, qubit) = _qubits[qsIndex];
+            }
+            else {
+                qsIndex = index;
+                (qcIndex, qubit) = _qubits[qsIndex];
+            }
+
+            return (qsIndex, qcIndex, qubit);
+        }
     }
 }
 
