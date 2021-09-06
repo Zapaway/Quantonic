@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
+using Cysharp.Threading.Tasks;
 using sysnum = System.Numerics;
 using mathnetl = MathNet.Numerics.LinearAlgebra;
 
@@ -57,11 +58,14 @@ public sealed class Qubit : MonoBehaviour
     }
 
     /// <summary>
-    /// After applying the unary operator, update its position. This does not notify Controllable of any changes.
+    /// After applying the unary operator, update its position. This method by itself 
+    /// does not notify Controllable of any changes.
     /// </summary>
-    public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
+    public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator) {
         Description = _quantumState.ApplyUnaryOperator(unaryOperator);
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
+
+        await UniTask.Yield();
     }
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 using Quantum;
@@ -38,7 +39,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
         throw new System.NotImplementedException();
     }
 
-    protected override void _apply(Controllable controllable, int[] indices)
+    protected override void _apply(Controllable controllable, List<int[]> indices)
     {
         throw new System.NotImplementedException();
     }

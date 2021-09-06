@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -37,9 +38,9 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
 
     /// <summary>
     /// Apply the operator onto the QuantumState(s) via controllable methods.
-    /// Indices in the arrya represent the specific qubits on the controllable.
+    /// Indices in the array represent the specific qubits on the controllable.
     /// </summary>
-    protected abstract void _apply(Controllable controllable, int[] indices);
+    protected abstract void _apply(Controllable controllable, List<int[]> indices);
 
     protected abstract UniTaskVoid GateCollisionAction(Collision2D collision);
     #endregion Abstract Properties and Methods

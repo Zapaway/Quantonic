@@ -107,8 +107,7 @@ public abstract class Controllable : MonoBehaviour
 
     #region Select Qubits
     /// <summary>
-    /// Ask the controllable what single qubit to use.
-    /// (For now, use the first qubit in the controllable)
+    /// Ask the controllable qubit(s) to use.
     /// </summary>
     public async UniTask<int> AskForSingleQubitIndex() {
         StageUIManager ui = StageUIManager.Instance;
@@ -141,8 +140,11 @@ public abstract class Controllable : MonoBehaviour
 
     // using these methods will automatically notify the controllable to check its qubit state
     #region Applying Methods
-    public void ApplyUnaryOperator(UnaryOperator unaryOperator, int qsIndex) {
-        _subcirc.ApplyUnaryOperator(unaryOperator, qsIndex, isQCIndex: false);
+    /// <summary>
+    /// Apply a unary operator on qubit(s) within the subcircuit.
+    /// </summary>
+    public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] qsIndices) {
+        await _subcirc.ApplyUnaryOperator(unaryOperator, qsIndices, isQCIndices: false);
     }
     #endregion Applying Methods
 }

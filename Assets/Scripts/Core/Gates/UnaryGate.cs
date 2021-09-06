@@ -1,4 +1,5 @@
-using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -70,7 +71,9 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         int res = await _occupiedControllable.AskForSingleQubitIndex();
 
         if (res >= 0) {
-            int[] qubitIndex = new int[_capacity]{ res };
+            List<int[]> qubitIndex = new List<int[]>();
+            qubitIndex.Add(new int[_capacity] { res });
+
             base.OnCollisionEnter2D(collision).Forget();
             _apply(_occupiedControllable, qubitIndex);
         } 
@@ -78,8 +81,8 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         ControlManager.Instance.InQQVPanelMode(false);
     }
 
-    protected override void _apply(Controllable controllable, int[] indices)
+    protected override void _apply(Controllable controllable, List<int[]> indices)
     {
-        controllable.ApplyUnaryOperator(_operator, indices[0]);
+        controllable.ApplyUnaryOperator(_operator, indices.Select(x => x[0]).ToArray()).Forget();
     }
-}
+} 

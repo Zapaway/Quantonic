@@ -26,6 +26,7 @@ namespace Quantum {
         public static readonly PauliYOperator pauliYOperator = new PauliYOperator();
         public static readonly PauliZOperator pauliZOperator = new PauliZOperator();
         public static readonly HadamardOperator hadamardOperator = new HadamardOperator();
+        public static readonly IdentityOperator identityOperator = new IdentityOperator();
         public static readonly CNOTOperator cnotOperator = new CNOTOperator();
         public static readonly SWAPOperator swapOperator = new SWAPOperator();
         #endregion Operators
