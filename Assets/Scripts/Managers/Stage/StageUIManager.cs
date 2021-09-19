@@ -95,8 +95,6 @@ namespace Managers
         /// Move the render textures left or right by one.
         /// <summary>
         public async UniTask MoveQQVRenderTextures(QQVMoveOptions moveAction) {
-            await UniTask.Yield();
-
             if (moveAction == QQVMoveOptions.Left) {
                 _addQQVPressesAndActivate(QQVMoveOptions.Right);
                 _qubitLeftIndex--;
@@ -116,13 +114,15 @@ namespace Managers
                 // update render textures 
                 await _updateAllQubitRepresentationsUnsafe();
             }
+
+            await UniTask.Yield();
         }
         /// <summary>
         /// Update the selected representation index.
         /// </summary>
         public async UniTask UpdateSelectedQubit((int repIndex, int qubitIndex) qubitRep) {
-            await UniTask.Yield();
             _selectedRepresentationIndex = qubitRep.repIndex;
+            await UniTask.Yield();
         }
         /// <summary>
         /// <para>
@@ -143,15 +143,15 @@ namespace Managers
 
             // Default subscriber to the representation submit event. All it does is turn off the panel.
             async UniTask SubmitDefaultMode((int repIndex, int qubitIndex) qubitRep) {
-                await UniTask.Yield();
                 ToggleQQVPanel();
+                await UniTask.Yield();
             }  
             /* Single-mode subscriber to the representation submit event.
             Updates the submitted qubit index array with one qubit index. */
             async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
-                await UniTask.Yield();
                 _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
                 ToggleQQVPanel();
+                await UniTask.Yield();
             }  
             /* Multi-mode subscriber to the representation submit event.
             Updates the submitted qubit index array with qubit indices. */
@@ -270,12 +270,12 @@ namespace Managers
         /// <summary>
         /// Set qubit representation based on a new qubit.
         /// </summary>
-        private async UniTask _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) {
-            await UniTask.Yield();
-            
+        private async UniTask _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) {            
             Controllable ctrlable = ControlManager.Instance.CurrentControllable;
             RenderTexture renderTexture = ctrlable.GetRenderTextureUnsafe(qubitIndex);
             _qqvScript.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
+
+            await UniTask.Yield();
         }
 
         /// <summary>
