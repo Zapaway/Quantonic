@@ -135,7 +135,7 @@ public sealed partial class QubitCircuit {
         public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] indices, bool areQCIndices) {
             // apply the unary operator to the qubit(s) individually
             int[] qsIndices = await UniTask.WhenAll(from i in indices select _applyOneUnaryOperator(unaryOperator, i, areQCIndices));
-            
+
             // update the composite state after the unary operators
             _updateCompositeState(unaryOperator, qsIndices);
         }
@@ -163,6 +163,7 @@ public sealed partial class QubitCircuit {
         /// </summary>
         private async UniTask<int> _applyOneUnaryOperator(UnaryOperator unaryOperator, int index, bool isQCIndex) {
             (int qsIndex, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            Debug.Log(qubit.name);
             await qubit.ApplyUnaryOperator(unaryOperator);
             return qsIndex;
         }

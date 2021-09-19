@@ -63,7 +63,8 @@ public sealed class Qubit : MonoBehaviour
     /// </summary>
     public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator) {
         await UniTask.Yield();
-        
+
+        _quantumState.ApplyUnaryOperator(unaryOperator);
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
     }

@@ -13,8 +13,9 @@ public sealed class Player : Controllable
     }
 
     private void Start() {
-        _addQubitFromPrefab(xTracker);  // all players should start off with one qubit
-        Testing().Forget();
+        Qubit qubit0 = _addQubitFromPrefab(xTracker);  // all players should start off with one qubit
+        qubit0.name = "qubit0";
+        // Testing().Forget();
         // Testing2().Forget();
     }
 
@@ -37,23 +38,23 @@ public sealed class Player : Controllable
         Qubit qubit3 = _addQubitFromPrefab(xTracker);
         qubit3.name = "qubit3";
 
-        /// remove
-        await UniTask.Delay(TimeSpan.FromSeconds(2));
-        _subcirc.RemoveAt(3, isQCIndex: false);  // qubit3
-
-        // /// replace 
+        // /// remove
         // await UniTask.Delay(TimeSpan.FromSeconds(2));
-        // Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
-        // newQubit2.name = "meow";
-        // Destroy(qubit2.gameObject);
-        // _subcirc[2] = newQubit2;
+        // _subcirc.RemoveAt(3, isQCIndex: false);  // qubit3
 
-        // /// move
+        // // /// replace 
+        // // await UniTask.Delay(TimeSpan.FromSeconds(2));
+        // // Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
+        // // newQubit2.name = "meow";
+        // // Destroy(qubit2.gameObject);
+        // // _subcirc[2] = newQubit2;
+
+        // // /// move
+        // // await UniTask.Delay(TimeSpan.FromSeconds(2));
+        // // _subcirc.Move(0, 1);
+
+        // /// reset
         // await UniTask.Delay(TimeSpan.FromSeconds(2));
-        // _subcirc.Move(0, 1);
-
-        /// reset
-        await UniTask.Delay(TimeSpan.FromSeconds(2));
-        _subcirc.Clear();
+        // _subcirc.Clear();
     }
 }
