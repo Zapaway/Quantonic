@@ -139,7 +139,9 @@ public sealed partial class QubitCircuit {
             // update the composite state after the unary operators
             _updateCompositeState(unaryOperator, qsIndices);
         }
-        public async UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair) {            
+        public async UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair) { 
+            await UniTask.Yield();           
+
             // do note that if the binary operator isn't a controlled, then order does not matter
             (int controlQSIndex, _, Qubit controlQubit) = _getQubitInfo(indexPair[0], isQCPair);
             (int targetQSIndex, _, Qubit targetQubit) = _getQubitInfo(indexPair[1], isQCPair);
@@ -155,8 +157,6 @@ public sealed partial class QubitCircuit {
             else {
                 _updateCompositeState(binaryOperator, controlQSIndex, targetQSIndex);
             }
-
-            await UniTask.Yield();
         }
         /// <summary>
         /// Apply a unary operator on one qubit. Returns the qubit's subcirc index.
@@ -207,6 +207,7 @@ public sealed partial class QubitCircuit {
             if (controlQSIndex == targetQSIndex) {
                 throw new ArgumentException("Control index and target index may not equal each other.");
             }
+            await UniTask.Yield();
 
             async UniTask<Matrix<sysnum.Complex>> _createDenseMatrixOperator(
                 Matrix<sysnum.Complex> densityMatrix, 

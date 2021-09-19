@@ -73,7 +73,6 @@ public sealed class Qubit : MonoBehaviour
         IControlledOperator<BinaryOperator> controlledBinOp,
         Qubit control 
     ) {
-        
         await UniTask.Yield();
     }
 }

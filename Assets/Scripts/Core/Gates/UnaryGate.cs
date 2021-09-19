@@ -46,13 +46,13 @@ public sealed class UnaryGate : Gate<UnaryOperator>
         }
     }
 
-    protected async override UniTaskVoid OnCollisionEnter2D(Collision2D collision) {        
+    protected async override UniTaskVoid OnCollisionEnter2D(Collision2D collision) {  
+        await UniTask.Yield();      
+        
         if (collision.gameObject.CompareTag("Controllable") && _occupiedControllable == null) {
             _occupiedControllable = ControlManager.Instance.CurrentControllable;
             GateCollisionAction(collision).Forget();
         }
-        
-        await UniTask.Yield();
     }
 
     private void OnCollisionExit2D(Collision2D collision) {
