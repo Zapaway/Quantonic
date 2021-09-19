@@ -34,7 +34,16 @@ public interface IQubitSubcircuit {
     void Subscribe(NotifyCollectionChangedEventHandler handler);
     void Unsubscribe(NotifyCollectionChangedEventHandler handler);
 
+    /// <summary>
+    /// Apply a unary operator on qubit(s).
+    /// </summary>
     UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] indices, bool isQCIndices);
+    /// <summary>
+    /// Apply a binary operator on one qubit pair. 
+    /// If the binary operator is a controlled operator, 
+    /// the zero index is the control and the one index is the target.
+    /// </summary>
+    UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair);
 }
 
 public sealed partial class QubitCircuit {
@@ -44,9 +53,6 @@ public sealed partial class QubitCircuit {
     /// but qubit circuit indices work too.
     /// </summary>
     private sealed class QubitSubcircuit : IQubitSubcircuit {
-        // used to determine how to update the composite state
-        private static readonly int _unaryOperatorMultiQubitThreshold = 2;  
-
         private readonly QubitCircuit _qc;
         private readonly Controllable _controllable;
         private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;  // the higher the index, the more binary value
@@ -55,7 +61,7 @@ public sealed partial class QubitCircuit {
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
         private readonly Dictionary<int, int> _QCIndexToQSIndex; 
 
-        // quantum data of the subcircuit
+        // quantum data of the subcircuit (is loosely connected to the qubits)
         private Vector<sysnum.Complex> _compositeQuantumState = Vector<sysnum.Complex>.Build.Dense(
             1, sysnum.Complex.One
         );  // act as a scalar
@@ -126,14 +132,32 @@ public sealed partial class QubitCircuit {
         #endregion Getters and Setters
 
         #region Quantum Operations
-        /// <summary>
-        /// Apply a unary operator on qubit(s).
-        /// </summary>
-        public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] indices, bool isQCIndices) {
-            int[] qsIndices = await UniTask.WhenAll(from i in indices select _applyOneUnaryOperator(unaryOperator, i, isQCIndices));
+        public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] indices, bool areQCIndices) {
+            // apply the unary operator to the qubit(s) individually
+            int[] qsIndices = await UniTask.WhenAll(from i in indices select _applyOneUnaryOperator(unaryOperator, i, areQCIndices));
+            
+            // update the composite state after the unary operators
             _updateCompositeState(unaryOperator, qsIndices);
         }
+        public async UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair) {
+            await UniTask.Yield();
+            
+            // do note that if the binary operator isn't a controlled, then order does not matter
+            (int controlQSIndex, _, Qubit controlQubit) = _getQubitInfo(indexPair[0], isQCPair);
+            (int targetQSIndex, _, Qubit targetQubit) = _getQubitInfo(indexPair[1], isQCPair);
 
+            // update the composite state 
+            var ctrlledOp = binaryOperator as IControlledOperator<BinaryOperator>;
+            if (ctrlledOp != null) {
+                bool didChange = await _updateCompositeState(ctrlledOp, controlQSIndex, targetQSIndex);
+                if (didChange) {
+                    await _applyOneUnaryOperator(ctrlledOp.TargetUnaryOperator, targetQSIndex, isQCIndex: false);
+                }
+            } 
+            else {
+                _updateCompositeState(binaryOperator, controlQSIndex, targetQSIndex);
+            }
+        }
         /// <summary>
         /// Apply a unary operator on one qubit. Returns the qubit's subcirc index.
         /// </summary>
@@ -144,40 +168,120 @@ public sealed partial class QubitCircuit {
         }
 
         /// <summary>
+        /// Create the unitary operator using little endian ordering.
+        /// </summary>
+        /// <param name="operatorMatrices">
+        /// <para>Matrices that are ordered from highest to lowest qubit subcirc value.</para>
+        /// (e.x. operator on qs 2, operator on qs 1, operator on qs 0)
+        /// </param>
+        private Matrix<sysnum.Complex> _createUnitaryGate(Matrix<sysnum.Complex>[] operatorMatrices) {
+            Matrix<sysnum.Complex> unitaryOp = Matrix<sysnum.Complex>.Build.DenseIdentity(1);
+
+            foreach (var matrix in operatorMatrices) {
+                unitaryOp = unitaryOp.KroneckerProduct(matrix);
+            }
+
+            return unitaryOp;
+        }
+        /// <summary>
         /// Update the composite state after a unary operator operation.
-        /// The amount of qubits determines the most efficient method for updating.
-        /// <list type="bullet">
-        /// <item>
-        /// <description>If less than or equal to threshold, then create a matrix unitary operator.</description>
-        /// </item>
-        /// <item>
-        /// <description>If greater than threshold, then recalculate the entire composite state.</description>
-        /// </item>
-        /// </list>
         /// </summary>
         private void _updateCompositeState(UnaryOperator unaryOperator, int[] qsIndices) {
-            if (_qubits.Count <= _unaryOperatorMultiQubitThreshold) {
-                Matrix<sysnum.Complex> unitaryOp = Matrix<sysnum.Complex>.Build.DenseIdentity(1);
+            Matrix<sysnum.Complex>[] operatorMatrices = (
+                from i in Enumerable.Range(0, _qubits.Count).Reverse() 
+                select qsIndices.Contains(i) 
+                    ? unaryOperator.Matrix 
+                    : QuantumFactory.identityOperator.Matrix
+            ).ToArray();
 
-                for (int i = _qubits.Count - 1; i >= 0; --i) {
-                    Matrix<sysnum.Complex> unaryOp = qsIndices.Contains(i) 
-                        ? unaryOperator.Matrix
-                        : QuantumFactory.identityOperator.Matrix;
+            _compositeQuantumState *= _createUnitaryGate(operatorMatrices);
+        }
+        /// <summary>
+        /// Update the composite state after a binary controlled operator operation.
+        /// </summary>
+        /// <returns>Did the composite state change.</returns>
+        private async UniTask<bool> _updateCompositeState(
+            IControlledOperator<BinaryOperator> binaryCtrlOperator, int controlQSIndex, int targetQSIndex
+        ) {
+            if (controlQSIndex == targetQSIndex) {
+                throw new ArgumentException("Control index and target index may not equal each other.");
+            }
+            await UniTask.Yield();
 
-                    unitaryOp = unitaryOp.KroneckerProduct(unaryOp);
+            async UniTask<Matrix<sysnum.Complex>> _createDenseMatrixOperator(
+                Matrix<sysnum.Complex> densityMatrix, 
+                Matrix<sysnum.Complex> specialOperatorMatrix
+            ) {
+                await UniTask.Yield();
+
+                // used to determine order of operators 
+                bool controlIndexLessThanTargetIndex = controlQSIndex < targetQSIndex;  
+
+                // determine amount of matrices needed to make binary controlled unitary
+                int num_of_identities = Math.Abs(controlQSIndex - targetQSIndex) - 1;
+
+                // create the list of operators
+                List<Matrix<sysnum.Complex>> operators = new List<Matrix<sysnum.Complex>>(num_of_identities + 2);
+
+                // add operators left to the density matrix
+                //  special operator
+                operators.Add(specialOperatorMatrix);  
+                //  identities
+                for (int _ = 0; _ < num_of_identities; ++_) operators.Add(QuantumFactory.identityOperator.Matrix);
+                //  density matrix
+                operators.Add(densityMatrix);  
+
+                // it should be operators right to the density matrix if not less than
+                if (!controlIndexLessThanTargetIndex) operators.Reverse();
+
+                return _createUnitaryGate(operators.ToArray());
+            }
+
+            // create binary controlled unitary
+            Matrix<sysnum.Complex> binaryControlledUnitary;
+            {
+                var (zeroUnitary, oneUnitary) = await UniTask.WhenAll(
+                    _createDenseMatrixOperator(  // zero
+                        QuantumFactory.groundStateDensityMatrix,
+                        QuantumFactory.identityOperator.Matrix
+                    ),
+                    _createDenseMatrixOperator(  // one
+                        QuantumFactory.excitedStateDensityMatrix,
+                        binaryCtrlOperator.TargetUnaryOperator.Matrix
+                    )
+                );
+
+                binaryControlledUnitary = zeroUnitary + oneUnitary;
+            }
+
+            // create whole unitary to cover entire composite 
+            Matrix<sysnum.Complex> compositeStateUnitary;
+            {
+                List<Matrix<sysnum.Complex>> operatorMatrices = new List<Matrix<sysnum.Complex>>(_qubits.Count - 2);
+                for (int i = _qubits.Count() - 1; i >= 0; --i) {
+                    if (i == controlQSIndex || i == targetQSIndex) {
+                        operatorMatrices.Add(binaryControlledUnitary);
+
+                        // get to the other end of binary operator and will skip over it after this iteration ends
+                        i -= Mathf.Abs(controlQSIndex - targetQSIndex);  
+                    } 
+                    else operatorMatrices.Add(QuantumFactory.identityOperator.Matrix);
                 }
 
-                _compositeQuantumState *= unitaryOp;
+                compositeStateUnitary = _createUnitaryGate(operatorMatrices.ToArray());
             }
-            else {
-                Vector<sysnum.Complex> prevCompVector = Vector<sysnum.Complex>.Build.Dense(1, sysnum.Complex.One);
-            
-                foreach (var (_, qubit) in _qubits.Select(x => (x.qcIndex, x.qubit))) {
-                    prevCompVector = _vectorKroneckerProduct(qubit.QuantumStateVector, prevCompVector);
-                }
 
-                _compositeQuantumState = prevCompVector;
-            }
+            Vector<sysnum.Complex> newCQS = _compositeQuantumState *= compositeStateUnitary;
+            bool didChange = newCQS != _compositeQuantumState;
+            _compositeQuantumState = newCQS;
+
+            return didChange;
+        }
+        /// <summary>
+        /// Update the composite state after a binary operator operation. 
+        /// </summary>
+        private bool _updateCompositeState(BinaryOperator binaryOperator, int qsIndexA, int qsIndexB) {
+            throw new System.NotImplementedException();
         }
 
         private Vector<sysnum.Complex> _vectorKroneckerProduct(Vector<sysnum.Complex> b, Vector<sysnum.Complex> a) {
@@ -190,7 +294,7 @@ public sealed partial class QubitCircuit {
             return Vector<sysnum.Complex>.Build.DenseOfEnumerable(resList.SelectMany(e => e));
         }
         #endregion Quantum Operations
-        
+
         /// <summary>
         /// Get all information about a qubit, which includes itself, its index in the subcirc,
         /// and its index in the circ.

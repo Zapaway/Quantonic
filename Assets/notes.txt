@@ -9,4 +9,6 @@
     - *toggle ESC*: switch between (Controllable w/ StageUI) | (PauseUI) action maps
 
 TODO:
-    - 
+    - work on selecting multiple qubits
+    - work on applying binary operators
+    - only set the qubit limit to 5

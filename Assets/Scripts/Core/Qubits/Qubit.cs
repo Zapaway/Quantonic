@@ -45,7 +45,7 @@ public sealed class Qubit : MonoBehaviour
     // quantum state data
     private QuantumState _quantumState;
     public mathnetl.Vector<sysnum.Complex> QuantumStateVector => _quantumState.State;
-    public QuantumStateDescription Description {get; private set;}
+    public QuantumStateDescription Description => _quantumState.Description;
 
     private void Awake() {
         // initalize render texture
@@ -53,7 +53,7 @@ public sealed class Qubit : MonoBehaviour
         _camera.targetTexture = _renderTexture;
         
         // initalize rest of qubit information
-        (_quantumState, Description) = QuantumFactory.MakeQuantumState(_initialState);
+        _quantumState = QuantumFactory.MakeQuantumState(_initialState);
         _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
     }
 
@@ -62,10 +62,17 @@ public sealed class Qubit : MonoBehaviour
     /// does not notify Controllable of any changes.
     /// </summary>
     public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator) {
-        Description = _quantumState.ApplyUnaryOperator(unaryOperator);
+        await UniTask.Yield();
+        
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
+    }
 
+    public async UniTask ApplyBinaryOperator(
+        IControlledOperator<BinaryOperator> controlledBinOp,
+        Qubit control 
+    ) {
+        
         await UniTask.Yield();
     }
 }

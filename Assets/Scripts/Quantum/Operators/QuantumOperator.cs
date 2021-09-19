@@ -14,6 +14,16 @@ namespace Quantum.Operators {
         public abstract Matrix<Complex> Matrix {get;}  
     }
 
-    public abstract class UnaryOperator : QuantumOperator {}  // single-qubit gates
+    public abstract class UnaryOperator : QuantumOperator {}  // single-qubit gates   
     public abstract class BinaryOperator : QuantumOperator {}  // two-qubit gates
+    public abstract class MultiOperator : QuantumOperator {}  // multi-qubit gates
+
+    public interface IControlledOperator<T> where T : QuantumOperator {
+        T ControlledOpRef {get;}
+
+        /// <summary>
+        /// The unary operator to apply if the control qubit is not grounded.
+        /// </summary>
+        UnaryOperator TargetUnaryOperator {get;}
+    }
 }

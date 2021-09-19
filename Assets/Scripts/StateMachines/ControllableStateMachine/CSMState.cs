@@ -21,24 +21,25 @@ namespace StateMachines.CSM {
         }
 
         public virtual async UniTask Enter() {
+            await UniTask.Yield();
+
             _sidewaysInput = 0;
             _moveSpeed = 5;
-
-            await UniTask.Yield();
         } 
         public virtual async UniTask HandleInput() {
+            await UniTask.Yield();
+
             _isGrounded = CheckIfGrounded();
             _sidewaysInput = _ctrlManager.SidewaysInputValue();
-            
-            await UniTask.Yield();
         } 
         public virtual async UniTask LogicUpdate() {
             await UniTask.Yield();
         } 
         public virtual async UniTask PhysicsUpdate() {
+            await UniTask.Yield();
+            
             Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
             rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
-            await UniTask.Yield();
         } 
         public virtual async UniTask Exit() {
             await UniTask.Yield();

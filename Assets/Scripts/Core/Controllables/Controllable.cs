@@ -146,5 +146,15 @@ public abstract class Controllable : MonoBehaviour
     public async UniTask ApplyUnaryOperator(UnaryOperator unaryOperator, int[] qsIndices) {
         await _subcirc.ApplyUnaryOperator(unaryOperator, qsIndices, isQCIndices: false);
     }
+
+    /// <summary>
+    /// Apply a binary operator on qubit pair(s) within the subcircuit.
+    /// </summary>
+    public async UniTask ApplyBinaryOperator(
+        BinaryOperator binaryOperator, 
+        int[] qsPair
+    ) {
+        await _subcirc.ApplyBinaryOperator(binaryOperator, qsPair, isQCPair: false);
+    }
     #endregion Applying Methods
 }

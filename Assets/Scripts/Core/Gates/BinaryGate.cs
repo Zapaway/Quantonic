@@ -6,7 +6,7 @@ using Quantum.Operators;
 using Cysharp.Threading.Tasks;
 
 /// <summary> 
-/// GameObject that applies a binary quantum operator onto a Qubit.
+/// GameObject that applies a binary quantum operator onto a pair of qubits.
 /// </summary>
 public sealed class BinaryGate : Gate<BinaryOperator>
 {
@@ -22,7 +22,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
     #endregion Fields/Properties
 
     private void Awake() {
-        // determine what unary operator to use 
+        // determine what binary operator to use 
         switch (_binaryType) {
             case BinaryGateType.CNOT:
                 _operator = QuantumFactory.cnotOperator;
@@ -39,7 +39,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
         throw new System.NotImplementedException();
     }
 
-    protected override void _apply(Controllable controllable, List<int[]> indices)
+    protected override void _apply(Controllable controllable, int[] qsIndices)
     {
         throw new System.NotImplementedException();
     }

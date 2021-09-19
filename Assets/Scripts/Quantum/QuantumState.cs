@@ -10,8 +10,7 @@ namespace Quantum {
     public enum QuantumStateDescription {
         Ground, 
         Excited,
-        Superposition,
-        MaxSuperposition
+        Superposition    
     }
 
     /// <summary>
@@ -49,25 +48,20 @@ namespace Quantum {
         #endregion Constructors
         
         #region Operations
-        public QuantumStateDescription ApplyUnaryOperator(UnaryOperator unaryOperator) {
+        public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
             _state *= unaryOperator.Matrix;
             UpdateProbabilities();
-
-            return _desc;
         }
 
         public void UpdateProbabilities() {
-            _probsZero = ComplexExtensions.MagnitudeSquared(_state[0]); 
-            _probsOne = ComplexExtensions.MagnitudeSquared(_state[1]);
+            _probsZero = ComplexExtensions.MagnitudeSquared(_state[0]).Round(2);
+            _probsOne = ComplexExtensions.MagnitudeSquared(_state[1]).Round(2);
 
             if (_probsZero == 1) {
                 _desc = QuantumStateDescription.Ground;
             }
             else if (_probsOne == 1) {
                 _desc = QuantumStateDescription.Excited;
-            }
-            else if (_probsZero == 0.5) {
-                _desc = QuantumStateDescription.MaxSuperposition;
             }
             else {
                 _desc = QuantumStateDescription.Superposition;
@@ -83,7 +77,7 @@ namespace Quantum {
         /// The z-axis on the Bloch sphere represents the y-axis in Unity.
         /// </summary>
         internal Vector3 ToUnityPosition(PauliXOperator xOperator, PauliYOperator yOperator, PauliZOperator zOperator) {
-            var densityMatrix = _densityMatrix();
+            var densityMatrix = MakeDensityMatrix();
             return new Vector3(
                 (float)(xOperator.Matrix * densityMatrix).Trace().Real,
                 (float)(zOperator.Matrix * densityMatrix).Trace().Real,
@@ -116,16 +110,14 @@ namespace Quantum {
                 case QuantumStateDescription.Excited:
                     return "Excited";
                 case QuantumStateDescription.Superposition:
-                    return "Superposition";
-                case QuantumStateDescription.MaxSuperposition:
-                    return "Max Superposition";
+                    return _probsZero == 0.5 ? "Max Superposition" : "Superposition";
                 default:
                     return "";
             }
         }
         #endregion String Representations
 
-        private Matrix<sysnum.Complex> _densityMatrix() {
+        internal Matrix<sysnum.Complex> MakeDensityMatrix() {
             return _state.OuterProduct(_state);
         }
     }

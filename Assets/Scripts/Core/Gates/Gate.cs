@@ -40,7 +40,7 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// Apply the operator onto the QuantumState(s) via controllable methods.
     /// Indices in the array represent the specific qubits on the controllable.
     /// </summary>
-    protected abstract void _apply(Controllable controllable, List<int[]> indices);
+    protected abstract void _apply(Controllable controllable, int[] qsIndices);
 
     protected abstract UniTaskVoid GateCollisionAction(Collision2D collision);
     #endregion Abstract Properties and Methods

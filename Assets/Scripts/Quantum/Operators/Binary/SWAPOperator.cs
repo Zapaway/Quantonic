@@ -6,7 +6,7 @@ namespace Quantum.Operators {
     /// Swap quantum states.
     /// </summary>
     public class SWAPOperator : BinaryOperator
-    {
+    {        
         /*
         [1 0 0 0]
         [0 0 1 0]

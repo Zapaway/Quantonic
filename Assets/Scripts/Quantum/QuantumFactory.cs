@@ -1,4 +1,5 @@
 using System.Numerics;
+using MathNet.Numerics.LinearAlgebra;
 using static MathNet.Numerics.Constants;
 using unity = UnityEngine;
 
@@ -29,6 +30,13 @@ namespace Quantum {
         public static readonly IdentityOperator identityOperator = new IdentityOperator();
         public static readonly CNOTOperator cnotOperator = new CNOTOperator();
         public static readonly SWAPOperator swapOperator = new SWAPOperator();
+
+        public static readonly Matrix<Complex> groundStateDensityMatrix = MakeQuantumState(
+            BasisQuantumState.Ground
+        ).MakeDensityMatrix();
+        public static readonly Matrix<Complex> excitedStateDensityMatrix = MakeQuantumState(
+            BasisQuantumState.Excited
+        ).MakeDensityMatrix();
         #endregion Operators
         
         #region State
@@ -41,7 +49,7 @@ namespace Quantum {
             QuantumState qa = new QuantumState(ampliZero, ampliOne, scalarCoeff);
             return (qa, qa.Description);
         }
-        public static (QuantumState, QuantumStateDescription) MakeQuantumState(BasisQuantumState basis) {
+        public static QuantumState MakeQuantumState(BasisQuantumState basis) {
             // set up amplitudes
             Complex ampliZero = (
                 basis == BasisQuantumState.Excited ? 
@@ -73,8 +81,7 @@ namespace Quantum {
                 basis == BasisQuantumState.Excited
             ) ? 1 : Sqrt1Over2;
 
-            QuantumState qa = new QuantumState(ampliZero, ampliOne, scalarCoeff);
-            return (qa, qa.Description);
+            return new QuantumState(ampliZero, ampliOne, scalarCoeff);
         }
 
         /// <summary>

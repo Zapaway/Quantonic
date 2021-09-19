@@ -1042,9 +1042,13 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1060537086}
     m_Modifications:
+    - target: {fileID: 42960368481958648, guid: 6ac6831b5879eff4ea815c1363cc7125, type: 3}
+      propertyPath: _unaryType
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 3146167519326648042, guid: 6ac6831b5879eff4ea815c1363cc7125, type: 3}
       propertyPath: m_Name
-      value: PauliX
+      value: Test Gate
       objectReference: {fileID: 0}
     - target: {fileID: 3146167519326648042, guid: 6ac6831b5879eff4ea815c1363cc7125, type: 3}
       propertyPath: m_TagString
