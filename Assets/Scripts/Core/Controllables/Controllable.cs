@@ -29,6 +29,7 @@ public abstract class Controllable : MonoBehaviour
     private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
     public bool reachedOtherSideOfGate = false;
 
+    #region Unity Events
     protected virtual void Awake() {
         _subcirc = ControlManager.Instance.circ.CreateQubitSubcircuit(this);
     }
@@ -52,6 +53,7 @@ public abstract class Controllable : MonoBehaviour
         _notNearGateCancellationSource.Cancel();
         _notNearGateCancellationSource.Dispose();
     }
+    #endregion Unity Events
 
     #region Subcircuit Manipulation
     /// <summary>
@@ -107,7 +109,7 @@ public abstract class Controllable : MonoBehaviour
 
     #region Select Qubits
     /// <summary>
-    /// Ask the controllable qubit(s) to use.
+    /// Ask the controllable qubit to use.
     /// </summary>
     public async UniTask<int> AskForSingleQubitIndex() {
         StageUIManager ui = StageUIManager.Instance;

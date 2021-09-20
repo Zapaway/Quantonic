@@ -13,14 +13,39 @@ using Quantum.Operators;
 public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     private float _offsetWhenExit = 1;  // used to calculate end pos of lerp animation 
     private float _lerpSpeed = 5;  // how fast should the animation be
+    private Controllable _occupiedControllable;
+    protected Controllable OccupiedControllable => _occupiedControllable;
     protected T _operator;  
+
+    /// <summary>
+    /// Execute its gate action.
+    /// </summary>
+    private void OnCollisionEnter2D(Collision2D collision) {
+        if (collision.gameObject.CompareTag("Controllable") && _occupiedControllable == null) {
+            _occupiedControllable = ControlManager.Instance.CurrentControllable;
+            GateCollisionAction(collision).Forget();
+        }
+    }
+
+    /// <summary>
+    /// Stop the gate action.
+    /// </summary>
+    private void OnCollisionExit2D(Collision2D other) {
+        // if the controllable exits without going onto the other side, they had definitely canceled the prompt
+        if (!_occupiedControllable.reachedOtherSideOfGate) { 
+            _occupiedControllable.CancelForNotBeingNearGate();
+        }
+
+        _occupiedControllable.reachedOtherSideOfGate = false;
+        _occupiedControllable = null;
+    }
 
     /// <summary>
     /// When a controllable enters the gate, all input for it should be disabled until they get out.
     /// It should also play the simple lerp animation.
-    /// Any gates deriving from this should focus on executing their operations.
+    /// Any gates deriving from this should focus on executing their actions.
     /// </summary>
-    protected async virtual UniTaskVoid OnCollisionEnter2D(Collision2D collision) {
+    protected async virtual UniTaskVoid GateCollisionAction(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable")) {
             ControlManager.Instance.SetPlayingControlsActive(false);
 
@@ -42,7 +67,7 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// </summary>
     protected abstract void _apply(Controllable controllable, int[] qsIndices);
 
-    protected abstract UniTaskVoid GateCollisionAction(Collision2D collision);
+    // protected abstract UniTaskVoid GateCollisionAction(Collision2D collision);
     #endregion Abstract Properties and Methods
 
     /// <summary>

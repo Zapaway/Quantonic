@@ -178,7 +178,6 @@ namespace Managers
             // if not default, wait for the appropiate results
             switch (mode) {
                 case QQVSubmitMode.Single:
-                case QQVSubmitMode.Multi:
                     if (token == default) {
                         throw new ArgumentException("Must use cancellation token if not using default subscriber");
                     }
@@ -192,6 +191,8 @@ namespace Managers
 
                     _qqvScript.RepSubmittedAsyncFunc = SubmitDefaultMode;
                     break;
+                case QQVSubmitMode.Multi:
+                    throw new NotImplementedException();
             }
             
             return results;
