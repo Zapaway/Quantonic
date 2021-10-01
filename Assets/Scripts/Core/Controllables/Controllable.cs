@@ -109,13 +109,11 @@ public abstract class Controllable : MonoBehaviour
 
     #region Select Qubits
     /// <summary>
-    /// Ask the controllable qubit to use.
+    /// Ask for one qubit.
     /// </summary>
     public async UniTask<int> AskForSingleQubitIndex() {
-        StageUIManager ui = StageUIManager.Instance;
-
         _listenForNotNearGateCancellation = true;
-        var (isCancelled, res) = await ui.WaitForSubmitResults(
+        var (isCancelled, res) = await StageUIManager.Instance.WaitForSubmitResults(
             StageUIManager.QQVSubmitMode.Single, 
             _notNearGateCancellationSource.Token
         );
@@ -128,6 +126,26 @@ public abstract class Controllable : MonoBehaviour
         _notNearGateCancellationSource = new CancellationTokenSource();
 
         return isCancelled ? -1 : res[0];
+    }
+    
+    /// <summary>
+    /// Ask for one qubit.
+    /// </summary>
+    public async UniTask<List<int>> AskForMultipleSingleQubitIndices(int n) {
+        if (n > _subcirc.Count) return null;
+
+        List<int> res = new List<int>(n);
+
+        for (int _ = 0; _ < n; ++_) {
+            int index = await AskForSingleQubitIndex();
+            // TODO: Work on this. Think about how to stop user from picking the same index.
+            if (index == -1) {
+                return null;
+            } 
+            
+        }
+
+        throw new NotImplementedException();
     }
     #endregion Select Qubits
 

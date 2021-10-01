@@ -25,7 +25,6 @@ public sealed class UnaryGate : Gate<UnaryOperator>
     private const int _capacity = 1;
     public override int Capacity => _capacity;
 
-    private Controllable _occupiedControllable;
     #endregion Fields/Properties
 
     private void Awake() {
@@ -49,13 +48,13 @@ public sealed class UnaryGate : Gate<UnaryOperator>
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision) {
         ControlManager.Instance.InQQVPanelMode(true);
 
-        int res = await _occupiedControllable.AskForSingleQubitIndex();
+        int res = await OccupiedControllable.AskForSingleQubitIndex();
 
         if (res >= 0) {
             int[] qubitIndex = new int[]{ res };
 
             base.GateCollisionAction(collision).Forget();
-            _apply(_occupiedControllable, qubitIndex);
+            _apply(OccupiedControllable, qubitIndex);
         } 
 
         ControlManager.Instance.InQQVPanelMode(false);

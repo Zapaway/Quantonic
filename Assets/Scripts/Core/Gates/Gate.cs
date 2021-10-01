@@ -23,6 +23,7 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     private void OnCollisionEnter2D(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable") && _occupiedControllable == null) {
             _occupiedControllable = ControlManager.Instance.CurrentControllable;
+            Debug.Log(ControlManager.Instance.CurrentControllable);
             GateCollisionAction(collision).Forget();
         }
     }
