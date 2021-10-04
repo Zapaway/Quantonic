@@ -76,9 +76,7 @@ namespace Managers
         #endregion Event Methods
 
         #region QQV Methods
-        /// <summary>
-        /// Toggle on/off the QQV.
-        /// </summary>
+        // Toggle on/off the QQV.
         public void ToggleQQVPanel() {
             _isQQVDisplayed = !_isQQVDisplayed;
             SetQQVPanelActive(_isQQVDisplayed);
@@ -88,6 +86,14 @@ namespace Managers
                 _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
             }
             _qqvScript.SetPanelActive(isActive);
+        }
+
+        // Disable/enable interaction of a qubit rep.
+        public void EnableQubitRepInteract(int repIndex) {
+            _qqvScript.SetQubitRepresentationInteractable(repIndex, true);
+        }
+        public void DisableQubitRepInteract(int repIndex) {
+            _qqvScript.SetQubitRepresentationInteractable(repIndex, false);
         }
 
         // subscriber methods to QQV
@@ -133,6 +139,7 @@ namespace Managers
         /// If it is in default mode, it will skip the waiting. Otherwise, it will
         /// automatically wait for a result if a cancellation token is passed.
         /// </para>
+        /// Returns qubit index/indices.
         /// </summary>
         public async UniTask<(bool isCanceled, int[] indices)> WaitForSubmitResults(
             QQVSubmitMode mode = QQVSubmitMode.Default, 

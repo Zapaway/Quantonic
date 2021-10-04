@@ -129,7 +129,7 @@ public abstract class Controllable : MonoBehaviour
     }
     
     /// <summary>
-    /// Ask for one qubit.
+    /// Ask for one qubit at a time. Goes until n times.
     /// </summary>
     public async UniTask<List<int>> AskForMultipleSingleQubitIndices(int n) {
         if (n > _subcirc.Count) return null;
@@ -138,14 +138,22 @@ public abstract class Controllable : MonoBehaviour
 
         for (int _ = 0; _ < n; ++_) {
             int index = await AskForSingleQubitIndex();
-            // TODO: Work on this. Think about how to stop user from picking the same index.
-            if (index == -1) {
-                return null;
-            } 
+
+            if (index == -1) {  // operation was cancelled
+                break;
+            }
             
+            // disable option to interact with previous button 
+            StageUIManager.Instance.DisableQubitRepInteract(index);
+
+            res.Add(index);
         }
 
-        throw new NotImplementedException();
+        foreach (int i in res) {
+            StageUIManager.Instance.EnableQubitRepInteract(i);
+        }
+
+        return res.Count < n ? null : res;
     }
     #endregion Select Qubits
 

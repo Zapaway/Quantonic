@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+using Managers;
 using Quantum;
 using Quantum.Operators;
 using Cysharp.Threading.Tasks;
@@ -35,8 +36,13 @@ public sealed class BinaryGate : Gate<BinaryOperator>
 
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision)
     {
-        await UniTask.Yield();
-        throw new System.NotImplementedException();
+        ControlManager.Instance.InQQVPanelMode(true);
+
+        List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
+
+        if (res != null) {
+            int controlIndex = res[0]; int targetIndex = res[1];
+        }
     }
 
     protected override void _apply(Controllable controllable, int[] qsIndices)

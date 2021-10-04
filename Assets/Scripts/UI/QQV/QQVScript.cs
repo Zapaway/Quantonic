@@ -166,6 +166,15 @@ namespace UIScripts.QQV {
         }
 
         /// <summary>
+        /// Set a button to be interactable or not. 
+        /// Do caution that it does not check if the representation index is out of bounds.
+        /// </summary>
+        public void SetQubitRepresentationInteractable(int representationIndex, bool isInteractable) {
+            QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
+            qubitRep.rawImageScript.Button.interactable = isInteractable;
+        }
+
+        /// <summary>
         /// Select a qubit representation.
         /// </summary>
         private QubitRepresentation _getQubitRepresentation(int representationIndex) {
