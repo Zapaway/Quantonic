@@ -21,9 +21,14 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// Execute its gate action.
     /// </summary>
     private void OnCollisionEnter2D(Collision2D collision) {
-        if (collision.gameObject.CompareTag("Controllable") && _occupiedControllable == null) {
-            _occupiedControllable = ControlManager.Instance.CurrentControllable;
-            Debug.Log(ControlManager.Instance.CurrentControllable);
+        var currCtrlable = ControlManager.Instance.CurrentControllable;
+
+        if (
+            collision.gameObject.CompareTag("Controllable") && 
+            _occupiedControllable == null &&
+            currCtrlable.QubitCount >= Capacity  // ensure that there are enough qubits to be used 
+        ) {
+            _occupiedControllable = currCtrlable;
             GateCollisionAction(collision).Forget();
         }
     }
@@ -32,13 +37,16 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// Stop the gate action.
     /// </summary>
     private void OnCollisionExit2D(Collision2D other) {
-        // if the controllable exits without going onto the other side, they had definitely canceled the prompt
-        if (!_occupiedControllable.reachedOtherSideOfGate) { 
-            _occupiedControllable.CancelForNotBeingNearGate();
-        }
+        if (_occupiedControllable != null) {
+            // if the controllable exits without going onto the other side, they had definitely canceled the prompt
+            if (!_occupiedControllable.reachedOtherSideOfGate) { 
+                _occupiedControllable.CancelForNotBeingNearGate();
+            }
 
-        _occupiedControllable.reachedOtherSideOfGate = false;
-        _occupiedControllable = null;
+            // always reset the parameters
+            _occupiedControllable.reachedOtherSideOfGate = false;
+            _occupiedControllable = null;
+        }
     }
 
     /// <summary>
