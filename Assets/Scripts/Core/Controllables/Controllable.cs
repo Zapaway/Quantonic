@@ -111,15 +111,19 @@ public abstract class Controllable : MonoBehaviour
     /// <summary>
     /// Ask for one qubit.
     /// </summary>
-    public async UniTask<int> AskForSingleQubitIndex() {
+    /// <param name="autoSuccess">
+    /// Automatically execute success case if the operation wasn't cancelled.
+    /// If put to false, user is responsible of executing success case.
+    /// </param>
+    public async UniTask<int> AskForSingleQubitIndex(bool autoSuccess=true) {
         _listenForNotNearGateCancellation = true;
+
         var (isCancelled, res) = await StageUIManager.Instance.WaitForSubmitResults(
             StageUIManager.QQVSubmitMode.Single, 
             _notNearGateCancellationSource.Token
         );
-        if (!isCancelled) {
-            reachedOtherSideOfGate = true;
-            _listenForNotNearGateCancellation = false;  
+        if (!isCancelled && autoSuccess) {  // success case
+            _gateOperationSuccess();
         }
 
         _notNearGateCancellationSource.Dispose();
@@ -132,13 +136,16 @@ public abstract class Controllable : MonoBehaviour
     /// Ask for one qubit at a time. Goes until n times.
     /// </summary>
     public async UniTask<List<int>> AskForMultipleSingleQubitIndices(int n) {
+        await UniTask.Yield();
+        
         if (n > _subcirc.Count) return null;
 
         List<int> res = new List<int>(n);
+        Debug.Log($"Count is {n}");
 
         for (int _ = 0; _ < n; ++_) {
-            int index = await AskForSingleQubitIndex();
-
+            int index = await AskForSingleQubitIndex(autoSuccess: false); 
+            Debug.Log($"Meow {index} and curr: {_}");
             if (index == -1) {  // operation was cancelled
                 break;
             }
@@ -153,7 +160,18 @@ public abstract class Controllable : MonoBehaviour
             StageUIManager.Instance.EnableQubitRepInteract(i);
         }
 
-        return res.Count < n ? null : res;
+        if (res.Count == n) {
+            _gateOperationSuccess();
+            return res;
+        } else return null;
+    }
+
+    /// <summary>
+    /// Sucess case of the gate operation.
+    /// </summary>
+    private void _gateOperationSuccess() {
+        reachedOtherSideOfGate = true;
+        _listenForNotNearGateCancellation = false; 
     }
     #endregion Select Qubits
 
@@ -177,6 +195,7 @@ public abstract class Controllable : MonoBehaviour
 
     /// <summary>
     /// Apply a binary operator on qubit pair(s) within the subcircuit.
+    /// TODO: Update the QSM of controllable.
     /// </summary>
     public async UniTask ApplyBinaryOperator(
         BinaryOperator binaryOperator, 

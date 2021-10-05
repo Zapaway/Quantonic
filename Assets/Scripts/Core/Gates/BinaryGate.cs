@@ -36,17 +36,24 @@ public sealed class BinaryGate : Gate<BinaryOperator>
 
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision)
     {
+        // TODO: Fix ghosting issue where even though it is cancelled, there is still waiting <-----
+        //      - Something wrong with showing panel.
+        //      - Nothing wrong in this function.
+        //      - check "SubmitSingleMode" in StageUIManager (where there is toggling of QQV panel)
         ControlManager.Instance.InQQVPanelMode(true);
 
         List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
-
+        
         if (res != null) {
-            int controlIndex = res[0]; int targetIndex = res[1];
+            base.GateCollisionAction(collision).Forget();
+            _apply(OccupiedControllable, res.ToArray());
         }
+
+        ControlManager.Instance.InQQVPanelMode(false);
     }
 
     protected override void _apply(Controllable controllable, int[] qsIndices)
     {
-        throw new System.NotImplementedException();
+        controllable.ApplyBinaryOperator(_operator, qsIndices).Forget();
     }
 }

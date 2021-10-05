@@ -15,7 +15,9 @@ public sealed class Player : Controllable
     private void Start() {
         Qubit qubit0 = _addQubitFromPrefab(xTracker);  // all players should start off with one qubit
         qubit0.name = "qubit0";
-        Testing().Forget();
+        Qubit qubit1 = _addQubitFromPrefab(xTracker + 5); 
+        qubit0.name = "qubit1";
+        // Testing().Forget();
         // Testing2().Forget();
     }
 
