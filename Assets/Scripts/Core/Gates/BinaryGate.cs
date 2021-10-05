@@ -36,14 +36,13 @@ public sealed class BinaryGate : Gate<BinaryOperator>
 
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision)
     {
-        
-        // ControlManager.Instance.InQQVPanelMode(true);
+        ControlManager.Instance.InQQVPanelMode(true);
 
-        // List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
+        List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
 
-        // if (res != null) {
-        //     int controlIndex = res[0]; int targetIndex = res[1];
-        // }
+        if (res != null) {
+            int controlIndex = res[0]; int targetIndex = res[1];
+        }
     }
 
     protected override void _apply(Controllable controllable, int[] qsIndices)
