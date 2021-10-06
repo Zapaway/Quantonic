@@ -274,14 +274,10 @@ public sealed partial class QubitCircuit {
                 compositeStateUnitary = _createUnitaryGate(operatorMatrices.ToArray());
             }
 
-            Vector<sysnum.Complex> newCQS = _compositeQuantumState *= compositeStateUnitary;
+            Vector<sysnum.Complex> newCQS = _compositeQuantumState * compositeStateUnitary;
             bool didChange = newCQS != _compositeQuantumState;
-
-            Debug.Log($"Old:\n{_compositeQuantumState}");
-            Debug.Log($"New:\n{newCQS}");
-
             _compositeQuantumState = newCQS;
-
+            
             return didChange;
         }
         /// <summary>

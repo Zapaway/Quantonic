@@ -68,11 +68,4 @@ public sealed class Qubit : MonoBehaviour
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
     }
-
-    public async UniTask ApplyBinaryOperator(
-        IControlledOperator<BinaryOperator> controlledBinOp,
-        Qubit control 
-    ) {
-        await UniTask.Yield();
-    }
 }
