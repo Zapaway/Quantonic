@@ -210,6 +210,17 @@ namespace Managers
             return results;
         }
 
+        /// <summary>
+        /// Refresh all qubit representations.
+        /// </summary>
+        public async UniTask RefreshAllQubitRepresentationsUnsafe() {
+            IEnumerable<UniTask> renderingTasks = (
+                from i in Enumerable.Range(0, _qqvScript.RawImageCapacity) 
+                select _setQubitRepresentationUnsafe(i, _qubitLeftIndex + i)
+            );
+            await UniTask.WhenAll(renderingTasks);
+        }
+        
         // render texture methods
         public void SetQQVRenderTextures() {  // used in init of qubit circuit
             ControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
@@ -267,17 +278,6 @@ namespace Managers
                 case NotifyCollectionChangedAction.Reset:  
                     break;
             }
-        }
-
-        /// <summary>
-        /// Refresh all qubit representations.
-        /// </summary>
-        public async UniTask RefreshAllQubitRepresentationsUnsafe() {
-            IEnumerable<UniTask> renderingTasks = (
-                from i in Enumerable.Range(0, _qqvScript.RawImageCapacity) 
-                select _setQubitRepresentationUnsafe(i, _qubitLeftIndex + i)
-            );
-            await UniTask.WhenAll(renderingTasks);
         }
 
         /// <summary>
