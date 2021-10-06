@@ -115,16 +115,18 @@ public abstract class Controllable : MonoBehaviour
     /// Automatically execute success case if the operation wasn't cancelled.
     /// If put to false, user is responsible of executing success case.
     /// </param>
-    public async UniTask<int> AskForSingleQubitIndex(bool autoSuccess=true) {
+    /// <param name="returnQubitIndex">
+    /// If true (by default), return qubit index. Else, return representation index.
+    /// </param>
+    public async UniTask<int> AskForSingleIndex(bool returnQubitIndex=true, bool autoSuccess=true) {
         _listenForNotNearGateCancellation = true;
 
         var (isCancelled, res) = await StageUIManager.Instance.WaitForSubmitResults(
             StageUIManager.QQVSubmitMode.Single, 
-            _notNearGateCancellationSource.Token
+            _notNearGateCancellationSource.Token,
+            returnQubitIndex
         );
-        if (!isCancelled && autoSuccess) {  // success case
-            _gateOperationSuccess();
-        }
+        if (!isCancelled && autoSuccess) _gateOperationSuccess();
 
         _notNearGateCancellationSource.Dispose();
         _notNearGateCancellationSource = new CancellationTokenSource();
@@ -140,23 +142,24 @@ public abstract class Controllable : MonoBehaviour
         
         if (n > _subcirc.Count) return null;
 
-        List<int> res = new List<int>(n);
-        Debug.Log($"Count is {n}");
+        // TODO: Work on SetQubitRepresentationInteractable (since you might enable the wrong representation)
+        // MAKE USE OF "RefreshAllQubitRepresentationsUnsafe" qqv ^^^
+        List<int> reps = new List<int>(n);  // rep indices
+        List<int> res = new List<int>(n);  // qubit indices
 
         for (int _ = 0; _ < n; ++_) {
-            int index = await AskForSingleQubitIndex(autoSuccess: false); 
-            Debug.Log($"Meow {index} and curr: {_}");
-            if (index == -1) {  // operation was cancelled
+            int repIndex = await AskForSingleIndex(returnQubitIndex: false, autoSuccess: false);
+            if (repIndex == -1) {  // operation was cancelled
                 break;
             }
             
             // disable option to interact with previous button 
-            StageUIManager.Instance.DisableQubitRepInteract(index);
-
-            res.Add(index);
+            int qubitIndex = StageUIManager.Instance.DisableQubitRepInteract(repIndex);
+            reps.Add(repIndex);
+            res.Add(qubitIndex);
         }
 
-        foreach (int i in res) {
+        foreach (int i in reps) {
             StageUIManager.Instance.EnableQubitRepInteract(i);
         }
 

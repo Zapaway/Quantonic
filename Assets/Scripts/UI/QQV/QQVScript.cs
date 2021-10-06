@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -45,6 +46,10 @@ namespace UIScripts.QQV {
         [SerializeField] private GameObject[] _qubitRepresentations;  
         private Dictionary<int, QubitRepresentation> _qubitRepresentationsDict = new Dictionary<int, QubitRepresentation>();
         public int RawImageCapacity => _qubitRepresentations.Length;
+
+        // any disabled qubit representations to be aware of 
+        // using dictionary for faster access times - do not use their values
+        private Dictionary<int, Nullable<byte>> _disabledQubitIndices = new Dictionary<int, Nullable<byte>>();
 
         // all delegates that can be used for custom behavior on the QQV child componenets 
         private Func<QQVMoveOptions, UniTask> _moveExecAsyncFunc; 
@@ -129,7 +134,10 @@ namespace UIScripts.QQV {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
             qubitRep.rawImageScript.Texture = rawImageTexture;
             qubitRep.qubitIndex = qubitIndex;
-            
+
+            // this is used to maintain a disabled qubit rep when the qubit reps move  
+            if (_disabledQubitIndices.ContainsKey(qubitIndex)) qubitRep.rawImageScript.Button.interactable = false;
+
             string text = rawImageTexture != null ? $"[{qubitIndex}]" : "";
             qubitRep.qubitIndexText.SetText(text);
         }
@@ -168,10 +176,19 @@ namespace UIScripts.QQV {
         /// <summary>
         /// Set a button to be interactable or not. 
         /// Do caution that it does not check if the representation index is out of bounds.
+        /// <returns>Qubit index.</returns>
         /// </summary>
-        public void SetQubitRepresentationInteractable(int representationIndex, bool isInteractable) {
+        public int SetQubitRepresentationInteractable(int representationIndex, bool isInteractable) {
+            throw new NotImplementedException();
+
+            // if you can see the , set the bool
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
             qubitRep.rawImageScript.Button.interactable = isInteractable;
+
+            if (!isInteractable) _addDisabled(qubitRep.qubitIndex);  // perserve info about disabled when moving
+            else _removeDisabled(qubitRep.qubitIndex);
+
+            return qubitRep.qubitIndex;
         }
 
         /// <summary>
@@ -182,5 +199,12 @@ namespace UIScripts.QQV {
             return _qubitRepresentationsDict[representationID];
         }
         #endregion Getters and Setters
+
+        private void _addDisabled(int qubitIndex) {
+            _disabledQubitIndices.Add(qubitIndex, null);
+        }
+        private void _removeDisabled(int qubitIndex) {
+            _disabledQubitIndices.Remove(qubitIndex);
+        }
     }
 }

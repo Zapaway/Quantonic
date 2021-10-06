@@ -78,7 +78,6 @@ namespace Managers
         #region QQV Methods
         // Toggle on/off the QQV.
         public void ToggleQQVPanel() {
-            Debug.Log(!_isQQVDisplayed);
             _isQQVDisplayed = !_isQQVDisplayed;
             SetQQVPanelActive(_isQQVDisplayed);
         }
@@ -89,12 +88,13 @@ namespace Managers
             _qqvScript.SetPanelActive(isActive);
         }
 
-        // Disable/enable interaction of a qubit rep.
-        public void EnableQubitRepInteract(int repIndex) {
-            _qqvScript.SetQubitRepresentationInteractable(repIndex, true);
+        // Disable/enable interaction of a qubit rep. All return affected qubit index.
+        public int EnableQubitRepInteract(int repIndex) {
+            return _qqvScript.SetQubitRepresentationInteractable(repIndex, true);
         }
-        public void DisableQubitRepInteract(int repIndex) {
-            _qqvScript.SetQubitRepresentationInteractable(repIndex, false);
+
+        public int DisableQubitRepInteract(int repIndex) {
+            return _qqvScript.SetQubitRepresentationInteractable(repIndex, false);
         }
 
         // subscriber methods to QQV
@@ -108,7 +108,7 @@ namespace Managers
                 _addQQVPressesAndActivate(QQVMoveOptions.Right);
                 _qubitLeftIndex--;
                 _subQQVPressesAndDeactivate(QQVMoveOptions.Left);
-                await _updateAllQubitRepresentationsUnsafe();
+                await RefreshAllQubitRepresentationsUnsafe();
             }
             else if (moveAction == QQVMoveOptions.Right) {
                 // allow the person to go back
@@ -121,7 +121,7 @@ namespace Managers
                 _subQQVPressesAndDeactivate(QQVMoveOptions.Right);
 
                 // update render textures 
-                await _updateAllQubitRepresentationsUnsafe();
+                await RefreshAllQubitRepresentationsUnsafe();
             }
         }
         /// <summary>
@@ -140,11 +140,15 @@ namespace Managers
         /// If it is in default mode, it will skip the waiting. Otherwise, it will
         /// automatically wait for a result if a cancellation token is passed.
         /// </para>
-        /// Returns qubit index/indices.
+        /// <param name="returnQubitIndex">
+        /// Returns qubit index/indices if this is true, 
+        /// else return representation index/incices.
+        /// </param>
         /// </summary>
         public async UniTask<(bool isCanceled, int[] indices)> WaitForSubmitResults(
             QQVSubmitMode mode = QQVSubmitMode.Default, 
-            CancellationToken token = default
+            CancellationToken token = default,
+            bool returnQubitIndex = true
         ) {
             // default results
             (bool isCanceled, int[] indices) results = (false, null);
@@ -158,7 +162,7 @@ namespace Managers
             Updates the submitted qubit index array with one qubit index. */
             async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
                 await UniTask.Yield();
-                _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
+                _submittedQubitIndex = new int[1]{ returnQubitIndex ? qubitRep.qubitIndex : qubitRep.repIndex};
                 SetQQVPanelActive(true);
             }  
             /* Multi-mode subscriber to the representation submit event.
@@ -266,9 +270,9 @@ namespace Managers
         }
 
         /// <summary>
-        /// Update all qubit representations.
+        /// Refresh all qubit representations.
         /// </summary>
-        private async UniTask _updateAllQubitRepresentationsUnsafe() {
+        private async UniTask RefreshAllQubitRepresentationsUnsafe() {
             IEnumerable<UniTask> renderingTasks = (
                 from i in Enumerable.Range(0, _qqvScript.RawImageCapacity) 
                 select _setQubitRepresentationUnsafe(i, _qubitLeftIndex + i)
