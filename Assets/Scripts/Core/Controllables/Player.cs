@@ -17,10 +17,10 @@ public sealed class Player : Controllable
         qubit0.name = "qubit0";
         Qubit qubit1 = _addQubitFromPrefab(xTracker + 5); 
         qubit0.name = "qubit1";
-        Qubit qubit2 = _addQubitFromPrefab(xTracker + 10); 
-        qubit2.name = "qubit2";
-        Qubit qubit3 = _addQubitFromPrefab(xTracker + 15); 
-        qubit3.name = "qubit3";
+        // Qubit qubit2 = _addQubitFromPrefab(xTracker + 10); 
+        // qubit2.name = "qubit2";
+        // Qubit qubit3 = _addQubitFromPrefab(xTracker + 15); 
+        // qubit3.name = "qubit3";
         // Testing().Forget();
         // Testing2().Forget();
     }

@@ -211,8 +211,11 @@ namespace Managers
         /// Refresh all qubit representations.
         /// </summary>
         public async UniTask RefreshAllQubitRepresentationsUnsafe() {
+            int qubitCount = ControlManager.Instance.CurrentControllable.QubitCount;
+            int repCapacity = _qqvScript.RawImageCapacity;
+
             IEnumerable<UniTask> renderingTasks = (
-                from i in Enumerable.Range(0, _qqvScript.RawImageCapacity) 
+                from i in Enumerable.Range(0, qubitCount < repCapacity ? qubitCount : repCapacity)
                 select _setQubitRepresentationUnsafe(i, _qubitLeftIndex + i)
             );
             await UniTask.WhenAll(renderingTasks);

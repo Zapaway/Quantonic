@@ -140,15 +140,18 @@ public sealed partial class QubitCircuit {
             _updateCompositeState(unaryOperator, qsIndices);
         }
         public async UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair) { 
-            await UniTask.Yield();           
+            await UniTask.Yield();     
 
             // do note that if the binary operator isn't a controlled, then order does not matter
             (int controlQSIndex, _, Qubit controlQubit) = _getQubitInfo(indexPair[0], isQCPair);
             (int targetQSIndex, _, Qubit targetQubit) = _getQubitInfo(indexPair[1], isQCPair);
 
+            Debug.Log($"{controlQSIndex} : {targetQSIndex}");
+
             // update the composite state 
             var ctrlledOp = binaryOperator as IControlledOperator<BinaryOperator>;
             if (ctrlledOp != null) {
+                Debug.Log("Hello");
                 bool didChange = await _updateCompositeState(ctrlledOp, controlQSIndex, targetQSIndex);
                 if (didChange) {
                     await _applyOneUnaryOperator(ctrlledOp.TargetUnaryOperator, targetQSIndex, isQCIndex: false);
@@ -273,6 +276,10 @@ public sealed partial class QubitCircuit {
 
             Vector<sysnum.Complex> newCQS = _compositeQuantumState *= compositeStateUnitary;
             bool didChange = newCQS != _compositeQuantumState;
+
+            Debug.Log($"Old:\n{_compositeQuantumState}");
+            Debug.Log($"New:\n{newCQS}");
+
             _compositeQuantumState = newCQS;
 
             return didChange;
