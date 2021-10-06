@@ -1,14 +1,16 @@
 using Cysharp.Threading.Tasks;
 
+using Managers;
+
 namespace StateMachines.QSM {
     public abstract class QSMState : IState
     {
-        protected Controllable _controllable;
+        protected ControlManager _ctrlManager;
         protected QSM _stateMachine;
 
-        public QSMState(Controllable controllable, QSM stateMachine)
+
+        public QSMState(QSM stateMachine)
         {
-            _controllable = controllable;
             _stateMachine = stateMachine;
         }
 

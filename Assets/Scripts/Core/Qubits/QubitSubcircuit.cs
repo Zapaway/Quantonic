@@ -55,7 +55,7 @@ public sealed partial class QubitCircuit {
     private sealed class QubitSubcircuit : IQubitSubcircuit {
         private readonly QubitCircuit _qc;
         private readonly Controllable _controllable;
-        private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;  // the higher the index, the more binary value
+        private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;  // the higher the qs index, the more binary value
         public int Count => _qubits.Count;
 
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
