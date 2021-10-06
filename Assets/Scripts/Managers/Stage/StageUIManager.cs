@@ -78,6 +78,7 @@ namespace Managers
         #region QQV Methods
         // Toggle on/off the QQV.
         public void ToggleQQVPanel() {
+            Debug.Log(!_isQQVDisplayed);
             _isQQVDisplayed = !_isQQVDisplayed;
             SetQQVPanelActive(_isQQVDisplayed);
         }
@@ -151,14 +152,14 @@ namespace Managers
             // Default subscriber to the representation submit event. All it does is turn off the panel.
             async UniTask SubmitDefaultMode((int repIndex, int qubitIndex) qubitRep) {
                 await UniTask.Yield();
-                ToggleQQVPanel();
+                SetQQVPanelActive(true);
             }  
             /* Single-mode subscriber to the representation submit event.
             Updates the submitted qubit index array with one qubit index. */
             async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
                 await UniTask.Yield();
                 _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
-                ToggleQQVPanel();
+                SetQQVPanelActive(true);
             }  
             /* Multi-mode subscriber to the representation submit event.
             Updates the submitted qubit index array with qubit indices. */
