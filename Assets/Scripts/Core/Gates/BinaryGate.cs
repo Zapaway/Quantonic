@@ -44,6 +44,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
             base.GateCollisionAction(collision).Forget();
             _apply(OccupiedControllable, res.ToArray());
         }
+    
 
         ControlManager.Instance.InQQVPanelMode(false);
     }

@@ -135,8 +135,10 @@ namespace UIScripts.QQV {
             qubitRep.rawImageScript.Texture = rawImageTexture;
             qubitRep.qubitIndex = qubitIndex;
 
+            Button btn = qubitRep.rawImageScript.Button;
             // this is used to maintain a disabled qubit rep when the qubit reps move  
-            if (_disabledQubitIndices.ContainsKey(qubitIndex)) qubitRep.rawImageScript.Button.interactable = false;
+            if (_disabledQubitIndices.ContainsKey(qubitIndex)) btn.interactable = false;
+            else btn.interactable = true;
 
             string text = rawImageTexture != null ? $"[{qubitIndex}]" : "";
             qubitRep.qubitIndexText.SetText(text);
@@ -174,21 +176,12 @@ namespace UIScripts.QQV {
         }
 
         /// <summary>
-        /// Set a button to be interactable or not. 
-        /// Do caution that it does not check if the representation index is out of bounds.
-        /// <returns>Qubit index.</returns>
+        /// Adds or removes the qubit rep indices depending on its interactable state.
+        /// Caution that visual effects do not take effect right away.
         /// </summary>
-        public int SetQubitRepresentationInteractable(int representationIndex, bool isInteractable) {
-            throw new NotImplementedException();
-
-            // if you can see the , set the bool
-            QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            qubitRep.rawImageScript.Button.interactable = isInteractable;
-
-            if (!isInteractable) _addDisabled(qubitRep.qubitIndex);  // perserve info about disabled when moving
-            else _removeDisabled(qubitRep.qubitIndex);
-
-            return qubitRep.qubitIndex;
+        public void SetQubitRepresentationInteractable(int qubitIndex, bool isInteractable) {
+            if (!isInteractable) _addDisabled(qubitIndex);  
+            else _removeDisabled(qubitIndex);
         }
 
         /// <summary>

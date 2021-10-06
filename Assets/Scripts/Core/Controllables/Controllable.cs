@@ -115,16 +115,12 @@ public abstract class Controllable : MonoBehaviour
     /// Automatically execute success case if the operation wasn't cancelled.
     /// If put to false, user is responsible of executing success case.
     /// </param>
-    /// <param name="returnQubitIndex">
-    /// If true (by default), return qubit index. Else, return representation index.
-    /// </param>
-    public async UniTask<int> AskForSingleIndex(bool returnQubitIndex=true, bool autoSuccess=true) {
+    public async UniTask<int> AskForSingleQubitIndex(bool autoSuccess=true) {
         _listenForNotNearGateCancellation = true;
 
         var (isCancelled, res) = await StageUIManager.Instance.WaitForSubmitResults(
             StageUIManager.QQVSubmitMode.Single, 
-            _notNearGateCancellationSource.Token,
-            returnQubitIndex
+            _notNearGateCancellationSource.Token        
         );
         if (!isCancelled && autoSuccess) _gateOperationSuccess();
 
@@ -142,26 +138,18 @@ public abstract class Controllable : MonoBehaviour
         
         if (n > _subcirc.Count) return null;
 
-        // TODO: Work on SetQubitRepresentationInteractable (since you might enable the wrong representation)
-        // MAKE USE OF "RefreshAllQubitRepresentationsUnsafe" qqv ^^^
-        List<int> reps = new List<int>(n);  // rep indices
         List<int> res = new List<int>(n);  // qubit indices
 
         for (int _ = 0; _ < n; ++_) {
-            int repIndex = await AskForSingleIndex(returnQubitIndex: false, autoSuccess: false);
-            if (repIndex == -1) {  // operation was cancelled
-                break;
-            }
+            int qubitIndex = await AskForSingleQubitIndex(autoSuccess: false);
+            if (qubitIndex == -1) break; // operation was cancelled
             
-            // disable option to interact with previous button 
-            int qubitIndex = StageUIManager.Instance.DisableQubitRepInteract(repIndex);
-            reps.Add(repIndex);
+            StageUIManager.Instance.DisableQubitRepInteract(qubitIndex).Forget();
             res.Add(qubitIndex);
         }
 
-        foreach (int i in reps) {
-            StageUIManager.Instance.EnableQubitRepInteract(i);
-        }
+        // reset
+        UniTask.WhenAll(from i in res select StageUIManager.Instance.EnableQubitRepInteract(i)).Forget();
 
         if (res.Count == n) {
             _gateOperationSuccess();

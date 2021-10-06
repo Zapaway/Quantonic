@@ -88,13 +88,15 @@ namespace Managers
             _qqvScript.SetPanelActive(isActive);
         }
 
-        // Disable/enable interaction of a qubit rep. All return affected qubit index.
-        public int EnableQubitRepInteract(int repIndex) {
-            return _qqvScript.SetQubitRepresentationInteractable(repIndex, true);
+        // Disable/enable interaction of a qubit rep. Visual effects take place immediately.
+        public async UniTask EnableQubitRepInteract(int qubitIndex) {
+            _qqvScript.SetQubitRepresentationInteractable(qubitIndex, true);
+            await RefreshAllQubitRepresentationsUnsafe();
         }
 
-        public int DisableQubitRepInteract(int repIndex) {
-            return _qqvScript.SetQubitRepresentationInteractable(repIndex, false);
+        public async UniTask DisableQubitRepInteract(int qubitIndex) {
+           _qqvScript.SetQubitRepresentationInteractable(qubitIndex, false);
+           await RefreshAllQubitRepresentationsUnsafe();
         }
 
         // subscriber methods to QQV
@@ -140,15 +142,10 @@ namespace Managers
         /// If it is in default mode, it will skip the waiting. Otherwise, it will
         /// automatically wait for a result if a cancellation token is passed.
         /// </para>
-        /// <param name="returnQubitIndex">
-        /// Returns qubit index/indices if this is true, 
-        /// else return representation index/incices.
-        /// </param>
         /// </summary>
         public async UniTask<(bool isCanceled, int[] indices)> WaitForSubmitResults(
             QQVSubmitMode mode = QQVSubmitMode.Default, 
-            CancellationToken token = default,
-            bool returnQubitIndex = true
+            CancellationToken token = default
         ) {
             // default results
             (bool isCanceled, int[] indices) results = (false, null);
@@ -162,7 +159,7 @@ namespace Managers
             Updates the submitted qubit index array with one qubit index. */
             async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
                 await UniTask.Yield();
-                _submittedQubitIndex = new int[1]{ returnQubitIndex ? qubitRep.qubitIndex : qubitRep.repIndex};
+                _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
                 SetQQVPanelActive(true);
             }  
             /* Multi-mode subscriber to the representation submit event.
