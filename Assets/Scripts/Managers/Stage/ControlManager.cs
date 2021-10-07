@@ -139,6 +139,10 @@ namespace Managers {
         public bool MovementOccured() {
             return SidewaysInputValue() != 0 || IsJumpTriggered();
         }
+
+        public bool IsSpawnWaveTriggered() {
+            return _stageInputs?.Controllable.SpawnWave.triggered ?? false;
+        }
         #endregion Input Getters
 
         #region Input Setters 
