@@ -10,6 +10,7 @@ using Cysharp.Threading.Tasks;
 using Managers;
 using Quantum;
 using Quantum.Operators;
+using StateMachines.QSM;
 
 /*
 TODO: 
@@ -29,9 +30,20 @@ public abstract class Controllable : MonoBehaviour
     private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
     public bool reachedOtherSideOfGate = false;
 
+    private QSM _qsm = new QSM();
+    public QSM QSM => _qsm;
+    private QSMState _qsmState;
+    public QSMState QSMState => _qsmState;
+    private MultipleState _multiState;
+    public MultipleState MultiState => _multiState;
+
+
     #region Unity Events
     protected virtual void Awake() {
         _subcirc = ControlManager.Instance.circ.CreateQubitSubcircuit(this);
+
+        _qsmState = new QSMState(ControlManager.Instance, SpawnManager.Instance, _qsm);
+        _multiState = new MultipleState(ControlManager.Instance, SpawnManager.Instance, _qsm);
     }
 
     protected virtual void Update() {

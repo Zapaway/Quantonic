@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using Nito.Collections;
 
 using StateMachines.CSM;
+using StateMachines.QSM;
 
 namespace Managers {
     public sealed class OnCurrentControllableChangedEventArgs : EventArgs {
@@ -74,6 +75,11 @@ namespace Managers {
         public JumpingState JumpingState => _jumpingState;
         private StandingState _standingState;
         public StandingState StandingState => _standingState;
+
+        // uses it to detect the usage of a current controllables abilities
+        private QSM currQSM => CurrentControllable.QSM;
+        private QSMState currQSMState => CurrentControllable.QSMState;
+        private MultipleState currMultiState => CurrentControllable.MultiState;
         #endregion Fields/Properties
 
         #region Event Methods
@@ -109,6 +115,7 @@ namespace Managers {
 
         private async UniTaskVoid Start() {
             await _csm.InitializeState(_standingState);
+            await currQSM.InitializeState(currQSMState);
         }
 
         private async UniTaskVoid Update() {
@@ -118,10 +125,15 @@ namespace Managers {
             
             await _csm.CurrentState.HandleInput();
             await _csm.CurrentState.LogicUpdate();
+
+            await currQSM.CurrentState.HandleInput();
+            await currQSM.CurrentState.LogicUpdate();
         }
 
         private async UniTaskVoid FixedUpdate() {
             await _csm.CurrentState.PhysicsUpdate();
+
+            await currQSM.CurrentState.PhysicsUpdate();
         }
         #endregion Event Methods
 

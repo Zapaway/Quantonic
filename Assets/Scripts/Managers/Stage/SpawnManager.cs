@@ -13,6 +13,7 @@ namespace Managers {
         [SerializeField] private GameObject _qubitPrefab;  // default is the ground state
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private GameObject _clonePrefab;
+        [SerializeField] private GameObject _playerWavePrefab;
         
         private bool _isPlayerSpawned = false; 
         public bool IsPlayerSpawned => _isPlayerSpawned;
@@ -50,15 +51,31 @@ namespace Managers {
         /// TODO: Will need to add a way to know specific spawnpoints
         /// </summary>
         public Player SpawnPlayer() {
-            GameObject player = Instantiate(
-                _playerPrefab,
-                Vector3.zero,
-                _playerPrefab.transform.rotation
-            );
+            if (!_isPlayerSpawned) {
+                GameObject player = Instantiate(
+                    _playerPrefab,
+                    Vector3.zero,
+                    _playerPrefab.transform.rotation
+                );
 
-            _isPlayerSpawned = true;
-            return player.GetComponent<Player>();
+                _isPlayerSpawned = true;
+                return player.GetComponent<Player>();
+            } 
+
+            return null;
         }
+
+        /// <summary>
+        /// Spawn a wave ability from the given coords.
+        /// </summary>
+        public GameObject SpawnWave(Vector2 position) {
+            return Instantiate(
+                _playerWavePrefab,
+                position,
+                _playerWavePrefab.transform.rotation
+            );
+        }
+        
         #endregion Instantiation Methods
     }
 }

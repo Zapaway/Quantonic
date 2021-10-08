@@ -33,9 +33,12 @@ namespace StateMachines.QSM {
         public virtual async UniTask LogicUpdate() {
             await UniTask.Yield();
 
-            bool isAval = _currSpawnedWaves < ControlManager.Instance.CurrentControllable?.QubitCount;
+            Controllable curr = ControlManager.Instance.CurrentControllable;
+            bool isAval = curr == null ? false : _currSpawnedWaves <= curr.QubitCount;
             if (_ctrlManager.IsSpawnWaveTriggered() && isAval) {
-                // spawn a wave using spawnmanager (use async unitask forget)
+                // spawn a wave using spawnmanager (use async unitask forget) 
+                // todo: get notified when the wave is gone
+                _spawnManager.SpawnWave(curr.transform.position);
                 _currSpawnedWaves++;
             }
         } 
