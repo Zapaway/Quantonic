@@ -33,8 +33,8 @@ public sealed class WaveMoveScript : MonoBehaviour
     }
 
     private void Start() {
-        _moveAndScale().Forget();
-        _waveRb.velocity = new Vector2(_moveSpeed, _waveRb.velocity.y);
+        scaleWhileMoving().Forget();
+        _waveRb.velocity = transform.right * _moveSpeed;
     }
 
     private void Update() {
@@ -44,7 +44,7 @@ public sealed class WaveMoveScript : MonoBehaviour
         }
     }
 
-    private async UniTaskVoid _moveAndScale() {
+    private async UniTaskVoid scaleWhileMoving() {
         while (true) {
             _currentScale += _deltaScale;
             if (this != null) transform.localScale = Vector3.one * _currentScale;

@@ -40,14 +40,14 @@ public abstract class Controllable : MonoBehaviour
 
     #region Unity Events
     protected virtual void Awake() {
-        _subcirc = ControlManager.Instance.circ.CreateQubitSubcircuit(this);
+        _subcirc = StageControlManager.Instance.circ.CreateQubitSubcircuit(this);
 
-        _qsmState = new QSMState(ControlManager.Instance, SpawnManager.Instance, _qsm);
-        _multiState = new MultipleState(ControlManager.Instance, SpawnManager.Instance, _qsm);
+        _qsmState = new QSMState(StageControlManager.Instance, SpawnManager.Instance, this, _qsm);
+        _multiState = new MultipleState(StageControlManager.Instance, SpawnManager.Instance, this, _qsm);
     }
 
     protected virtual void Update() {
-        if (ControlManager.Instance.IsJumpTriggered()) {
+        if (StageControlManager.Instance.IsJumpTriggered()) {
             CancelForNotBeingNearGate();
         }
     }

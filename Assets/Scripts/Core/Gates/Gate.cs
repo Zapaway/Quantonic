@@ -21,7 +21,7 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// Execute its gate action.
     /// </summary>
     private void OnCollisionEnter2D(Collision2D collision) {
-        var currCtrlable = ControlManager.Instance.CurrentControllable;
+        var currCtrlable = StageControlManager.Instance.CurrentControllable;
 
         if (
             collision.gameObject.CompareTag("Controllable") && 
@@ -56,11 +56,11 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
     /// </summary>
     protected async virtual UniTaskVoid GateCollisionAction(Collision2D collision) {
         if (collision.gameObject.CompareTag("Controllable")) {
-            ControlManager.Instance.SetPlayingControlsActive(false);
+            StageControlManager.Instance.SetPlayingControlsActive(false);
 
             await _playAnimation(collision.gameObject);
 
-            ControlManager.Instance.SetPlayingControlsActive(true);
+            StageControlManager.Instance.SetPlayingControlsActive(true);
         }
     }
     

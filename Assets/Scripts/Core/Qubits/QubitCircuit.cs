@@ -14,7 +14,7 @@ public sealed partial class QubitCircuit
 {   
     #region Fields/Properties
     private const int _defaultCapacity = 20;
-    private Controllable CurrentControllable => ControlManager.Instance.CurrentControllable;
+    private Controllable CurrentControllable => StageControlManager.Instance.CurrentControllable;
 
     // there should be no removing of any qubit, only setting it inactive
     private readonly List<Qubit> _allQubits;  
@@ -32,7 +32,7 @@ public sealed partial class QubitCircuit
         _allQubits = new List<Qubit>(_defaultCapacity);
         _allSubcircuits = new Dictionary<int, QubitSubcircuit>();
     }
-    public void InitQubitCircuit(ControlManager controlManager) {
+    public void InitQubitCircuit(StageControlManager controlManager) {
         // set up the events
         StageUIManager.Instance.SetQQVRenderTextures();
 

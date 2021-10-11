@@ -36,7 +36,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
 
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision)
     {
-        ControlManager.Instance.InQQVPanelMode(true);
+        StageControlManager.Instance.InQQVPanelMode(true);
 
         List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
         
@@ -46,7 +46,7 @@ public sealed class BinaryGate : Gate<BinaryOperator>
         }
     
 
-        ControlManager.Instance.InQQVPanelMode(false);
+        StageControlManager.Instance.InQQVPanelMode(false);
     }
 
     protected override void _apply(Controllable controllable, int[] qsIndices)

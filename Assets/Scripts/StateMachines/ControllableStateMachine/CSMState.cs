@@ -8,13 +8,13 @@ using Managers;
 namespace StateMachines.CSM {
     public abstract class CSMState : IState
     {
-        protected ControlManager _ctrlManager;
+        protected StageControlManager _ctrlManager;
         protected CSM _stateMachine;
         protected float _sidewaysInput;
         protected float _moveSpeed;
         protected bool _isGrounded;
         
-        public CSMState(ControlManager controlManager, CSM stateMachine)
+        public CSMState(StageControlManager controlManager, CSM stateMachine)
         {
             _ctrlManager = controlManager;
             _stateMachine = stateMachine;

@@ -110,7 +110,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
                 {
                     ""name"": """",
                     ""id"": ""4edfe89a-f5eb-41e7-8b40-346f1eeae103"",
-                    ""path"": ""<Keyboard>/capsLock"",
+                    ""path"": ""<Keyboard>/alt"",
                     ""interactions"": """",
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",

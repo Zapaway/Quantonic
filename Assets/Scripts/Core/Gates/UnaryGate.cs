@@ -46,7 +46,7 @@ public sealed class UnaryGate : Gate<UnaryOperator>
     }
 
     protected override async UniTaskVoid GateCollisionAction(Collision2D collision) {        
-        ControlManager.Instance.InQQVPanelMode(true);
+        StageControlManager.Instance.InQQVPanelMode(true);
 
         int res = await OccupiedControllable.AskForSingleQubitIndex();
 
@@ -57,7 +57,7 @@ public sealed class UnaryGate : Gate<UnaryOperator>
             _apply(OccupiedControllable, qubitIndex);
         } 
 
-        ControlManager.Instance.InQQVPanelMode(false);
+        StageControlManager.Instance.InQQVPanelMode(false);
     }
 
     protected override void _apply(Controllable controllable, int[] qsIndices)

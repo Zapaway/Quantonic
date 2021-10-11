@@ -31,7 +31,7 @@ namespace Managers {
     /// <description>Keeps track of composite quantum state </description>
     /// </item>
     /// </list></summary>
-    public sealed class ControlManager : Manager<ControlManager>
+    public sealed class StageControlManager : Manager<StageControlManager>
     {
         #region Fields/Properties
         private StageInputs _stageInputs; 
@@ -132,7 +132,6 @@ namespace Managers {
 
         private async UniTaskVoid FixedUpdate() {
             await _csm.CurrentState.PhysicsUpdate();
-
             await currQSM.CurrentState.PhysicsUpdate();
         }
         #endregion Event Methods

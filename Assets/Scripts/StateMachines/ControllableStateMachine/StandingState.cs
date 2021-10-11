@@ -13,7 +13,7 @@ namespace StateMachines.CSM {
     { 
         private bool _isJump;
         
-        public StandingState(ControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
+        public StandingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
         
         public override async UniTask Enter() {
             await base.Enter();

@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 namespace Managers {
     /// <summary>
-    /// This is a global manager.
+    /// Handles all game information and events. 
     /// </summary>
     [RequireComponent(typeof(AddOns.DontDestroyOnLoad))]
     public class GameManager : Manager<GameManager>

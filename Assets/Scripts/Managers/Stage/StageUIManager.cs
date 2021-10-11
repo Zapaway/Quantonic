@@ -66,7 +66,7 @@ namespace Managers
 
         private void Start() {
             // the current controllable on every stage is the player, which will spawn one qubit at start
-            Controllable controllable = ControlManager.Instance.CurrentControllable;
+            Controllable controllable = StageControlManager.Instance.CurrentControllable;
             
             // QQV
             _qqvScript.SetPanelActive(_isQQVDisplayed);
@@ -211,7 +211,7 @@ namespace Managers
         /// Refresh all qubit representations.
         /// </summary>
         public async UniTask RefreshAllQubitRepresentationsUnsafe() {
-            int qubitCount = ControlManager.Instance.CurrentControllable.QubitCount;
+            int qubitCount = StageControlManager.Instance.CurrentControllable.QubitCount;
             int repCapacity = _qqvScript.RawImageCapacity;
 
             IEnumerable<UniTask> renderingTasks = (
@@ -223,14 +223,14 @@ namespace Managers
         
         // render texture methods
         public void SetQQVRenderTextures() {  // used in init of qubit circuit
-            ControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
+            StageControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
         }
         /// <summary>
         /// Observe any changes in the controllable's qubit collection and reflect it onto the
         /// qubit representations in the QQV.
         /// </summary>
         private void _qqvHandleChange(object sender, NotifyCollectionChangedEventArgs e) {
-            Controllable ctrlable = ControlManager.Instance.CurrentControllable;
+            Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
             
 
             switch (e.Action) {
@@ -286,7 +286,7 @@ namespace Managers
         private async UniTask _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) { 
             await UniTask.Yield();           
 
-            Controllable ctrlable = ControlManager.Instance.CurrentControllable;
+            Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
             RenderTexture renderTexture = ctrlable.GetRenderTextureUnsafe(qubitIndex);
             _qqvScript.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
         }

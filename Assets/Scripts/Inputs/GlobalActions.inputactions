@@ -1,0 +1,50 @@
+{
+    "name": "GlobalActions",
+    "maps": [
+        {
+            "name": "Mouse",
+            "id": "a53647fb-4379-472a-95db-76deb21ca967",
+            "actions": [
+                {
+                    "name": "Click",
+                    "type": "Value",
+                    "id": "111cbad5-9449-4369-8c22-e2facf342294",
+                    "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "Press(behavior=1)"
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "a43cf833-5cdc-47f4-a16f-877269ead60e",
+                    "path": "<Mouse>/leftButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Click",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                }
+            ]
+        }
+    ],
+    "controlSchemes": [
+        {
+            "name": "Keyboard&Mouse",
+            "bindingGroup": "Keyboard&Mouse",
+            "devices": [
+                {
+                    "devicePath": "<Keyboard>",
+                    "isOptional": false,
+                    "isOR": false
+                },
+                {
+                    "devicePath": "<Mouse>",
+                    "isOptional": false,
+                    "isOR": false
+                }
+            ]
+        }
+    ]
+}

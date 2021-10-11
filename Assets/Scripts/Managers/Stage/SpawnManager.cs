@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cysharp.Threading.Tasks;
 
 namespace Managers {
     /// <summary>
@@ -68,12 +69,20 @@ namespace Managers {
         /// <summary>
         /// Spawn a wave ability from the given coords.
         /// </summary>
-        public GameObject SpawnWave(Vector2 position) {
-            return Instantiate(
+        public async UniTask SpawnWave(Vector2 position) {
+            float aimAng = 0;
+
+            // if the cursor is held down, then launch the wave towards the cursor
+            if (GlobalControlManager.Instance.IsCursorHeldDown) {  
+                aimAng = GlobalControlManager.Instance.GetAngleRelativeToPoint(position);
+            }
+
+            GameObject waveObj = Instantiate(
                 _playerWavePrefab,
                 position,
-                _playerWavePrefab.transform.rotation
+                Quaternion.Euler(0, 0, aimAng)
             );
+            await UniTask.WaitUntil(() => waveObj == null);  // wait until wave is destroyed
         }
         
         #endregion Instantiation Methods

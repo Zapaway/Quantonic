@@ -8,17 +8,23 @@ namespace StateMachines.QSM {
     /// </summary>
     public class QSMState : IState
     {
-        protected ControlManager _ctrlManager;
+        protected StageControlManager _ctrlManager;
         protected SpawnManager _spawnManager;
+        protected Controllable _controllable;
         protected QSM _stateMachine;
 
         private int _currSpawnedWaves;
         protected int CurrSpawnedWaves => _currSpawnedWaves;
 
-        public QSMState(ControlManager ctrlManager, SpawnManager spawnManager, QSM stateMachine)
-        {
+        public QSMState(
+            StageControlManager ctrlManager, 
+            SpawnManager spawnManager, 
+            Controllable controllable, 
+            QSM stateMachine
+        ) {
             _ctrlManager = ctrlManager;
             _spawnManager = spawnManager;
+            _controllable = controllable;
             _stateMachine = stateMachine;
         }
 
@@ -33,12 +39,9 @@ namespace StateMachines.QSM {
         public virtual async UniTask LogicUpdate() {
             await UniTask.Yield();
 
-            Controllable curr = ControlManager.Instance.CurrentControllable;
-            bool isAval = curr == null ? false : _currSpawnedWaves <= curr.QubitCount;
+            bool isAval = _controllable == null ? false : _currSpawnedWaves < _controllable.QubitCount;
             if (_ctrlManager.IsSpawnWaveTriggered() && isAval) {
-                // spawn a wave using spawnmanager (use async unitask forget) 
-                // todo: get notified when the wave is gone
-                _spawnManager.SpawnWave(curr.transform.position);
+                _spawnWave().Forget();
                 _currSpawnedWaves++;
             }
         } 
@@ -48,5 +51,15 @@ namespace StateMachines.QSM {
         public virtual async UniTask Exit() {
             await UniTask.Yield();
         } 
+
+        /// <summary>
+        /// Spawn a wave. Once it is destroyed, allow the player to use their ability one more time.
+        /// </summary>
+        private async UniTaskVoid _spawnWave() {
+            await UniTask.Yield();
+
+            await _spawnManager.SpawnWave(_controllable.transform.position);
+            _currSpawnedWaves--;
+        }
     }
 }

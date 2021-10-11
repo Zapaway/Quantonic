@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 1597645218505151062}
   - component: {fileID: 1597645218505151063}
   m_Layer: 0
-  m_Name: Control Manager
+  m_Name: Stage Control Manager
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -43,3 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbaa6ba4a832c98429db6d9f1b335dd1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _plaformLayerMask:
+    serializedVersion: 2
+    m_Bits: 0

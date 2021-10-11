@@ -20,7 +20,7 @@ namespace StateMachines.CSM {
         private float _jumpHeight = 5;  // how far does the controllable teleport up (DO NOT SET THIS TO ZERO)
         private float _jumpDuration = 5;
 
-        public JumpingState(ControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
+        public JumpingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
 
         public override async UniTask Enter() {
             await base.Enter();
