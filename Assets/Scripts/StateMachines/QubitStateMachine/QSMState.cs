@@ -1,3 +1,4 @@
+using System;
 using Cysharp.Threading.Tasks;
 
 using Managers;
@@ -15,6 +16,8 @@ namespace StateMachines.QSM {
 
         private int _currSpawnedWaves;
         protected int CurrSpawnedWaves => _currSpawnedWaves;
+        private bool _isNotOnCooldown = true;
+        private const float _cooldownSec = 1.5f;
 
         public QSMState(
             StageControlManager ctrlManager, 
@@ -39,10 +42,17 @@ namespace StateMachines.QSM {
         public virtual async UniTask LogicUpdate() {
             await UniTask.Yield();
 
-            bool isAval = _controllable == null ? false : _currSpawnedWaves < _controllable.QubitCount;
+            bool isAval = _isNotOnCooldown && (
+                _controllable == null ? false : _currSpawnedWaves < _controllable.QubitCount
+            );
             if (_ctrlManager.IsSpawnWaveTriggered() && isAval) {
                 _spawnWave().Forget();
                 _currSpawnedWaves++;
+                
+                // cooldown 
+                _isNotOnCooldown = false;
+                await UniTask.Delay(TimeSpan.FromSeconds(_cooldownSec));
+                _isNotOnCooldown = true;
             }
         } 
         public virtual async UniTask PhysicsUpdate() {
