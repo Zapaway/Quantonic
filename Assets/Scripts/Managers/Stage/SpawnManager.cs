@@ -26,7 +26,7 @@ namespace Managers {
 
         #region Instantiation Methods
         /// <summary>
-        /// Factory method for instantiating a qubit.
+        /// Spawn a qubit.
         /// </summary>
         public Qubit MakeQubit(float xOffset) {
             GameObject qubit = Instantiate(
@@ -46,9 +46,17 @@ namespace Managers {
 
             return qubit.GetComponent<Qubit>();
         }
+        public Qubit[] MakeQubits(int n) {
+            for (int _ = 0; _ < n; ++_) {
+
+            }
+
+            return null;
+        }
+        
 
         /// <summary>
-        /// Spawn the player. 
+        /// Spawn a player. 
         /// TODO: Will need to add a way to know specific spawnpoints
         /// </summary>
         public Player SpawnPlayer() {
