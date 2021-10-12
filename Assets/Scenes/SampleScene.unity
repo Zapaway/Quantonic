@@ -982,6 +982,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2991371895953785771, guid: 646978f82c0056a4f8e921886530fb5a, type: 3}
+      propertyPath: _mainCamera
+      value: 
+      objectReference: {fileID: 519420031}
     - target: {fileID: 5521582528570944385, guid: 646978f82c0056a4f8e921886530fb5a, type: 3}
       propertyPath: m_Name
       value: Global Control Manager
