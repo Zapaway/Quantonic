@@ -91,7 +91,7 @@ namespace Managers {
 
             // if the cursor is held down, then launch the wave towards the cursor
             if (GlobalControlManager.Instance.IsCursorHeldDown) {  
-                aimAng = GlobalControlManager.Instance.GetAngleRelativeToPoint(position);
+                aimAng = GlobalControlManager.Instance.GetAngleRelativeToMouse(position);
             }
 
             GameObject waveObj = Instantiate(

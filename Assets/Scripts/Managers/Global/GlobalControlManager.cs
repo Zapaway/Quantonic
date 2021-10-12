@@ -49,7 +49,7 @@ namespace Managers {
             worldPos.z = 0;
             return worldPos;
         }
-        public float GetAngleRelativeToPoint(Vector3 centerPoint) {
+        public float GetAngleRelativeToMouse(Vector3 centerPoint) {
             Vector3 mouseWorldPos = GetMouseWorldPosition();
             Vector3 aimDir = (mouseWorldPos - centerPoint).normalized;
             return Mathf.Atan2(aimDir.y, aimDir.x) * Mathf.Rad2Deg;

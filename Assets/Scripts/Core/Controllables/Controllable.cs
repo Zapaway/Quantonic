@@ -65,6 +65,13 @@ public abstract class Controllable : MonoBehaviour
         _notNearGateCancellationSource.Cancel();
         _notNearGateCancellationSource.Dispose();
     }
+
+    private void OnTriggerEnter2D(Collider2D other) {
+        if (other.CompareTag("Qubit")) {
+            _addQubit();
+            Destroy(other.gameObject);
+        }
+    }
     #endregion Unity Events
 
     #region Subcircuit Manipulation

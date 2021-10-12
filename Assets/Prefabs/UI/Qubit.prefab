@@ -105,7 +105,7 @@ GameObject:
   m_Component:
   - component: {fileID: 967471473964972378}
   - component: {fileID: 3272899843167656828}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: Qubit
   m_TagString: Qubit
   m_Icon: {fileID: 0}
@@ -145,7 +145,6 @@ MonoBehaviour:
   _quantumStateIndicator: {fileID: 632948544966082284}
   _blochSphere: {fileID: 967471474672849518}
   _camera: {fileID: 967471474708062144}
-  _renderTexture: {fileID: 8400000, guid: fadcf394733769c4a84388319cc9e84b, type: 2}
 --- !u!1 &967471474090502701
 GameObject:
   m_ObjectHideFlags: 0
