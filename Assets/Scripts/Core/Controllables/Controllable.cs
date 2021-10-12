@@ -23,7 +23,7 @@ TODO:
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
-    protected IQubitSubcircuit _subcirc;   
+    private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
 
     private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
@@ -69,40 +69,35 @@ public abstract class Controllable : MonoBehaviour
 
     #region Subcircuit Manipulation
     /// <summary>
-    /// Checks if the GameObject is a qubit and returns it. If true, it adds it onto the list.
+    /// Get an available qubit and give it to the controllable.
     /// </summary>
-    protected bool _addQubitSafe(GameObject possibleQubit) {
-        bool isQubit = possibleQubit.CompareTag("Qubit");
-        if (isQubit) {
-            var qubit = possibleQubit.GetComponent<Qubit>();
-
-            _subcirc.Add(qubit);
-        }
-        return isQubit;
-    }
-    /// <summary>
-    /// Just adds the GameObject into the list without checking. Can result in null values being put.
-    /// </summary>
-    protected void _addQubitUnsafe(GameObject possibleQubit) {
-        var qubit = possibleQubit.GetComponent<Qubit>();
-
-        _subcirc.Add(qubit);
-    }
-    /// <summary>
-    /// Creates a qubit from prefab and adds it onto the list.
-    /// </summary>
-    protected Qubit _addQubitFromPrefab(float xOffset) {
-        Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
-
-        _subcirc.Add(qubit);
+    protected Qubit _addQubit() {
+        var (_, qubit) = _subcirc.Add();
         return qubit;
     }
-    protected Qubit _addQubitFromPrefab(Vector3 position) {
-        Qubit qubit = SpawnManager.Instance.MakeQubit(position);
+    // /// <summary>
+    // /// Just adds the GameObject into the list without checking. Can result in null values being put.
+    // /// </summary>
+    // protected void _addQubitUnsafe(GameObject possibleQubit) {
+    //     var qubit = possibleQubit.GetComponent<Qubit>();
 
-        _subcirc.Add(qubit);
-        return qubit;
-    }
+    //     _subcirc.Add(qubit);
+    // }
+    // /// <summary>
+    // /// Creates a qubit from prefab and adds it onto the list.
+    // /// </summary>
+    // protected Qubit _addQubitFromPrefab(float xOffset) {
+    //     Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
+
+    //     _subcirc.Add(qubit);
+    //     return qubit;
+    // }
+    // protected Qubit _addQubitFromPrefab(Vector3 position) {
+    //     Qubit qubit = SpawnManager.Instance.MakeQubit(position);
+
+    //     _subcirc.Add(qubit);
+    //     return qubit;
+    // }
 
     /// <summary>
     /// Get a render texture of a qubit. Do note that it will not check if the index is out of bounds.

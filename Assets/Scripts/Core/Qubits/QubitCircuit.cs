@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Linq;
 using UnityEngine;
 
 using Managers;
@@ -14,10 +15,13 @@ public sealed partial class QubitCircuit
 {   
     #region Fields/Properties
     private const int _defaultCapacity = 20;
+    private const int _spacing = 10;
+    private const int _leftOffset = 100;
+
     private Controllable CurrentControllable => StageControlManager.Instance.CurrentControllable;
 
     // there should be no removing of any qubit, only setting it inactive
-    private readonly List<Qubit> _allQubits;  
+    private List<Qubit> _allQubits;  
     public int Count => _allQubits.Count;
 
     // use a controllable's ID to access its subcircuit (their qubits)
@@ -29,12 +33,14 @@ public sealed partial class QubitCircuit
     #endregion Fields/Properties
 
     public QubitCircuit() {
-        _allQubits = new List<Qubit>(_defaultCapacity);
         _allSubcircuits = new Dictionary<int, QubitSubcircuit>();
     }
     public void InitQubitCircuit(StageControlManager controlManager) {
         // set up the events
         StageUIManager.Instance.SetQQVRenderTextures();
+
+        // pool the qubits
+        _allQubits = SpawnManager.Instance.MakeQubits(_defaultCapacity, _spacing, _leftOffset);
 
         controlManager.OnCurrentControllableChanged += (object sender, OnCurrentControllableChangedEventArgs e) => {
             Controllable oldCtrllable = e.OldValue, newCtrllable = e.NewValue;
@@ -76,11 +82,11 @@ public sealed partial class QubitCircuit
     #region Qubit Circuit Manipulation
     /// <summary>
     /// Remove all subcircuits and set every qubit inactive.
-    /// Note that there is no notification of the any subcircuits being cleared.
+    /// Note that there is no notification of each subcircuit being cleared.
     /// </summary>
     public void ClearAllQubits() {
-        for (int i = 0; i < _allQubits.Count; ++i) {
-            _allQubits[i] = null;
+        foreach (var qubit in _allQubits) {
+            _setActiveQubit(qubit, false);
         }
 
         _allSubcircuits.Clear();
@@ -88,19 +94,40 @@ public sealed partial class QubitCircuit
     #endregion Qubit Circuit Manipulation
 
     #region Qubit Subcircuit Helpers
-    private int _add(Qubit newQubit) {
-        _allQubits.Add(newQubit);
-        return _allQubits.Count - 1;
+    /// <summary>
+    /// Get an available qubit and return it and its qcIndex. 
+    /// </summary>
+    private (Qubit, int) _getAval() {
+        int qcIndex = -1;
+
+        Qubit qubit = _allQubits.FirstOrDefault(qubit => {
+            qcIndex++;
+            return !qubit.gameObject.activeSelf;
+        });
+        if (qubit == null) qcIndex = -1;
+        else _setActiveQubit(qubit, true);
+
+        return (qubit, qcIndex);
+    }
+    /// <summary>
+    /// Get a qubit that is not available but not in use currently.
+    /// </summary>
+    private int _getNotUsed() {
+        throw new NotImplementedException();
     }
 
     private void _clear(Dictionary<int, int>.KeyCollection qcIndices) {
         foreach (int qcIndex in qcIndices) {
-            _allQubits[qcIndex] = null;
+            _setActiveQubit(_allQubits[qcIndex], false);
         }
     }
 
     private void _removeAt(int qcIndex) {
-        _allQubits[qcIndex] = null;
+        _setActiveQubit(_allQubits[qcIndex], false);
     }
     #endregion Qubit Subcircuit Helpers
+
+    private void _setActiveQubit(Qubit qubit, bool isActive) {
+        qubit.gameObject.SetActive(isActive);
+    }
 }

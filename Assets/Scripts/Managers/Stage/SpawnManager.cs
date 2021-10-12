@@ -46,12 +46,21 @@ namespace Managers {
 
             return qubit.GetComponent<Qubit>();
         }
-        public Qubit[] MakeQubits(int n) {
-            for (int _ = 0; _ < n; ++_) {
 
+        /// <summary>
+        /// Create a row of qubits that are left offsetted from the origin (0, 0). All qubits will be disabled initally. 
+        /// </summary>
+        /// <returns> A list of qubits, with the leftmost qubit corresponding to the 0 index. </returns>
+        public List<Qubit> MakeQubits(int n, int spacing, uint leftOffset) {
+            List<Qubit> res = new List<Qubit>();
+
+            for (int i = n - 1; i >= 0; --i) {
+                Qubit qubit = MakeQubit(-leftOffset - i * spacing);
+                qubit.gameObject.SetActive(false);
+                res.Add(qubit);
             }
 
-            return null;
+            return res;
         }
         
 

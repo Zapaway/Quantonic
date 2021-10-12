@@ -19,7 +19,10 @@ public interface IQubitSubcircuit {
     int Count {get;}
     RenderTexture GetRenderTexture(int index, bool isQCIndex);
 
-    IQubitSubcircuit Add(Qubit newQubit);
+    /// <summary>
+    /// Add an available qubit onto the qubit subcircuit.
+    /// </summary>
+    (IQubitSubcircuit, Qubit) Add();
 
     /// <summary>
     /// Remove a controllable's subcircuit and set the qubits found in it inactive on the qubit circuit.
@@ -74,14 +77,17 @@ public sealed partial class QubitCircuit {
         }
 
         #region Qubit Subcircuit Manipulation
-        public IQubitSubcircuit Add(Qubit newQubit) {
-            int qcIndex = _qc._add(newQubit);
+        public (IQubitSubcircuit, Qubit) Add() {
+            var (avalQubit, qcIndex) = _qc._getAval();
 
-            _qubits.Add((qcIndex, newQubit));
-            _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
+            if (qcIndex != -1) {
+                _qubits.Add((qcIndex, avalQubit));
+                _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
 
-            _compositeQuantumState = _vectorKroneckerProduct(newQubit.QuantumStateVector, _compositeQuantumState);
-            return this;
+                _compositeQuantumState = _vectorKroneckerProduct(avalQubit.QuantumStateVector, _compositeQuantumState);
+            } else throw new NotImplementedException();
+
+            return (this, avalQubit);
         }
 
         public void Clear() {
