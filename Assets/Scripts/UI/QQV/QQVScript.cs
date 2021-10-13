@@ -144,6 +144,9 @@ namespace UIScripts.QQV {
             qubitRep.qubitIndexText.SetText(text);
         }
 
+        public bool GetPanelActive() {
+            return gameObject.activeSelf;
+        }
         /// <summary>
         /// Set the panel unactive or active.
         /// </summary>

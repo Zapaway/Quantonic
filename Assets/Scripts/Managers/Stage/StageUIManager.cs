@@ -38,6 +38,7 @@ namespace Managers
 
         // current selected representation 
         private int _selectedRepresentationIndex = 0;
+        public int SelectedRepIndex => _selectedRepresentationIndex;
         
         // keep track of qubit index of the leftmost qubit representation
         private int _qubitLeftIndex = 0;
@@ -80,6 +81,9 @@ namespace Managers
         public void ToggleQQVPanel() {
             _isQQVDisplayed = !_isQQVDisplayed;
             SetQQVPanelActive(_isQQVDisplayed);
+        }
+        public bool GetQQVPanelActive() {
+            return _qqvScript.GetPanelActive();
         }
         public void SetQQVPanelActive(bool isActive) {
             if (isActive) {
@@ -232,7 +236,6 @@ namespace Managers
         private void _qqvHandleChange(object sender, NotifyCollectionChangedEventArgs e) {
             Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
             
-
             switch (e.Action) {
                 // newStartingIndex: index of added element on collection
                 // newItems: added element

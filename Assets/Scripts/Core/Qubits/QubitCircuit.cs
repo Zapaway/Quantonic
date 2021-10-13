@@ -81,6 +81,13 @@ public sealed partial class QubitCircuit
 
     #region Qubit Circuit Manipulation
     /// <summary>
+    /// Transfer selected qubits using qcIndices from one controllable to another.
+    /// </summary>
+    public void TransferQubits(Controllable oldCtrl, Controllable newCtrl, int[] qcIndices) {
+        throw new NotImplementedException();
+    }
+
+    /// <summary>
     /// Remove all subcircuits and set every qubit inactive.
     /// Note that there is no notification of each subcircuit being cleared.
     /// </summary>

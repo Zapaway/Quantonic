@@ -23,13 +23,11 @@ TODO:
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
+    // qubits of controllable
     private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
 
-    private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
-    private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
-    public bool reachedOtherSideOfGate = false;
-
+    // determines what abilities can be used with the qubits
     private QSM _qsm = new QSM();
     public QSM QSM => _qsm;
     private QSMState _qsmState;
@@ -37,13 +35,18 @@ public abstract class Controllable : MonoBehaviour
     private MultipleState _multiState;
     public MultipleState MultiState => _multiState;
 
+    // used for checking if the controllable is busy
+    private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
+    private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
+    public bool IsBusy => _listenForNotNearGateCancellation;
+    public bool reachedOtherSideOfGate = false;
 
     #region Unity Events
     protected virtual void Awake() {
         _subcirc = StageControlManager.Instance.circ.CreateQubitSubcircuit(this);
 
-        _qsmState = new QSMState(StageControlManager.Instance, SpawnManager.Instance, this, _qsm);
-        _multiState = new MultipleState(StageControlManager.Instance, SpawnManager.Instance, this, _qsm);
+        _qsmState = new QSMState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
+        _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
     }
 
     protected virtual void Update() {
@@ -82,29 +85,6 @@ public abstract class Controllable : MonoBehaviour
         var (_, qubit) = _subcirc.Add();
         return qubit;
     }
-    // /// <summary>
-    // /// Just adds the GameObject into the list without checking. Can result in null values being put.
-    // /// </summary>
-    // protected void _addQubitUnsafe(GameObject possibleQubit) {
-    //     var qubit = possibleQubit.GetComponent<Qubit>();
-
-    //     _subcirc.Add(qubit);
-    // }
-    // /// <summary>
-    // /// Creates a qubit from prefab and adds it onto the list.
-    // /// </summary>
-    // protected Qubit _addQubitFromPrefab(float xOffset) {
-    //     Qubit qubit = SpawnManager.Instance.MakeQubit(xOffset);
-
-    //     _subcirc.Add(qubit);
-    //     return qubit;
-    // }
-    // protected Qubit _addQubitFromPrefab(Vector3 position) {
-    //     Qubit qubit = SpawnManager.Instance.MakeQubit(position);
-
-    //     _subcirc.Add(qubit);
-    //     return qubit;
-    // }
 
     /// <summary>
     /// Get a render texture of a qubit. Do note that it will not check if the index is out of bounds.

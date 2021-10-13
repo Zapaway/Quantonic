@@ -10,6 +10,7 @@ namespace StateMachines.QSM {
     public class QSMState : IState
     {
         protected StageControlManager _ctrlManager;
+        protected StageUIManager _uiManager;
         protected SpawnManager _spawnManager;
         protected Controllable _controllable;
         protected QSM _stateMachine;
@@ -21,11 +22,13 @@ namespace StateMachines.QSM {
 
         public QSMState(
             StageControlManager ctrlManager, 
+            StageUIManager stageUIManager,
             SpawnManager spawnManager, 
             Controllable controllable, 
             QSM stateMachine
         ) {
             _ctrlManager = ctrlManager;
+            _uiManager = stageUIManager;
             _spawnManager = spawnManager;
             _controllable = controllable;
             _stateMachine = stateMachine;
@@ -37,9 +40,6 @@ namespace StateMachines.QSM {
             _currSpawnedWaves = 0;
         } 
         public virtual async UniTask HandleInput() {            
-            await UniTask.Yield();
-        } 
-        public virtual async UniTask LogicUpdate() {
             await UniTask.Yield();
 
             bool isAval = _isNotOnCooldown && (
@@ -53,6 +53,13 @@ namespace StateMachines.QSM {
                 _isNotOnCooldown = false;
                 await UniTask.Delay(TimeSpan.FromSeconds(_cooldownSec));
                 _isNotOnCooldown = true;
+            }
+        } 
+        public virtual async UniTask LogicUpdate() {
+            await UniTask.Yield();
+
+            if (_controllable.QubitCount > 1) {
+                await _stateMachine.ChangeState(_controllable.MultiState);
             }
         } 
         public virtual async UniTask PhysicsUpdate() {

@@ -42,7 +42,6 @@ namespace Managers {
         // events & delegates
         public event EventHandler<OnCurrentControllableChangedEventArgs> OnCurrentControllableChanged;
 
-
         // controllables      
         private Controllable _currControllable = null;  
         public Controllable CurrentControllable {
@@ -65,9 +64,11 @@ namespace Managers {
 
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
 
-        // platform layer
+        // layers
         [SerializeField] private LayerMask _plaformLayerMask;
         public LayerMask PlatformLayerMask => _plaformLayerMask;
+        [SerializeField] private LayerMask _defaultLayerMask;
+        public LayerMask DefaultLayerMask => _defaultLayerMask;
 
         // uses it to affect the controllable movement
         private CSM _csm = new CSM();
@@ -77,9 +78,9 @@ namespace Managers {
         public StandingState StandingState => _standingState;
 
         // uses it to detect the usage of a current controllables abilities
-        private QSM currQSM => CurrentControllable.QSM;
-        private QSMState currQSMState => CurrentControllable.QSMState;
-        private MultipleState currMultiState => CurrentControllable.MultiState;
+        private QSM currQSM => CurrentControllable?.QSM;
+        private QSMState currQSMState => CurrentControllable?.QSMState;
+        private MultipleState currMultiState => CurrentControllable?.MultiState;
         #endregion Fields/Properties
 
         #region Event Methods
@@ -124,15 +125,15 @@ namespace Managers {
             }
             
             await _csm.CurrentState.HandleInput();
-            await _csm.CurrentState.LogicUpdate();
-
             await currQSM.CurrentState.HandleInput();
-            await currQSM.CurrentState.LogicUpdate();
+
+            await _csm.CurrentState.LogicUpdate();
+            if (currQSM != null) await currQSM.CurrentState.LogicUpdate();
         }
 
         private async UniTaskVoid FixedUpdate() {
             await _csm.CurrentState.PhysicsUpdate();
-            await currQSM.CurrentState.PhysicsUpdate();
+            if (currQSM != null) await currQSM.CurrentState.PhysicsUpdate();
         }
         #endregion Event Methods
 
@@ -143,16 +144,21 @@ namespace Managers {
         public bool IsJumpTriggered() {
             return _stageInputs?.Controllable.Jump.triggered ?? false;
         }
+        public bool IsSplitToggled() {
+            return _stageInputs?.Controllable.Split.triggered ?? false;
+        }
+        public bool IsSwitchTriggered() {
+            return _stageInputs?.Controllable.Switch.triggered ?? false;
+        }
+        public bool IsSpawnWaveTriggered() {
+            return _stageInputs?.Controllable.SpawnWave.triggered ?? false;
+        }
         public bool IsToggleQVVTriggered() {
             return _stageInputs?.StageUI.ToggleQQV.triggered ?? false;
         }
         
         public bool MovementOccured() {
             return SidewaysInputValue() != 0 || IsJumpTriggered();
-        }
-
-        public bool IsSpawnWaveTriggered() {
-            return _stageInputs?.Controllable.SpawnWave.triggered ?? false;
         }
         #endregion Input Getters
 

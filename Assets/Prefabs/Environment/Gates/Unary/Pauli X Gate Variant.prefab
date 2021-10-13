@@ -22,7 +22,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 386768369857146776, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
       propertyPath: m_Name
-      value: Pauli X Gate
+      value: Pauli X Gate Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1509384071780994070, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
       propertyPath: m_Materials.Array.data[0]

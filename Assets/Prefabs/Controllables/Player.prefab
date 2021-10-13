@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 748523834017275454}
   - component: {fileID: 748523834017275441}
   - component: {fileID: 748523834017275440}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Player
   m_TagString: Controllable
   m_Icon: {fileID: 0}
@@ -144,3 +144,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 496eaa6e72481b546bf2659f83cdb21c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  reachedOtherSideOfGate: 0

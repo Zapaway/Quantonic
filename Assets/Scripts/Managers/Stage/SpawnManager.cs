@@ -84,6 +84,21 @@ namespace Managers {
         }
 
         /// <summary>
+        /// Spawn a clone around a specific controllable on the left side.
+        /// </summary>
+        public Clone SpawnClone(Controllable controllable, float spacing) {
+            Transform ctrlableTrans = controllable.transform;
+            Vector2 leftSideOfCtrlable = new Vector2(ctrlableTrans.position.x - ctrlableTrans.localScale.x/2 - spacing, ctrlableTrans.position.y);
+            GameObject cloneObj = Instantiate(
+                _clonePrefab,
+                leftSideOfCtrlable,
+                _clonePrefab.transform.rotation
+            );
+
+            return cloneObj.GetComponent<Clone>();
+        }
+
+        /// <summary>
         /// Spawn a wave ability from the given coords.
         /// </summary>
         public async UniTask SpawnWave(Vector2 position) {

@@ -45,4 +45,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _plaformLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 64
+  _defaultLayerMask:
+    serializedVersion: 2
+    m_Bits: 1

@@ -43,6 +43,14 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""interactions"": """"
                 },
                 {
+                    ""name"": ""Switch"",
+                    ""type"": ""Button"",
+                    ""id"": ""5e4220be-fe46-4217-b034-ca7472834a66"",
+                    ""expectedControlType"": ""Button"",
+                    ""processors"": """",
+                    ""interactions"": """"
+                },
+                {
                     ""name"": ""SpawnWave"",
                     ""type"": ""Button"",
                     ""id"": ""6f963ddd-63b3-45a8-8153-8b01aa73701a"",
@@ -115,6 +123,17 @@ public class @StageInputs : IInputActionCollection, IDisposable
                     ""processors"": """",
                     ""groups"": ""KeyboardMouse"",
                     ""action"": ""SpawnWave"",
+                    ""isComposite"": false,
+                    ""isPartOfComposite"": false
+                },
+                {
+                    ""name"": """",
+                    ""id"": ""1b69c036-0e09-4e0c-ad3a-bf31f7e1f929"",
+                    ""path"": ""<Keyboard>/tab"",
+                    ""interactions"": """",
+                    ""processors"": """",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""Switch"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -368,6 +387,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
         m_Controllable_Movement = m_Controllable.FindAction("Movement", throwIfNotFound: true);
         m_Controllable_Jump = m_Controllable.FindAction("Jump", throwIfNotFound: true);
         m_Controllable_Split = m_Controllable.FindAction("Split", throwIfNotFound: true);
+        m_Controllable_Switch = m_Controllable.FindAction("Switch", throwIfNotFound: true);
         m_Controllable_SpawnWave = m_Controllable.FindAction("SpawnWave", throwIfNotFound: true);
         // Stage UI
         m_StageUI = asset.FindActionMap("Stage UI", throwIfNotFound: true);
@@ -433,6 +453,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
     private readonly InputAction m_Controllable_Movement;
     private readonly InputAction m_Controllable_Jump;
     private readonly InputAction m_Controllable_Split;
+    private readonly InputAction m_Controllable_Switch;
     private readonly InputAction m_Controllable_SpawnWave;
     public struct ControllableActions
     {
@@ -441,6 +462,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
         public InputAction @Movement => m_Wrapper.m_Controllable_Movement;
         public InputAction @Jump => m_Wrapper.m_Controllable_Jump;
         public InputAction @Split => m_Wrapper.m_Controllable_Split;
+        public InputAction @Switch => m_Wrapper.m_Controllable_Switch;
         public InputAction @SpawnWave => m_Wrapper.m_Controllable_SpawnWave;
         public InputActionMap Get() { return m_Wrapper.m_Controllable; }
         public void Enable() { Get().Enable(); }
@@ -460,6 +482,9 @@ public class @StageInputs : IInputActionCollection, IDisposable
                 @Split.started -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSplit;
                 @Split.performed -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSplit;
                 @Split.canceled -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSplit;
+                @Switch.started -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSwitch;
+                @Switch.performed -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSwitch;
+                @Switch.canceled -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSwitch;
                 @SpawnWave.started -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSpawnWave;
                 @SpawnWave.performed -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSpawnWave;
                 @SpawnWave.canceled -= m_Wrapper.m_ControllableActionsCallbackInterface.OnSpawnWave;
@@ -476,6 +501,9 @@ public class @StageInputs : IInputActionCollection, IDisposable
                 @Split.started += instance.OnSplit;
                 @Split.performed += instance.OnSplit;
                 @Split.canceled += instance.OnSplit;
+                @Switch.started += instance.OnSwitch;
+                @Switch.performed += instance.OnSwitch;
+                @Switch.canceled += instance.OnSwitch;
                 @SpawnWave.started += instance.OnSpawnWave;
                 @SpawnWave.performed += instance.OnSpawnWave;
                 @SpawnWave.canceled += instance.OnSpawnWave;
@@ -611,6 +639,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
         void OnMovement(InputAction.CallbackContext context);
         void OnJump(InputAction.CallbackContext context);
         void OnSplit(InputAction.CallbackContext context);
+        void OnSwitch(InputAction.CallbackContext context);
         void OnSpawnWave(InputAction.CallbackContext context);
     }
     public interface IStageUIActions

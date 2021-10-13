@@ -152,8 +152,6 @@ public sealed partial class QubitCircuit {
             (int controlQSIndex, _, Qubit controlQubit) = _getQubitInfo(indexPair[0], isQCPair);
             (int targetQSIndex, _, Qubit targetQubit) = _getQubitInfo(indexPair[1], isQCPair);
 
-            Debug.Log($"{controlQSIndex} : {targetQSIndex}");
-
             // update the composite state 
             var ctrlledOp = binaryOperator as IControlledOperator<BinaryOperator>;
             if (ctrlledOp != null) {

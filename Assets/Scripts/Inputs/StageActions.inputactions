@@ -30,6 +30,14 @@
                     "interactions": ""
                 },
                 {
+                    "name": "Switch",
+                    "type": "Button",
+                    "id": "5e4220be-fe46-4217-b034-ca7472834a66",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": ""
+                },
+                {
                     "name": "SpawnWave",
                     "type": "Button",
                     "id": "6f963ddd-63b3-45a8-8153-8b01aa73701a",
@@ -102,6 +110,17 @@
                     "processors": "",
                     "groups": "KeyboardMouse",
                     "action": "SpawnWave",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1b69c036-0e09-4e0c-ad3a-bf31f7e1f929",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "KeyboardMouse",
+                    "action": "Switch",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

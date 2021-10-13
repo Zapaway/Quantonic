@@ -53,7 +53,7 @@ namespace StateMachines.CSM {
             transform.Translate(Vector3.up * _jumpHeight);
             await UniTask.Delay(TimeSpan.FromSeconds(_jumpDuration), ignoreTimeScale: false);
 
-            float onGroundY = CheckIfAboveGround();
+            float onGroundY = _checkIfAboveGround();
             if (onGroundY != 0f) {
                 transform.position = new Vector2(transform.position.x, onGroundY);
             } 
@@ -64,7 +64,7 @@ namespace StateMachines.CSM {
             rigidbody.gravityScale = 1f;  
         }
         
-        private float CheckIfAboveGround() {
+        private float _checkIfAboveGround() {
             BoxCollider2D col = _ctrlManager.CurrentBox;
             RaycastHit2D hit = Physics2D.BoxCast(
                 col.bounds.center, col.bounds.size, 
