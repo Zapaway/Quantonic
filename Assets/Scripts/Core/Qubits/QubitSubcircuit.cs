@@ -23,6 +23,10 @@ public interface IQubitSubcircuit {
     /// Add an available qubit onto the qubit subcircuit.
     /// </summary>
     (IQubitSubcircuit, Qubit) Add();
+    /// <summary>
+    /// "Add" a qubit to the qubit subcirc by explicitly enabling a qubit with the circuit index.
+    /// </summary>
+    (IQubitSubcircuit, Qubit) Add(int qcIndex);
 
     /// <summary>
     /// Remove a controllable's subcircuit and set the qubits found in it inactive on the qubit circuit.
@@ -88,6 +92,10 @@ public sealed partial class QubitCircuit {
             } else throw new NotImplementedException();
 
             return (this, avalQubit);
+        }
+        public (IQubitSubcircuit, Qubit) Add(int qcIndex) {
+            Qubit qubit = _qc._enable(qcIndex);
+            return (this, qubit);
         }
 
         public void Clear() {

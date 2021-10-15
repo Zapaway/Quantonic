@@ -82,9 +82,16 @@ public sealed partial class QubitCircuit
     #region Qubit Circuit Manipulation
     /// <summary>
     /// Transfer selected qubits using qcIndices from one controllable to another.
+    /// Assume that the new controllable does not have a subcirc.
     /// </summary>
     public void TransferQubits(Controllable oldCtrl, Controllable newCtrl, int[] qcIndices) {
-        throw new NotImplementedException();
+        IQubitSubcircuit oldSubcirc = GetQubitSubcircuit(oldCtrl);
+        IQubitSubcircuit newSubcirc = CreateQubitSubcircuit(newCtrl);
+
+        foreach (int i in qcIndices) {
+            oldSubcirc.RemoveAt(i, isQCIndex: true);
+            newSubcirc.Add(i);
+        }
     }
 
     /// <summary>
@@ -121,6 +128,15 @@ public sealed partial class QubitCircuit
     /// </summary>
     private int _getNotUsed() {
         throw new NotImplementedException();
+    }
+    /// <summary>
+    /// Forcibly "add" a qubit to the circuit by enabling it.
+    /// </summary>
+    private Qubit _enable(int qcIndex) {
+        Qubit qubit = _allQubits[qcIndex];
+        _setActiveQubit(qubit, true);
+
+        return qubit;
     }
 
     private void _clear(Dictionary<int, int>.KeyCollection qcIndices) {
