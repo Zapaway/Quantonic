@@ -1264,6 +1264,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 741087244205057703, guid: cc1b114b21f2ab54999c8ed1f772c608, type: 3}
+      propertyPath: _clonePrefab
+      value: 
+      objectReference: {fileID: 3375531578766206820, guid: a576503b30c0a5945be20f21cf03992d, type: 3}
+    - target: {fileID: 741087244205057703, guid: cc1b114b21f2ab54999c8ed1f772c608, type: 3}
       propertyPath: _qubitPrefab
       value: 
       objectReference: {fileID: 967471473964972377, guid: 5900a4902699538418b7257815d71fdb, type: 3}

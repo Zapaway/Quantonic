@@ -27,27 +27,21 @@ namespace StateMachines.QSM {
         } 
         public override async UniTask HandleInput() {            
             await base.HandleInput();
-
-            // TODO: Check if the QQV panel is open
-            if (_ctrlManager.IsSplitToggled() && _hasAvalSpace && !_controllable.IsBusy) {
-                /*
-                 * FILES TO OPEN
-                 * StageControlManager
-                 * SpawnManager
-                 * StageUIManager
-                 * Controllable
-                 * QSMState
-                 * QubitCircuit
-                 * QubitSubcircuit
-                 */
-
-                // create clone
+            if (
+                _ctrlManager.IsSplitToggled() && 
+                _controllable.QubitCount > 1 &&
+                _uiManager.GetQQVPanelActive() && 
+                !_controllable.IsBusy &&
+                _hasAvalSpace 
+                ) 
+            {
+                // create clone and add it to deque
                 Clone clone = _spawnManager.SpawnClone(_controllable, _spacingBetweenClones);
+                _ctrlManager.AddControllableToBack(clone);
 
-                // transfter qubit from curr qubitsubcirc to the clone's and update qubitcirc
-
-
-                // reflect on stage ui
+                // transfter qubit from curr qubitsubcirc to the clone's, update qubitcirc, and reflect change on ui
+                int qsIndex = _uiManager.QubitRepIndexToQSIndex(_uiManager.SelectedRepIndex);
+                _ctrlManager.circ.TransferQubits(_controllable, clone, new[] {qsIndex});
             }
         } 
         public override async UniTask LogicUpdate() {

@@ -42,6 +42,8 @@ namespace Managers
         
         // keep track of qubit index of the leftmost qubit representation
         private int _qubitLeftIndex = 0;
+        private int repRightIndex => _qqvScript.RawImageCapacity - 1;
+        private int qubitRightIndex => _qubitLeftIndex + repRightIndex;
 
         // keep track of how many lefts and rights may be pressed
         private int _avalLeftPresses = 0;
@@ -103,6 +105,29 @@ namespace Managers
         public async UniTask DisableQubitRepInteract(int qubitIndex) {
            _qqvScript.SetQubitRepresentationInteractable(qubitIndex, false);
            await RefreshAllQubitRepresentationsUnsafe();
+        }
+
+        /// <summary>
+        /// Refresh arrow buttons.
+        /// </summary>
+        public void RefreshArrowButtons() {
+            _updateQQVLeftButtonActive(_avalLeftPresses != 0);
+            _updateQQVRightButtonActive(_avalRightPresses != 0);
+        }
+        /// <summary>
+        /// Refresh all qubit representations.
+        /// </summary>
+        public async UniTask RefreshAllQubitRepresentationsUnsafe() {
+            int qubitCount = StageControlManager.Instance.CurrentControllable.QubitCount;
+            int repCapacity = _qqvScript.RawImageCapacity;
+
+            IEnumerable<UniTask> renderingTasks = (
+                from i in Enumerable.Range(0, qubitCount < repCapacity ? qubitCount : repCapacity)
+                select _setQubitRepresentationUnsafeAsync(i, _qubitLeftIndex + i)
+            );
+            await UniTask.WhenAll(renderingTasks);
+
+            _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
         }
             #endregion Toggle QQV and Its Elements
 
@@ -191,20 +216,9 @@ namespace Managers
             #endregion Subscribe to QQV
 
             #region Render Texture Methods
-        /// <summary>
-        /// Refresh all qubit representations.
-        /// </summary>
-        public async UniTask RefreshAllQubitRepresentationsUnsafe() {
-            int qubitCount = StageControlManager.Instance.CurrentControllable.QubitCount;
-            int repCapacity = _qqvScript.RawImageCapacity;
-
-            IEnumerable<UniTask> renderingTasks = (
-                from i in Enumerable.Range(0, qubitCount < repCapacity ? qubitCount : repCapacity)
-                select _setQubitRepresentationUnsafe(i, _qubitLeftIndex + i)
-            );
-            await UniTask.WhenAll(renderingTasks);
+        public int QubitRepIndexToQSIndex(int repIndex) {
+            return _qqvScript.GetQubitRepresentation(repIndex).Item2;
         }
-
         public void SetQQVRenderTextures() {  // used in init of qubit circuit
             StageControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
         }
@@ -235,30 +249,34 @@ namespace Managers
             }
         }
         /// <summary>
-        /// Shift the currently displayed render textures to the left one time (ends up reseting one qubit rep).
+        /// Shift the currently displayed render textures to the left or right one time (ends up reseting one qubit rep).
         /// </summary>
         /// <param name="representationIndices">
-        /// The indices to shift (order matters, as it will not be sorted). Must have at least two elements.
+        /// The indices to shift (order matters, as it will not be sorted). Must contain at least one element.
         /// </param>
-        private void _shiftQQVRenderTexturesLeft(int[] representationIndices) {
-            if (representationIndices.Count() < 2) throw new ArgumentException($"arguement 'representationIndices' must have at least two elements");
+        private void _shiftQQVRenderTextures(QQVMoveOptions direction, IEnumerable<int> representationIndices) {
+            if (representationIndices.Count() < 1) throw new ArgumentException("arguement 'representationIndices' must have at least one element");
             
-            var repPairs = representationIndices.Skip(1).Zip(representationIndices, (second, first) => new[] {first, second});
-            foreach (var (dest, src) in repPairs.Select(x => (x[0], x[1]))) {
-                throw new NotImplementedException();
-            }
-            // Texture prevTexture = null; int prevQSIndex = -1;
-            // for (int counter = 0; counter < representationIndices.Count(); ++counter) {
-            //     int repIndex = representationIndices[counter];
-                
-            //     // store old data
-            //     (prevTexture, prevQSIndex) = _qqvScript.GetQubitRepresentation(repIndex);
+            // NOTE: if there is one element, it will skip this block
+            {
+                var repPairs = representationIndices.Skip(1).Zip(representationIndices, (second, first) => new[] {first, second});
+                if (direction == QQVMoveOptions.Right) repPairs.Reverse();
 
-            //     // replace the old data with new one
-            //     if (counter != 0) {
-                    
-            //     }
-            // }
+                foreach (var (repDest, repSrc) in repPairs.Select(x => direction == QQVMoveOptions.Left ? (x[0], x[1]) : (x[1], x[0]))) {
+                    // left: move the right texture to the left one 
+                    // right: move the left texture to the right one
+                    var (srcTexture, srcQSIndex) = _qqvScript.GetQubitRepresentation(repSrc);
+                    int qsIndex = direction == QQVMoveOptions.Left ? repDest + _qubitLeftIndex : srcQSIndex;
+                    // Debug.Log(qsIndex);
+                    _qqvScript.SetQubitRepresentation(repDest, qsIndex, srcTexture); 
+                }
+            }
+
+            // set the representation that did not get replaced to nothing
+            _qqvScript.SetQubitRepresentation(
+                direction == QQVMoveOptions.Left ? representationIndices.Last() : representationIndices.First(),
+                0,
+                rawImageTexture: null);
         }
 
         /// <summary>
@@ -267,19 +285,19 @@ namespace Managers
         /// </summary>
         private void _qqvHandleChange(object sender, NotifyCollectionChangedEventArgs e) {
             Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
-            int qsIndex, qcIndex; Qubit qubit;
             
             switch (e.Action) {
                 // newStartingIndex: index of added element on collection
                 // newItems: added element
                 case NotifyCollectionChangedAction.Add: 
+                {
                     bool wasInserted = (e.NewStartingIndex != ctrlable.QubitCount - 1);
                     int currentQubitCount = ctrlable.QubitCount;
 
                     // if added
                     if (!wasInserted) { 
                         // note that this will never have a null value as the subcirc only accepts value tuples
-                        (_, qubit) = e.NewItems[0] as (int, Qubit)? ?? default; 
+                        (_, Qubit qubit) = e.NewItems[0] as (int, Qubit)? ?? default; 
 
                         RenderTexture renderTexture = qubit.RenderTexture;
 
@@ -295,38 +313,37 @@ namespace Managers
                             _addQQVPressesAndActivate(QQVMoveOptions.Right);
                         }
                     } 
-                    break;
+                } break;
 
                 // oldStartingIndex: index of removed element on collection
                 // oldItems: removed element
                 case NotifyCollectionChangedAction.Remove:  
-                    (qcIndex, qubit) = e.OldItems[0] as (int, Qubit)? ?? default;
-                    qsIndex = e.OldStartingIndex;
+                {
+                    var (qcIndex, qubit) = e.OldItems[0] as (int, Qubit)? ?? default;
+                    int qsIndex = e.OldStartingIndex;
 
-                    // check if the removed qubit was showned on the QQV
+                    int repCapacity = _qqvScript.RawImageCapacity;
                     int diff = qsIndex - _qubitLeftIndex;
-                    if (diff == 0) {  // if left side, hide it
-                        // if can move right
-                        if (_isRightButtonActive) MoveQQVRenderTextures(QQVMoveOptions.Right).Forget();
-                        else {
-                            // shift 
-                            var middle = _qqvScript.GetQubitRepresentation(1);
-                            var right = _qqvScript.GetQubitRepresentation(2);
-                        }
 
-                        // cleaan up and set the left index to somehting new
+                    if (diff > repRightIndex) throw new NotSupportedException("Qubit removed must be visible on the QQV before deletion.");
+
+                    if (!_isLeftButtonActive) {
+                        _shiftQQVRenderTextures(QQVMoveOptions.Left, Enumerable.Range(diff, repCapacity - diff)); 
+
+                        if (_isRightButtonActive) {
+                            _setQubitRepresentationUnsafe(repRightIndex, qubitRightIndex);
+                            _avalRightPresses--;
+                        }
+                    }
+                    else {
+                        _shiftQQVRenderTextures(QQVMoveOptions.Right, Enumerable.Range(diff, repCapacity - diff));
+                        _setQubitRepresentationUnsafe(0, --_qubitLeftIndex);
+                        _avalLeftPresses--;
                     }
 
-                    break;
-                // oldStartingIndex/newStartingIndex: index where replacement occured on collection
-                // oldItems: old, replaced element
-                // newItems: new element
-                case NotifyCollectionChangedAction.Replace:  
-                
-                // oldStartingIndex: old index of element that was moved on collection
-                // newStartingIndex: new index of moved element where its currently located on collection
-                // oldItems/newItems: moved element
-                case NotifyCollectionChangedAction.Move: 
+                    RefreshArrowButtons();
+                    RefreshAllQubitRepresentationsUnsafe().Forget();
+                } break;
 
                 case NotifyCollectionChangedAction.Reset:  
                     break;
@@ -336,12 +353,17 @@ namespace Managers
         /// <summary>
         /// Set qubit representation based on a new qubit.
         /// </summary>
-        private async UniTask _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) { 
-            await UniTask.Yield();           
-
+        private void _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) {
             Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
             RenderTexture renderTexture = ctrlable.GetRenderTextureUnsafe(qubitIndex);
             _qqvScript.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
+        }
+        /// <summary>
+        /// Set qubit representation based on a new qubit async.
+        /// </summary>
+        private async UniTask _setQubitRepresentationUnsafeAsync(int representationIndex, int qubitIndex) { 
+            await UniTask.Yield();
+            _setQubitRepresentationUnsafe(representationIndex, qubitIndex);
         }
 
         /// <summary>

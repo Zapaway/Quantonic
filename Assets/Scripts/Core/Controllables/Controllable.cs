@@ -12,11 +12,6 @@ using Quantum;
 using Quantum.Operators;
 using StateMachines.QSM;
 
-/*
-TODO: 
-    - add qubitstatemachine 
-*/
-
 /// <summary>
 /// Any object that can be controlled with input derives from this base class.
 /// </summary>
@@ -39,11 +34,11 @@ public abstract class Controllable : MonoBehaviour
     private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
     private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
     public bool IsBusy => _listenForNotNearGateCancellation;
-    public bool reachedOtherSideOfGate = false;
+    [HideInInspector] public bool reachedOtherSideOfGate = false;
 
     #region Unity Events
     protected virtual void Awake() {
-        _subcirc = StageControlManager.Instance.circ.CreateQubitSubcircuit(this);
+        _subcirc = StageControlManager.Instance.circ.GetOrCreateQubitSubcircuit(this);
 
         _qsmState = new QSMState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
         _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);

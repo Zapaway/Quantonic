@@ -189,10 +189,14 @@ namespace Managers {
         }
         #endregion Input Setters
 
-        #region Control Modes
+        #region Control Modes 
         public void InQQVPanelMode(bool option) {
             StageUIManager.Instance.SetQQVPanelActive(option);
             SetToggleQQVInputActive(!option);
+        }
+
+        public void AddControllableToBack(Controllable controllable) {
+            _controllables.AddToBack(controllable);
         }
         #endregion Control Modes
     }

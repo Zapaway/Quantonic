@@ -22,11 +22,11 @@ public interface IQubitSubcircuit {
     /// <summary>
     /// Add an available qubit onto the qubit subcircuit.
     /// </summary>
-    (IQubitSubcircuit, Qubit) Add();
+    (IQubitSubcircuit subcirc, Qubit qubit) Add();
     /// <summary>
     /// "Add" a qubit to the qubit subcirc by explicitly enabling a qubit with the circuit index.
     /// </summary>
-    (IQubitSubcircuit, Qubit) Add(int qcIndex);
+    (IQubitSubcircuit subcirc, Qubit qubit) Add(int qcIndex);
 
     /// <summary>
     /// Remove a controllable's subcircuit and set the qubits found in it inactive on the qubit circuit.
@@ -34,9 +34,9 @@ public interface IQubitSubcircuit {
     void Clear();
 
     /// <summary>
-    /// Remove a specific qubit from the subcircuit and set it inactive on the qubit circuit. 
+    /// Remove a specific qubit from the subcircuit and set it inactive on the qubit circuit.
     /// </summary>
-    IQubitSubcircuit RemoveAt(int index, bool isQCIndex);
+    (IQubitSubcircuit subcirc, int avalQCIndex) RemoveAt(int index, bool isQCIndex);
 
     void Subscribe(NotifyCollectionChangedEventHandler handler);
     void Unsubscribe(NotifyCollectionChangedEventHandler handler);
@@ -83,19 +83,23 @@ public sealed partial class QubitCircuit {
         #region Qubit Subcircuit Manipulation
         public (IQubitSubcircuit, Qubit) Add() {
             var (avalQubit, qcIndex) = _qc._getAval();
-
-            if (qcIndex != -1) {
-                _qubits.Add((qcIndex, avalQubit));
-                _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
-
-                _compositeQuantumState = _vectorKroneckerProduct(avalQubit.QuantumStateVector, _compositeQuantumState);
-            } else throw new NotImplementedException();
+            _add(qcIndex, avalQubit);
 
             return (this, avalQubit);
         }
         public (IQubitSubcircuit, Qubit) Add(int qcIndex) {
             Qubit qubit = _qc._enable(qcIndex);
+            _add(qcIndex, qubit);
+
             return (this, qubit);
+        }
+        private void _add(int qcIndex, Qubit qubit) {
+            if (qcIndex != -1) {
+                _qubits.Add((qcIndex, qubit));
+                _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
+
+                _compositeQuantumState = _vectorKroneckerProduct(qubit.QuantumStateVector, _compositeQuantumState);
+            } else throw new NotImplementedException();
         }
 
         public void Clear() {
@@ -105,29 +109,30 @@ public sealed partial class QubitCircuit {
             _qubits.Clear();  // although not needed to get rid of entire subcircuit instance, we need notification of clearance
         }
 
-        public IQubitSubcircuit RemoveAt(int index, bool isQCIndex) {
-            (int qsIndex, int qcIndex, _) = _getQubitInfo(index, isQCIndex);
-            
-            return _removeAt(qsIndex, qcIndex);
+        public (IQubitSubcircuit, int) RemoveAt(int index, bool isQCIndex) {
+            (int qsIndex, int qcIndex, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return (this, _removeAt(qsIndex, qcIndex, qubit));
         }
-        private IQubitSubcircuit _removeAt(int qsIndex, int qcIndex) {
+        private int _removeAt(int qsIndex, int qcIndex, Qubit qubit) {
             _QCIndexToQSIndex.Remove(qcIndex);
             // now update the dictionary
             foreach (
-                var (circIndex, subcircIndex) in _QCIndexToQSIndex
-                    .Where(x => x.Key > qcIndex)  // any circ index that is after the removed index is affected
+                var (circIndex, subcircIndex) in _QCIndexToQSIndex.ToArray()
+                    .Where(x => x.Key > qcIndex)  // any circ index after the index that is about to be removed is affected
                     .Select(x => (x.Key, x.Value))
             ) {
+                int newSubcircIndex = subcircIndex - 1;
+
                 // since the circ index will always stay the same, just update the subcirc index
-                _QCIndexToQSIndex[circIndex] = subcircIndex - 1;  // minus 1 because we removed one subcirc element
+                _QCIndexToQSIndex[circIndex] = newSubcircIndex;  // minus 1 because we removed one subcirc element
             }
 
             _qc._removeAt(qcIndex);
 
-            // now a qubit can be removed from the subcirc, since the dictionary is updated
+            // now a qubit can be removed from the subcirc, since the dictionary and the qubits are updated
             _qubits.RemoveAt(qsIndex);
 
-            return this;
+            return qcIndex;
         }
 
         public void Subscribe(NotifyCollectionChangedEventHandler handler) {

@@ -14,6 +14,14 @@ public sealed class Player : Controllable
     private void Start() {
         // all players should start with one qubit
         _addQubit();
+        _test();
+    }
+
+    private void _test() {
+        _addQubit();
+        _addQubit();
+        _addQubit();
+        _addQubit();
     }
 
     // private async UniTaskVoid Testing2() {

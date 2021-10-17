@@ -50,26 +50,23 @@ public sealed partial class QubitCircuit
     }
 
     /// <summary>
-    /// Create a qubit subcircuit. Controllable value must not be null.
+    /// Get a qubit subcircuit. Controllable value must not be null.
     /// </summary>
-    public IQubitSubcircuit CreateQubitSubcircuit(Controllable controllable) {
-        if (controllable == null) {
-            throw new ArgumentNullException("Controllable must be a non-null value");
+    public IQubitSubcircuit GetQubitSubcircuit(Controllable controllable) {
+        return _allSubcircuits[controllable.GetHashCode()];
+    }
+    /// <summary>
+    /// Get a qubit subcircuit. If it cannot be found, it will create a new subcirc and return that.
+    /// Controllable value must not be null.
+    /// </summary>
+    public IQubitSubcircuit GetOrCreateQubitSubcircuit(Controllable controllable) {
+        if (_allSubcircuits.ContainsKey(controllable.GetHashCode())) {
+            return GetQubitSubcircuit(controllable);
         }
 
         QubitSubcircuit subcirc = new QubitSubcircuit(this, controllable);
         _allSubcircuits[controllable.GetHashCode()] = subcirc;
-
         return subcirc;
-    }
-    /// <summary>
-    /// Get a qubit subcircuit from the dictionary. If controllable value is null, use the current
-    /// controllable from the ControlManager.
-    /// </summary>
-    public IQubitSubcircuit GetQubitSubcircuit(Controllable controllable = null) {
-        if (controllable == null) controllable = CurrentControllable;
-
-        return _allSubcircuits[controllable.GetHashCode()];
     }
 
     public void AddSubcircuitHandler(NotifyCollectionChangedEventHandler handler) {
@@ -84,13 +81,13 @@ public sealed partial class QubitCircuit
     /// Transfer selected qubits using qcIndices from one controllable to another.
     /// Assume that the new controllable does not have a subcirc.
     /// </summary>
-    public void TransferQubits(Controllable oldCtrl, Controllable newCtrl, int[] qcIndices) {
+    public void TransferQubits(Controllable oldCtrl, Controllable newCtrl, int[] qsIndices) {
         IQubitSubcircuit oldSubcirc = GetQubitSubcircuit(oldCtrl);
-        IQubitSubcircuit newSubcirc = CreateQubitSubcircuit(newCtrl);
+        IQubitSubcircuit newSubcirc = GetOrCreateQubitSubcircuit(newCtrl);
 
-        foreach (int i in qcIndices) {
-            oldSubcirc.RemoveAt(i, isQCIndex: true);
-            newSubcirc.Add(i);
+        foreach (int i in qsIndices) {
+            (_, int avalQCIndex) = oldSubcirc.RemoveAt(i, isQCIndex: false);
+            newSubcirc.Add(avalQCIndex);
         }
     }
 
