@@ -9,6 +9,13 @@ using Nito.Collections;
 using StateMachines.CSM;
 using StateMachines.QSM;
 
+/*
+Known issues when switching...
+    - moving is screwed up - look into csm
+    - qsm is running both at the same time (like spawning waves) - look into disabling scripts
+    - ui is not changing - look into this, stageuimanager, and qqvscript
+*/
+
 namespace Managers {
     public sealed class OnCurrentControllableChangedEventArgs : EventArgs {
         public Controllable OldValue {get; set;}
@@ -61,8 +68,13 @@ namespace Managers {
         }
         public Rigidbody2D CurrentRB {get; private set;}
         public BoxCollider2D CurrentBox {get; private set;}
-
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
+        private Player player;
+
+        // camera for following current controllable
+        private Camera _mainCamera; 
+        private const float _smoothCameraSpeed = 0.125f;
+        [SerializeField] private Vector3 _cameraOffset;
 
         // layers
         [SerializeField] private LayerMask _plaformLayerMask;
@@ -77,10 +89,6 @@ namespace Managers {
         private StandingState _standingState;
         public StandingState StandingState => _standingState;
 
-        // uses it to detect the usage of a current controllables abilities
-        private QSM currQSM => CurrentControllable?.QSM;
-        private QSMState currQSMState => CurrentControllable?.QSMState;
-        private MultipleState currMultiState => CurrentControllable?.MultiState;
         #endregion Fields/Properties
 
         #region Event Methods
@@ -95,10 +103,13 @@ namespace Managers {
             circ.InitQubitCircuit(this);
 
             // player should always be the default current controllable
-            CurrentControllable = SpawnManager.Instance.SpawnPlayer();
+            CurrentControllable = player = SpawnManager.Instance.SpawnPlayer();
             CurrentRB = CurrentControllable.GetComponent<Rigidbody2D>();
             CurrentBox = CurrentControllable.GetComponent<BoxCollider2D>();
             _controllables.AddToBack(CurrentControllable);
+
+            // set up main camera
+            _mainCamera = Camera.main;
 
             // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);
@@ -116,24 +127,34 @@ namespace Managers {
 
         private async UniTaskVoid Start() {
             await _csm.InitializeState(_standingState);
-            await currQSM.InitializeState(currQSMState);
+            // await currQSM.InitializeState(currQSMState); // <--
         }
 
         private async UniTaskVoid Update() {
-            if (IsToggleQVVTriggered()) {
-                StageUIManager.Instance.ToggleQQVPanel();
-            }
+            // Debug.Log(currQSM == null);
+            if (IsToggleQVVTriggered()) StageUIManager.Instance.ToggleQQVPanel();
+            if (IsSwitchTriggered() && _controllables.Count > 1) SwitchControllable();
             
             await _csm.CurrentState.HandleInput();
-            await currQSM.CurrentState.HandleInput();
-
+            
             await _csm.CurrentState.LogicUpdate();
-            if (currQSM != null) await currQSM.CurrentState.LogicUpdate();
+            // if (currQSM != null) await currQSM.CurrentState.LogicUpdate();
         }
 
         private async UniTaskVoid FixedUpdate() {
             await _csm.CurrentState.PhysicsUpdate();
-            if (currQSM != null) await currQSM.CurrentState.PhysicsUpdate();
+            // if (currQSM != null) await currQSM.CurrentState.PhysicsUpdate();
+
+            // camera update
+            if (_currControllable != null) {
+                Transform targetTransform = _currControllable.transform;
+                Transform camTransform = _mainCamera.transform;
+
+                Vector3 destPos = targetTransform.position + _cameraOffset;
+                Vector3 smoothPos = Vector3.Lerp(camTransform.position, destPos, _smoothCameraSpeed);
+
+                camTransform.position = smoothPos;
+            }
         }
         #endregion Event Methods
 
@@ -194,10 +215,26 @@ namespace Managers {
             StageUIManager.Instance.SetQQVPanelActive(option);
             SetToggleQQVInputActive(!option);
         }
+        #endregion Control Modes
 
+        #region Controllable Methods
         public void AddControllableToBack(Controllable controllable) {
             _controllables.AddToBack(controllable);
         }
-        #endregion Control Modes
+
+        /// <summary>
+        /// Rotate left when switching between different controllables.
+        /// </summary>
+        public void SwitchControllable() {
+            if (_currControllable.IsBusy) _currControllable.CancelForNotBeingNearGate(); 
+
+            // move old to the back
+            _controllables.RemoveFromFront();
+            _controllables.AddToBack(_currControllable);
+
+            // set curr to new 
+            CurrentControllable = _controllables[0];
+        }
+        #endregion Controllable Methods
     }
 }

@@ -68,15 +68,21 @@ namespace Managers
         }
 
         private void Start() {
-            // the current controllable on every stage is the player, which will spawn one qubit at start
-            Controllable controllable = StageControlManager.Instance.CurrentControllable;
+            StageControlManager ctrlManager = StageControlManager.Instance;
             
             // QQV
             _qqvScript.SetPanelActive(_isQQVDisplayed);
             _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
             _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
 
-            // TODO: add a subscriber to listen to current controllable changes 
+            // whenever there is a change in controllable value, refresh to reflect ui changes
+            StageControlManager.Instance.OnCurrentControllableChanged += async (object sender, OnCurrentControllableChangedEventArgs e) => {
+                if (e.NewValue != null) {
+                    _selectedRepresentationIndex = 0;
+                    _qubitLeftIndex = 0;
+                    await RefreshAllQubitRepresentationsUnsafe();
+                }
+            }; 
         }
         #endregion Event Methods
 

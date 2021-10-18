@@ -44,10 +44,21 @@ public abstract class Controllable : MonoBehaviour
         _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
     }
 
-    protected virtual void Update() {
+    protected virtual async UniTask Start() {
+        await _qsm.InitializeState(_qsmState);
+    }
+
+    private async UniTaskVoid Update() {
         if (StageControlManager.Instance.IsJumpTriggered()) {
             CancelForNotBeingNearGate();
         }
+
+        await _qsm.CurrentState.HandleInput();
+        await _qsm.CurrentState.LogicUpdate();
+    }
+
+    private async UniTaskVoid FixedUpdate() {
+        await _qsm.CurrentState.PhysicsUpdate();
     }
 
     protected virtual void OnEnable() {

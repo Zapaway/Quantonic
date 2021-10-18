@@ -11,7 +11,9 @@ public sealed class Player : Controllable
         base.Awake();
     }
 
-    private void Start() {
+    protected override async UniTask Start() {
+        await base.Start();
+
         // all players should start with one qubit
         _addQubit();
         _test();

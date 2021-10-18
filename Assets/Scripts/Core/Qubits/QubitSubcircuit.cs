@@ -109,6 +109,9 @@ public sealed partial class QubitCircuit {
             _qubits.Clear();  // although not needed to get rid of entire subcircuit instance, we need notification of clearance
         }
 
+        /*
+            TODO - Work on fixing composite state.
+        */
         public (IQubitSubcircuit, int) RemoveAt(int index, bool isQCIndex) {
             (int qsIndex, int qcIndex, Qubit qubit) = _getQubitInfo(index, isQCIndex);
             return (this, _removeAt(qsIndex, qcIndex, qubit));

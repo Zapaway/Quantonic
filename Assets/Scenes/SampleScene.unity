@@ -1010,6 +1010,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _cameraOffset.y
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _cameraOffset.z
+      value: -10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
       propertyPath: _plaformLayerMask.m_Bits
       value: 64
       objectReference: {fileID: 0}
@@ -1448,11 +1456,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_SizeDelta.x
-      value: 960
+      value: 646.3
       objectReference: {fileID: 0}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_SizeDelta.y
-      value: 325
+      value: 217.1
       objectReference: {fileID: 0}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1488,7 +1496,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 425
+      value: 525
       objectReference: {fileID: 0}
     - target: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
