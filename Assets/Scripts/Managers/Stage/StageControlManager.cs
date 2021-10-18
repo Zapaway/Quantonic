@@ -11,8 +11,6 @@ using StateMachines.QSM;
 
 /*
 Known issues when switching...
-    - moving is screwed up - look into csm
-    - qsm is running both at the same time (like spawning waves) - look into disabling scripts
     - ui is not changing - look into this, stageuimanager, and qqvscript
 */
 
@@ -62,14 +60,18 @@ namespace Managers {
                         }
                     );
                 }
+                
+                // enable and disable scripts 
+                if (_currControllable != null) _currControllable.enabled = false;
+                if (value != null) value.enabled = true;
 
                 _currControllable = value;
             }
         }
-        public Rigidbody2D CurrentRB {get; private set;}
-        public BoxCollider2D CurrentBox {get; private set;}
+        public Rigidbody2D CurrentRB => CurrentControllable?.GetComponent<Rigidbody2D>();
+        public BoxCollider2D CurrentBox => CurrentControllable?.GetComponent<BoxCollider2D>();
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
-        private Player player;
+        private Player _player;
 
         // camera for following current controllable
         private Camera _mainCamera; 
@@ -103,9 +105,7 @@ namespace Managers {
             circ.InitQubitCircuit(this);
 
             // player should always be the default current controllable
-            CurrentControllable = player = SpawnManager.Instance.SpawnPlayer();
-            CurrentRB = CurrentControllable.GetComponent<Rigidbody2D>();
-            CurrentBox = CurrentControllable.GetComponent<BoxCollider2D>();
+            CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer();
             _controllables.AddToBack(CurrentControllable);
 
             // set up main camera
@@ -131,19 +131,15 @@ namespace Managers {
         }
 
         private async UniTaskVoid Update() {
-            // Debug.Log(currQSM == null);
             if (IsToggleQVVTriggered()) StageUIManager.Instance.ToggleQQVPanel();
-            if (IsSwitchTriggered() && _controllables.Count > 1) SwitchControllable();
+            if (IsSwitchTriggered() && _controllables.Count > 1 && IsControllableStanding()) SwitchControllable();
             
             await _csm.CurrentState.HandleInput();
-            
             await _csm.CurrentState.LogicUpdate();
-            // if (currQSM != null) await currQSM.CurrentState.LogicUpdate();
         }
 
         private async UniTaskVoid FixedUpdate() {
             await _csm.CurrentState.PhysicsUpdate();
-            // if (currQSM != null) await currQSM.CurrentState.PhysicsUpdate();
 
             // camera update
             if (_currControllable != null) {
@@ -180,6 +176,10 @@ namespace Managers {
         
         public bool MovementOccured() {
             return SidewaysInputValue() != 0 || IsJumpTriggered();
+        }
+
+        public bool IsControllableStanding() {
+            return _csm.CurrentState == StandingState;
         }
         #endregion Input Getters
 

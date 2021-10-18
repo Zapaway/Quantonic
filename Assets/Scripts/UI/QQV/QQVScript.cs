@@ -144,6 +144,15 @@ namespace UIScripts.QQV {
             qubitRep.qubitIndexText.SetText(text);
         }
 
+        public void ResetQubitRepresentation() {
+            for (int i = 0; i < _qubitRepresentations.Count(); ++i) {
+                SetQubitRepresentation(i, 0, rawImageTexture: null);
+            }
+
+            SetArrowButtonActive(QQVMoveOptions.Left, false);
+            SetArrowButtonActive(QQVMoveOptions.Right, false);
+        }
+
         public bool GetPanelActive() {
             return gameObject.activeSelf;
         }

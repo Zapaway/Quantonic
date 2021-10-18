@@ -32,11 +32,13 @@ namespace StateMachines.QSM {
                 _controllable.QubitCount > 1 &&
                 _uiManager.GetQQVPanelActive() && 
                 !_controllable.IsBusy &&
-                _hasAvalSpace 
+                _hasAvalSpace &&
+                _ctrlManager.IsControllableStanding()
                 ) 
             {
                 // create clone and add it to deque
-                Clone clone = _spawnManager.SpawnClone(_controllable, _spacingBetweenClones);
+                Controllable clone = _spawnManager.SpawnClone(_controllable, _spacingBetweenClones);
+                clone.enabled = false;  // make sure to disable for now
                 _ctrlManager.AddControllableToBack(clone);
 
                 // transfter qubit from curr qubitsubcirc to the clone's, update qubitcirc, and reflect change on ui

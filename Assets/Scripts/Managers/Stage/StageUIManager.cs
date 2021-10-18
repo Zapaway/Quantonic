@@ -78,9 +78,19 @@ namespace Managers
             // whenever there is a change in controllable value, refresh to reflect ui changes
             StageControlManager.Instance.OnCurrentControllableChanged += async (object sender, OnCurrentControllableChangedEventArgs e) => {
                 if (e.NewValue != null) {
+                    // reset everything before refreshing and start on the very left
+                    _qqvScript.ResetQubitRepresentation();
                     _selectedRepresentationIndex = 0;
                     _qubitLeftIndex = 0;
-                    await RefreshAllQubitRepresentationsUnsafe();
+
+                    // activate the right arrow button if needed
+                    int diff = e.NewValue.QubitCount - _qqvScript.RawImageCapacity;
+                    if (diff > 0) {
+                        _avalRightPresses = diff;
+                        _updateQQVRightButtonActive(true);
+                    }
+
+                    await RefreshAllQubitRepresentationsUnsafe(e.NewValue);
                 }
             }; 
         }
@@ -121,15 +131,19 @@ namespace Managers
             _updateQQVRightButtonActive(_avalRightPresses != 0);
         }
         /// <summary>
-        /// Refresh all qubit representations.
+        /// Refresh all qubit representations. 
         /// </summary>
-        public async UniTask RefreshAllQubitRepresentationsUnsafe() {
-            int qubitCount = StageControlManager.Instance.CurrentControllable.QubitCount;
+        /// <param name="controllable">
+        /// The controllable to refresh for. If not given an argument, it will default to the current controllable.
+        /// </param>
+        public async UniTask RefreshAllQubitRepresentationsUnsafe(Controllable controllable = null) {
+            controllable = controllable ?? StageControlManager.Instance.CurrentControllable;
+            int qubitCount = controllable.QubitCount;
             int repCapacity = _qqvScript.RawImageCapacity;
 
             IEnumerable<UniTask> renderingTasks = (
                 from i in Enumerable.Range(0, qubitCount < repCapacity ? qubitCount : repCapacity)
-                select _setQubitRepresentationUnsafeAsync(i, _qubitLeftIndex + i)
+                select _setQubitRepresentationUnsafeAsync(i, _qubitLeftIndex + i, controllable)
             );
             await UniTask.WhenAll(renderingTasks);
 
@@ -291,6 +305,7 @@ namespace Managers
         /// </summary>
         private void _qqvHandleChange(object sender, NotifyCollectionChangedEventArgs e) {
             Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
+            // Debug.Log($"I am {ctrlable.name} from qqvHandleChange");
             
             switch (e.Action) {
                 // newStartingIndex: index of added element on collection
@@ -359,17 +374,23 @@ namespace Managers
         /// <summary>
         /// Set qubit representation based on a new qubit.
         /// </summary>
-        private void _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex) {
-            Controllable ctrlable = StageControlManager.Instance.CurrentControllable;
-            RenderTexture renderTexture = ctrlable.GetRenderTextureUnsafe(qubitIndex);
+        /// <param name="controllable">
+        /// The controllable to refresh for. If not given an argument, it will default to the current controllable.
+        /// </param>
+        private void _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex, Controllable controllable = null) {
+            controllable = controllable ?? StageControlManager.Instance.CurrentControllable;
+            RenderTexture renderTexture = controllable.GetRenderTextureUnsafe(qubitIndex);
             _qqvScript.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
         }
         /// <summary>
         /// Set qubit representation based on a new qubit async.
         /// </summary>
-        private async UniTask _setQubitRepresentationUnsafeAsync(int representationIndex, int qubitIndex) { 
+        /// <param name="controllable">
+        /// The controllable to refresh for. If not given an argument, it will default to the current controllable.
+        /// </param>
+        private async UniTask _setQubitRepresentationUnsafeAsync(int representationIndex, int qubitIndex, Controllable controllable = null) { 
             await UniTask.Yield();
-            _setQubitRepresentationUnsafe(representationIndex, qubitIndex);
+            _setQubitRepresentationUnsafe(representationIndex, qubitIndex, controllable);
         }
 
         /// <summary>

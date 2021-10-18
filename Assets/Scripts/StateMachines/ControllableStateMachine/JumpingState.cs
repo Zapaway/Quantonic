@@ -17,13 +17,16 @@ namespace StateMachines.CSM {
     /// </summary>
     public sealed class JumpingState : CSMState
     { 
-        private float _jumpHeight = 5;  // how far does the controllable teleport up (DO NOT SET THIS TO ZERO)
-        private float _jumpDuration = 5;
+        private const float _jumpHeight = 5;  // how far does the controllable teleport up (DO NOT SET THIS TO ZERO)
+        private const float _jumpDuration = 5;
+        private bool _isFinishedJump;  // use this instead of _isGrounded as it is more reliable (accurate)
 
         public JumpingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
 
         public override async UniTask Enter() {
             await base.Enter();
+            
+            _isFinishedJump = false;
             Jump().Forget();
         } 
         public override async UniTask HandleInput() {
@@ -31,7 +34,8 @@ namespace StateMachines.CSM {
         } 
         public override async UniTask LogicUpdate() {
             await base.LogicUpdate();
-            if (_isGrounded) {
+
+            if (_isFinishedJump) {
                 await _stateMachine.ChangeState(_ctrlManager.StandingState);
             } else {
                 // TODO Add death here.
@@ -56,6 +60,7 @@ namespace StateMachines.CSM {
             float onGroundY = _checkIfAboveGround();
             if (onGroundY != 0f) {
                 transform.position = new Vector2(transform.position.x, onGroundY);
+                _isFinishedJump = true;
             } 
             else {
                 // TODO death here or something
