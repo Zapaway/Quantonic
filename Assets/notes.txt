@@ -1,2 +1,7 @@
 TODO:
-    - create switching between controllables
+    - update removeat to accurately reflect the state
+    - create qubit details ui
+    - create finish line
+    * create timer
+    * create enemy 
+    * fix "entangled" and such
