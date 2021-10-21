@@ -1,3 +1,4 @@
+using sys = System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -41,11 +42,13 @@ public sealed class Qubit : MonoBehaviour
     private RenderTexture _renderTexture;
     public RenderTexture RenderTexture => _renderTexture;
 
-
     // quantum state data
     private QuantumState _quantumState;
     public mathnetl.Vector<sysnum.Complex> QuantumStateVector => _quantumState.State;
     public QuantumStateDescription Description => _quantumState.Description;
+    public string DescriptionString => _quantumState.DescriptionToString();
+    public (double ground, double excited) Probabilities => (_quantumState.ProbsZero, _quantumState.ProbsOne);
+    public static sys.Func<double, string> ProbabilityToStringFunc => QuantumState.ProbabilityToStringFunc;
 
     private void Awake() {
         // initalize render texture

@@ -36,7 +36,7 @@ namespace UIScripts.QQV {
     /// <summary>
     /// The script for the entire QQV panel.
     /// </summary>
-    public sealed class QQVScript : MonoBehaviour
+    public sealed class QQVScript : Panel
     {
         // buttons
         [SerializeField] private Button _leftButton;
@@ -151,16 +151,6 @@ namespace UIScripts.QQV {
 
             SetArrowButtonActive(QQVMoveOptions.Left, false);
             SetArrowButtonActive(QQVMoveOptions.Right, false);
-        }
-
-        public bool GetPanelActive() {
-            return gameObject.activeSelf;
-        }
-        /// <summary>
-        /// Set the panel unactive or active.
-        /// </summary>
-        public void SetPanelActive(bool isActive) {
-            gameObject.SetActive(isActive);
         }
 
         /// <summary>

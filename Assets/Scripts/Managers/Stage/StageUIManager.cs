@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
 
 using UIScripts.QQV;
+using UIScripts.QDP;
 
 /*
 TODO
@@ -44,6 +45,7 @@ namespace Managers
         private int _qubitLeftIndex = 0;
         private int repRightIndex => _qqvScript.RawImageCapacity - 1;
         private int qubitRightIndex => _qubitLeftIndex + repRightIndex;
+        private int selectedQubitIndex => _qubitLeftIndex + _selectedRepresentationIndex;
 
         // keep track of how many lefts and rights may be pressed
         private int _avalLeftPresses = 0;
@@ -54,6 +56,11 @@ namespace Managers
         // used to toggle the QQV on and off
         private bool _isQQVDisplayed = false;
         #endregion Quick Qubit Viewer (QQV) Data
+
+        #region Qubit Display Panel (QDP) Data
+        [SerializeField] private GameObject _QDP;
+        private QDPScript _qdpScript;
+        #endregion Qubit Display Panel (QDP) Data
 
         #region Event Methods
         protected override void Awake()
@@ -432,6 +439,17 @@ namespace Managers
         }
             #endregion Render Texture Methods
         #endregion QQV Methods
+
+        #region QDP Methods
+        public void SetQDPPanel(Controllable controllable, int qubitIndex) {
+            Texture qubitTexture = controllable.GetRenderTextureUnsafe(qubitIndex);
+            _qdpScript.SetQDP(qubitTexture, qubit)
+        }
+
+        public void UpdateQDPPanel(Qubit qubit) {
+
+        }
+        #endregion QDP Methods
 
         // private void _test(IList ilist, string type, NotifyCollectionChangedAction action) {
         //     if (ilist != null) {

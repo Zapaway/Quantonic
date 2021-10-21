@@ -98,6 +98,8 @@ public abstract class Controllable : MonoBehaviour
     public RenderTexture GetRenderTextureUnsafe(int qsIndex) {
         return _subcirc.GetRenderTexture(qsIndex, isQCIndex: false);
     }
+    /// <summary>
+    /// Get 
 
     public void SubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _subcirc.Subscribe(eventHandler);

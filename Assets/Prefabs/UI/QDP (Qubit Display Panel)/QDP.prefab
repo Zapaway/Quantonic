@@ -613,7 +613,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5468392537b68634ca2dc12aacd42559, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _qubitRepRawImage: {fileID: 2732805660164700229}
+  _qubitIndexText: {fileID: 8284668424453440542}
+  _qubitStateText: {fileID: 4891261028423858920}
   _pieChart: {fileID: 4891261030353884824}
+  _groundStateProbText: {fileID: 4891261029015119358}
+  _excitedStateProbText: {fileID: 4891261030050027829}
 --- !u!1 &4891261029169275101
 GameObject:
   m_ObjectHideFlags: 0
@@ -1663,6 +1668,28 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c03ea1428d07d7b42872c018015fb66a, type: 3}
+--- !u!114 &8284668424453440542 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3537632431649344220, guid: c03ea1428d07d7b42872c018015fb66a, type: 3}
+  m_PrefabInstance: {fileID: 4891261029032201922}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2732805660164700229 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7353779754331682439, guid: c03ea1428d07d7b42872c018015fb66a, type: 3}
+  m_PrefabInstance: {fileID: 4891261029032201922}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1344c3c82d62a2a41a3576d8abb8e3ea, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &2742658171952888501 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 7345053159640790135, guid: c03ea1428d07d7b42872c018015fb66a, type: 3}

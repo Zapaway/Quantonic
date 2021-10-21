@@ -11,13 +11,13 @@ public class PieChartScript : MonoBehaviour
     /// <summary>
     /// Automatically change the pie chart to reflect the changes in value.
     /// </summary>
-    public void SetValues(float[] values) {
-        float total = values.Sum();
-        float currSum = 0;
+    public void SetValues(double[] values) {
+        double total = values.Sum();
+        double currSum = 0;
 
         for (int i = 0; i < values.Length; ++i) {
             currSum += values[i];
-            _pieLayers[i].fillAmount = currSum/total;
+            _pieLayers[i].fillAmount = (float)(currSum/total);
         }
     }
 }

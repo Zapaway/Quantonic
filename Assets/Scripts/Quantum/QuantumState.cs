@@ -34,6 +34,8 @@ namespace Quantum {
 
         private double _probsOne;
         public double ProbsOne => _probsOne;
+
+        public static sys.Func<double, string> ProbabilityToStringFunc => x => x.ToString("#0.##%");
         #endregion Fields/Properties
         
         #region Constructors
@@ -96,10 +98,9 @@ namespace Quantum {
 
         #region String Representations
         public (string, string) ProbabilitiesToString() {
-            sys.Func<double, string> toString = x => x.ToString("#0.##%");
             return (
-                toString(_probsZero),
-                toString(_probsOne)
+                ProbabilityToStringFunc(_probsZero),
+                ProbabilityToStringFunc(_probsOne)
             );
         }
 
