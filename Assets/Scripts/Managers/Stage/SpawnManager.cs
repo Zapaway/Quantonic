@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 namespace Managers {
     /// <summary>
-    /// Handles all spawning in a stage,
+    /// Handles all spawning and despawning in a stage,
     /// except for when the player starts (handled in ControlManager).
     /// Also contains prefabs for instantiation.
     /// </summary>
@@ -15,6 +15,11 @@ namespace Managers {
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private GameObject _clonePrefab;
         [SerializeField] private GameObject _playerWavePrefab;
+        
+        // checkpoints
+        private GameObject[] _checkpoints;
+        // TODO: Add and store checkpoint, along with recent checkpoint (for now, the spawning is origin) 
+        //  - see spawnPlayer()
         
         private bool _isPlayerSpawned = false; 
         public bool IsPlayerSpawned => _isPlayerSpawned;
@@ -66,7 +71,6 @@ namespace Managers {
 
         /// <summary>
         /// Spawn a player. 
-        /// TODO: Will need to add a way to know specific spawnpoints
         /// </summary>
         public Player SpawnPlayer() {
             if (!_isPlayerSpawned) {
@@ -118,6 +122,15 @@ namespace Managers {
         }
         
         #endregion Instantiation Methods
+
+        #region Deletion Methods
+        public void DestroyEveryControllable() {
+
+        }
+        public void DestroyCurrentControllable() {
+
+        }
+        #endregion Deletion Methods
     }
 }
 

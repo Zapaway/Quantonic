@@ -4,7 +4,6 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using MathNet.Numerics;
 using MathNet.Numerics.LinearAlgebra;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -136,6 +135,7 @@ public sealed partial class QubitCircuit {
             // now a qubit can be removed from the subcirc, since the dictionary and the qubits are updated
             _qubits.RemoveAt(qsIndex);
 
+            _compositeQuantumState = _recalculateCompositeState();
             return qcIndex;
         }
 
@@ -246,16 +246,16 @@ public sealed partial class QubitCircuit {
                 bool controlIndexLessThanTargetIndex = controlQSIndex < targetQSIndex;  
 
                 // determine amount of matrices needed to make binary controlled unitary
-                int num_of_identities = Math.Abs(controlQSIndex - targetQSIndex) - 1;
+                int numOfIdentities = Math.Abs(controlQSIndex - targetQSIndex) - 1;
 
                 // create the list of operators
-                List<Matrix<sysnum.Complex>> operators = new List<Matrix<sysnum.Complex>>(num_of_identities + 2);
+                List<Matrix<sysnum.Complex>> operators = new List<Matrix<sysnum.Complex>>(numOfIdentities + 2);
 
                 // add operators left to the density matrix
                 //  special operator
                 operators.Add(specialOperatorMatrix);  
                 //  identities
-                for (int _ = 0; _ < num_of_identities; ++_) operators.Add(QuantumFactory.identityOperator.Matrix);
+                for (int _ = 0; _ < numOfIdentities; ++_) operators.Add(QuantumFactory.identityOperator.Matrix);
                 //  density matrix
                 operators.Add(densityMatrix);  
 
@@ -310,6 +310,20 @@ public sealed partial class QubitCircuit {
         /// </summary>
         private bool _updateCompositeState(BinaryOperator binaryOperator, int qsIndexA, int qsIndexB) {
             throw new System.NotImplementedException();
+        }
+
+        /// <summary>
+        /// Recalculate composite state with the current qubits in the list.
+        /// </summary>
+        private Vector<sysnum.Complex> _recalculateCompositeState() {
+            Vector<sysnum.Complex> res = Vector<sysnum.Complex>.Build.Dense(1, sysnum.Complex.One);
+
+            for (int i = _qubits.Count() - 1; i >= 0; --i) {
+                var (_, qubit) = _qubits[i];
+                res = _vectorKroneckerProduct(res, qubit.QuantumStateVector);
+            }
+
+            return res;
         }
 
         private Vector<sysnum.Complex> _vectorKroneckerProduct(Vector<sysnum.Complex> b, Vector<sysnum.Complex> a) {

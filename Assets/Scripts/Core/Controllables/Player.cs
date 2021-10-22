@@ -21,9 +21,9 @@ public sealed class Player : Controllable
 
     private void _test() {
         _addQubit();
-        _addQubit();
-        _addQubit();
-        _addQubit();
+        // _addQubit();
+        // _addQubit();
+        // _addQubit();
     }
 
     // private async UniTaskVoid Testing2() {

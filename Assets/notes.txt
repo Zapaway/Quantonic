@@ -1,5 +1,4 @@
 TODO:
-    - update removeat to accurately reflect the state
     - create finish line
     - create timer
     - create enemy 
@@ -7,3 +6,8 @@ TODO:
     - create necessary visual cues (e.g. type of gate)
     - fix "entangled" and such
     * add effects
+
+    -> OPEN TimerScript
+    -> OPEN SpawnManager
+    -> OPEN StageControlManager
+    -> OPEN StageUIManager
