@@ -9,11 +9,6 @@ using Nito.Collections;
 using StateMachines.CSM;
 using StateMachines.QSM;
 
-/*
-Known issues when switching...
-    - ui is not changing - look into this, stageuimanager, and qqvscript
-*/
-
 namespace Managers {
     public sealed class OnCurrentControllableChangedEventArgs : EventArgs {
         public Controllable OldValue {get; set;}
@@ -131,7 +126,7 @@ namespace Managers {
         }
 
         private async UniTaskVoid Update() {
-            if (IsToggleQVVTriggered()) StageUIManager.Instance.ToggleQQVPanel();
+            if (IsToggleQVVTriggered()) StageUIManager.Instance.ToggleQubitPanels();
             if (IsSwitchTriggered() && _controllables.Count > 1 && IsControllableStanding()) SwitchControllable();
             
             await _csm.CurrentState.HandleInput();
@@ -212,7 +207,7 @@ namespace Managers {
 
         #region Control Modes 
         public void InQQVPanelMode(bool option) {
-            StageUIManager.Instance.SetQQVPanelActive(option);
+            StageUIManager.Instance.SetQubitPanelsActive(option);
             SetToggleQQVInputActive(!option);
         }
         #endregion Control Modes

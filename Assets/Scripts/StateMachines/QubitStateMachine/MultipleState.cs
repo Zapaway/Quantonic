@@ -30,7 +30,7 @@ namespace StateMachines.QSM {
             if (
                 _ctrlManager.IsSplitToggled() && 
                 _controllable.QubitCount > 1 &&
-                _uiManager.GetQQVPanelActive() && 
+                _uiManager.AreQubitPanelsDisplayed && 
                 !_controllable.IsBusy &&
                 _hasAvalSpace &&
                 _ctrlManager.IsControllableStanding()

@@ -18,6 +18,7 @@ using Quantum.Operators;
 public interface IQubitSubcircuit {
     int Count {get;}
     RenderTexture GetRenderTexture(int index, bool isQCIndex);
+    (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex);
 
     /// <summary>
     /// Add an available qubit onto the qubit subcircuit.
@@ -148,8 +149,13 @@ public sealed partial class QubitCircuit {
 
         #region Getters and Setters
         public RenderTexture GetRenderTexture(int index, bool isQCIndex) {
-            (int qsIndex, int qcIndex, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
             return qubit.RenderTexture;
+        }
+
+        public (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return (qubit.DescriptionString, qubit.Probabilities.ground, qubit.Probabilities.excited);
         }
         #endregion Getters and Setters
 

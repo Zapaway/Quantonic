@@ -48,7 +48,6 @@ public sealed class Qubit : MonoBehaviour
     public QuantumStateDescription Description => _quantumState.Description;
     public string DescriptionString => _quantumState.DescriptionToString();
     public (double ground, double excited) Probabilities => (_quantumState.ProbsZero, _quantumState.ProbsOne);
-    public static sys.Func<double, string> ProbabilityToStringFunc => QuantumState.ProbabilityToStringFunc;
 
     private void Awake() {
         // initalize render texture

@@ -99,7 +99,12 @@ public abstract class Controllable : MonoBehaviour
         return _subcirc.GetRenderTexture(qsIndex, isQCIndex: false);
     }
     /// <summary>
-    /// Get 
+    /// Get the qubit's state along with its ground and excited state probabilites. 
+    /// Do note that it will not check if the index is out of bounds. 
+    /// </summary>
+    public (string descString, double ground, double excited) GetQubitInfoUnsafe(int qsIndex) {
+        return _subcirc.GetQubitInfoUnsafe(qsIndex, isQCIndex: false);
+    } 
 
     public void SubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _subcirc.Subscribe(eventHandler);

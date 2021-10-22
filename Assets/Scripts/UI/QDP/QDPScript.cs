@@ -31,22 +31,14 @@ namespace UIScripts.QDP {
             _qubitStateText.SetText(qubitState);
             _updateProbabilities(groundStateProb, excitedStateProb, stringFunc);
         } 
-
-        /// <summary>
-        /// Update the state and probabilites in the QDP.
-        /// </summary>
-        public void UpdateQDP(string qubitState, double groundStateProb, double excitedStateProb, Func<double, string> stringFunc = null) {
-            _qubitStateText.SetText(qubitState);
-            _updateProbabilities(groundStateProb, excitedStateProb, stringFunc);
-        }
         #endregion Getters and Setters
 
         #region Helpers
         private void _updateProbabilities(double groundStateProb, double excitedStateProb, Func<double, string> stringFunc = null) {
             Func<double, string> doubleToString = stringFunc ?? delegate (double x) { return $"{x}%"; };
 
-            _groundStateProbText.SetText(doubleToString(groundStateProb));
-            _excitedStateProbText.SetText(doubleToString(excitedStateProb));
+            _groundStateProbText.SetText("0: " + doubleToString(groundStateProb));
+            _excitedStateProbText.SetText("1: " + doubleToString(excitedStateProb));
             _pieChart.SetValues(new double[] {groundStateProb, excitedStateProb});
         }
         #endregion Helpers

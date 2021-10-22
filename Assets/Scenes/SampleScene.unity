@@ -242,6 +242,22 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 4891261029155449787, guid: 6f6ddd4e0378a1c43be7eb0551af8a8e, type: 3}
   m_PrefabInstance: {fileID: 4891261028705104679}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &920172765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4891261029155449788, guid: 6f6ddd4e0378a1c43be7eb0551af8a8e, type: 3}
+  m_PrefabInstance: {fileID: 4891261028705104679}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &920172766 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 5325019984482933555, guid: 6f6ddd4e0378a1c43be7eb0551af8a8e, type: 3}
+  m_PrefabInstance: {fileID: 4891261028705104679}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 920172765}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5468392537b68634ca2dc12aacd42559, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &998925816
 GameObject:
   m_ObjectHideFlags: 0
@@ -781,6 +797,17 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 7930903299008448352, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
   m_PrefabInstance: {fileID: 7930903298110802901}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &2055277750 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7565470271270356375, guid: 7595c06d6e2f4d44898931532e1cc26c, type: 3}
+  m_PrefabInstance: {fileID: 7930903298110802901}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2055277748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 860098f81ee98be4281368dfe1ca0d43, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2073433408
 GameObject:
   m_ObjectHideFlags: 0
@@ -1643,6 +1670,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 600065340735122581, guid: e8b3b3845d255484595f286bb6ad55bd, type: 3}
+      propertyPath: _QDP
+      value: 
+      objectReference: {fileID: 920172765}
+    - target: {fileID: 600065340735122581, guid: e8b3b3845d255484595f286bb6ad55bd, type: 3}
       propertyPath: _QQV
       value: 
       objectReference: {fileID: 2055277748}
@@ -1654,6 +1685,14 @@ PrefabInstance:
       propertyPath: _QQV.panel
       value: 
       objectReference: {fileID: 2055277748}
+    - target: {fileID: 600065340735122581, guid: e8b3b3845d255484595f286bb6ad55bd, type: 3}
+      propertyPath: _qdpScript
+      value: 
+      objectReference: {fileID: 920172766}
+    - target: {fileID: 600065340735122581, guid: e8b3b3845d255484595f286bb6ad55bd, type: 3}
+      propertyPath: _qqvScript
+      value: 
+      objectReference: {fileID: 2055277750}
     - target: {fileID: 600065340735122581, guid: e8b3b3845d255484595f286bb6ad55bd, type: 3}
       propertyPath: _rawImagePanel
       value: 

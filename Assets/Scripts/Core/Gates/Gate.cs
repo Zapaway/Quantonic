@@ -61,6 +61,8 @@ public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
             await _playAnimation(collision.gameObject);
 
             StageControlManager.Instance.SetPlayingControlsActive(true);
+            
+            await StageUIManager.Instance.RefreshAllQubitRepresentationsUnsafe();
         }
     }
     

@@ -1,7 +1,9 @@
 TODO:
     - update removeat to accurately reflect the state
-    - create qubit details ui
     - create finish line
-    * create timer
-    * create enemy 
-    * fix "entangled" and such
+    - create timer
+    - create enemy 
+    - create death
+    - create necessary visual cues (e.g. type of gate)
+    - fix "entangled" and such
+    * add effects
