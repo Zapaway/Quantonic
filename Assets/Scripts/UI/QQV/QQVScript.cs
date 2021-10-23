@@ -48,7 +48,7 @@ namespace UIScripts.QQV {
         public int RawImageCapacity => _qubitRepresentations.Length;
 
         // any disabled qubit representations to be aware of 
-        // using dictionary for faster access times - do not use their values
+        // using dictionary for faster key-based access times - do not use their values
         private Dictionary<int, Nullable<byte>> _disabledQubitIndices = new Dictionary<int, Nullable<byte>>();
 
         // all delegates that can be used for custom behavior on the QQV child componenets 

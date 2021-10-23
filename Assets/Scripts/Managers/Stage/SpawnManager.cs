@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -70,16 +71,19 @@ namespace Managers {
         
 
         /// <summary>
-        /// Spawn a player. 
+        /// Spawn a player and start the timer. 
         /// </summary>
-        public Player SpawnPlayer() {
+        public Player SpawnPlayer(Func<UniTask> timeRunOutActionAsync) {
             if (!_isPlayerSpawned) {
                 GameObject player = Instantiate(
                     _playerPrefab,
                     Vector3.zero,
                     _playerPrefab.transform.rotation
                 );
-
+                
+                StageUIManager.Instance.TimerRunOutActionAsync = timeRunOutActionAsync;
+                StageUIManager.Instance.StartTimer();
+                
                 _isPlayerSpawned = true;
                 return player.GetComponent<Player>();
             } 

@@ -19,44 +19,54 @@ namespace Managers
     /// </summary>
     public sealed class StageUIManager : Manager<StageUIManager>
     {
-        #region Qubit Panel Data
-        private bool _areQubitPanelsDisplayed = false;  // used to toggle the QQV and QDP on and off
-        public bool AreQubitPanelsDisplayed => _areQubitPanelsDisplayed;            
-        
-            #region Quick Qubit Viewer (QQV) Data
-            /// <summary>
-            /// Different submit modes that the QQV can be in.
-            /// </summary>
-            public enum QQVSubmitMode {
-                Default, 
-                Single,
-                Multi
-            }
-            private int[] _submittedQubitIndex;  // used for knowing when to stop awaiting submission
-
-            [SerializeField] private QQVScript _qqvScript;
-
-            // current selected representation 
-            private int _selectedRepresentationIndex = 0;
-            public int SelectedRepIndex => _selectedRepresentationIndex;
+        #region Data
+            #region Qubit Panel Data
+            private bool _areQubitPanelsDisplayed = false;  // used to toggle the QQV and QDP on and off
+            public bool AreQubitPanelsDisplayed => _areQubitPanelsDisplayed;            
             
-            // keep track of qubit index of the leftmost qubit representation
-            private int _qubitLeftIndex = 0;
-            private int repRightIndex => _qqvScript.RawImageCapacity - 1;
-            private int qubitRightIndex => _qubitLeftIndex + repRightIndex;
-            private int selectedQubitIndex => _qubitLeftIndex + _selectedRepresentationIndex;
+                #region Quick Qubit Viewer (QQV) Data
+                /// <summary>
+                /// Different submit modes that the QQV can be in.
+                /// </summary>
+                public enum QQVSubmitMode {
+                    Default, 
+                    Single,
+                    Multi
+                }
+                private int[] _submittedQubitIndex;  // used for knowing when to stop awaiting submission
 
-            // keep track of how many lefts and rights may be pressed
-            private int _avalLeftPresses = 0;
-            private bool _isLeftButtonActive = false;
-            private int _avalRightPresses = 0;
-            private bool _isRightButtonActive = false;
-            #endregion Quick Qubit Viewer (QQV) Data
+                [SerializeField] private QQVScript _qqvScript;
 
-            #region Qubit Display Panel (QDP) Data
-            [SerializeField] private QDPScript _qdpScript;
-            #endregion Qubit Display Panel (QDP) Data
-        #endregion Qubit Panel Data
+                // current selected representation 
+                private int _selectedRepresentationIndex = 0;
+                public int SelectedRepIndex => _selectedRepresentationIndex;
+                
+                // keep track of qubit index of the leftmost qubit representation
+                private int _qubitLeftIndex = 0;
+                private int repRightIndex => _qqvScript.RawImageCapacity - 1;
+                private int qubitRightIndex => _qubitLeftIndex + repRightIndex;
+                private int selectedQubitIndex => _qubitLeftIndex + _selectedRepresentationIndex;
+
+                // keep track of how many lefts and rights may be pressed
+                private int _avalLeftPresses = 0;
+                private bool _isLeftButtonActive = false;
+                private int _avalRightPresses = 0;
+                private bool _isRightButtonActive = false;
+                #endregion Quick Qubit Viewer (QQV) Data
+
+                #region Qubit Display Panel (QDP) Data
+                [SerializeField] private QDPScript _qdpScript;
+                #endregion Qubit Display Panel (QDP) Data
+            #endregion Qubit Panel Data
+
+            #region Timer Data
+            [SerializeField] private TimerScript _timerScript;
+            private Func<UniTask> _timerRunOutActionAsync;
+            public Func<UniTask> TimerRunOutActionAsync {
+                set => _timerRunOutActionAsync = value;
+            }
+            #endregion Timer Data
+        #endregion Data
 
         #region Event Methods
         protected override void Awake()
@@ -474,5 +484,19 @@ namespace Managers
                 #endregion Getters and Setters
             #endregion QDP Methods
         #endregion Qubit Panels
+
+        #region Timer Methods
+        public void StartTimer() {
+            _timerScript.StartTimer(_timerRunOutActionAsync);
+        }
+
+        public void StopTimer() {
+            _timerScript.StopTimer();
+        }
+
+        public void ResetTimer() {
+            _timerScript.ResetTimer();
+        }
+        #endregion Timer Methods
     }
 }

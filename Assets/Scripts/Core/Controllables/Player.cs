@@ -19,6 +19,14 @@ public sealed class Player : Controllable
         _test();
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        // // TODO: add conditoinal here to see if the stage ended or not
+        // throw new NotSupportedException("Since the stage was not complete, you must use enabling to hide the player.");
+    }
+
     private void _test() {
         _addQubit();
         // _addQubit();

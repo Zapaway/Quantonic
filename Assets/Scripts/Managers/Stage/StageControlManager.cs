@@ -7,7 +7,6 @@ using Cysharp.Threading.Tasks;
 using Nito.Collections;
 
 using StateMachines.CSM;
-using StateMachines.QSM;
 
 namespace Managers {
     public sealed class OnCurrentControllableChangedEventArgs : EventArgs {
@@ -100,7 +99,7 @@ namespace Managers {
             circ.InitQubitCircuit(this);
 
             // player should always be the default current controllable
-            CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer();
+            CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer(DisablePlayer);
             _controllables.AddToBack(CurrentControllable);
 
             // set up main camera
@@ -122,7 +121,6 @@ namespace Managers {
 
         private async UniTaskVoid Start() {
             await _csm.InitializeState(_standingState);
-            // await currQSM.InitializeState(currQSMState); // <--
         }
 
         private async UniTaskVoid Update() {
@@ -229,6 +227,22 @@ namespace Managers {
 
             // set curr to new 
             CurrentControllable = _controllables[0];
+        }
+
+        /// <summary>
+        /// Destroy everything by disabling the player.
+        /// </summary>
+        public async UniTask DisablePlayer() {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
+        /// Destroy the current controllable. 
+        /// If it is a clone, it will destroy it and switch to a different clone.
+        /// If it is a player, then it will disable the player.
+        /// </summary>
+        public async UniTask DestroyCurrentControllable() {
+            throw new NotImplementedException();
         }
         #endregion Controllable Methods
     }
