@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4055921375411065865}
   - component: {fileID: 4055921375411065866}
   m_Layer: 7
-  m_Name: Player Wave
+  m_Name: Controllable Wave
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
