@@ -1,9 +1,10 @@
 fileFormatVersion: 2
-guid: 066da8f07f425c74f86965cffc8912d5
+guid: edc6619ba60e01141b796c8718960671
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - _enemyWavePrefab: {fileID: 1043152754930143410, guid: d5edf05bf32881c46a820993f5ef185d, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

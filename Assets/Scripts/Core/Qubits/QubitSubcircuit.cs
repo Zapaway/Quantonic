@@ -106,6 +106,9 @@ public sealed partial class QubitCircuit {
             _qc._clear(_QCIndexToQSIndex.Keys);
 
             _QCIndexToQSIndex.Clear();
+            _compositeQuantumState = Vector<sysnum.Complex>.Build.Dense(
+                1, sysnum.Complex.One
+            );  // act as a scalar
             _qubits.Clear();  // although not needed to get rid of entire subcircuit instance, we need notification of clearance
         }
 

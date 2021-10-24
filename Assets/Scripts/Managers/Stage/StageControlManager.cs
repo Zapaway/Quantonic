@@ -268,7 +268,7 @@ namespace Managers {
         /// If it is a clone, it will destroy it and switch to a different clone.
         /// If it is a player, then it will disable the player.
         /// </summary>
-        public async UniTask DestroyCurrentControllable() {
+        public async UniTask DestroyCurrentControllable() {            
             if (_currControllable == _player) {
                 StageUIManager.Instance.PauseTimer();
                 await DisablePlayer();
@@ -281,6 +281,23 @@ namespace Managers {
                 Destroy(_controllables.RemoveFromBack().gameObject);
 
                 InQQVPanelMode(false);
+            }
+        }
+
+        /// <summary>
+        /// Destroys a specified controllable. 
+        /// If it is the current controllable, switch over to using DestroyCurrentControllable method.
+        /// If it is the player, switch over to using DisablePlayer.
+        /// </summary>
+        public async UniTask DestroyControllable(Controllable controllable) {
+            if (controllable == _currControllable) await DestroyCurrentControllable();
+            else if (controllable == _player) {
+                StageUIManager.Instance.PauseTimer();
+                await DisablePlayer();
+            }
+            else if (controllable is Clone) {  // conditional statement used for safe guard against nulls
+                _controllables.Remove(controllable);
+                Destroy(controllable.gameObject);
             }
         }
         #endregion Controllable Methods

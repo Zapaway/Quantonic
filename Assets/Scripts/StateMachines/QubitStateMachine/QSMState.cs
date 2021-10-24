@@ -75,7 +75,7 @@ namespace StateMachines.QSM {
         private async UniTaskVoid _spawnWave() {
             await UniTask.Yield();
 
-            await _spawnManager.SpawnWave(_controllable.transform.position);
+            await _spawnManager.SpawnPlayerWave(_controllable.transform.position);
             _currSpawnedWaves--;
         }
     }

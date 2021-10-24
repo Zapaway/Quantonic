@@ -16,9 +16,9 @@ public sealed class WaveMoveScript : MonoBehaviour
     private static float _moveSpeed = 5f;
 
     // scaling (shared properties)
-    private static readonly float _duration = 5f;
-    private static readonly float _initScale = 1f;
-    private static readonly float _scaleAmp = 2f;
+    private static readonly float _duration = 2f;
+    private static readonly float _initScale = 0.57f;
+    private static readonly float _scaleAmp = 1.01f;
     private static readonly float _animationSeconds = 1f;
     private static readonly int _frames = 100;
 

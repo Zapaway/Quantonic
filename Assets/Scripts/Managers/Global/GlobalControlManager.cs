@@ -49,10 +49,11 @@ namespace Managers {
             worldPos.z = 0;
             return worldPos;
         }
-        public float GetAngleRelativeToMouse(Vector3 centerPoint) {
-            Vector3 mouseWorldPos = GetMouseWorldPosition();
-            Vector3 aimDir = (mouseWorldPos - centerPoint).normalized;
-            return Mathf.Atan2(aimDir.y, aimDir.x) * Mathf.Rad2Deg;
+        public float GetAngleRelativeToMouse(Vector3 originCenterPoint) {
+            return GetAngleRelativeToTarget(GetMouseWorldPosition(), originCenterPoint);
+            // Vector3 mouseWorldPos = GetMouseWorldPosition();
+            // Vector3 aimDir = (mouseWorldPos - centerPoint).normalized;
+            // return Mathf.Atan2(aimDir.y, aimDir.x) * Mathf.Rad2Deg;
         }
         private void _clickStarted() {
             _isCursorHeldDown = true;
@@ -63,6 +64,11 @@ namespace Managers {
             _cursorController.ChangeCursor(_cursorController.CursorTexture);
         }
 
+        // helper methods
+        public float GetAngleRelativeToTarget(Vector2 targetPoint, Vector2 originCenterPoint) {
+            Vector2 aimDir = (targetPoint - originCenterPoint).normalized;
+            return  Mathf.Atan2(aimDir.y, aimDir.x) * Mathf.Rad2Deg;
+        }
     }
 }
 
