@@ -39,7 +39,7 @@ namespace StateMachines.CSM {
             await UniTask.Yield();
 
             Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
-            rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
+            if (rigidbody != null) rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
         } 
         public virtual async UniTask Exit() {
             await UniTask.Yield();

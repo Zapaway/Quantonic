@@ -70,7 +70,7 @@ public abstract class Controllable : MonoBehaviour
         _notNearGateCancellationSource.Cancel();
 
         // clear out every single qubit
-        _subcirc.Clear();
+        // _subcirc.Clear();
     }
 
     protected virtual void OnDestroy() {
@@ -93,6 +93,13 @@ public abstract class Controllable : MonoBehaviour
     protected Qubit _addQubit() {
         var (_, qubit) = _subcirc.Add();
         return qubit;
+    }
+
+    /// <summary>
+    /// Clear subcirc.
+    /// </summary>
+    protected void _clear() {
+        _subcirc.Clear();
     }
 
     /// <summary>

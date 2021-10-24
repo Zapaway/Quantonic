@@ -138,7 +138,9 @@ namespace Managers {
                 await _csm.CurrentState.PhysicsUpdate();
 
                 // camera update
-                Transform targetTransform = _currControllable.transform;
+                Transform targetTransform = _currControllable?.transform;
+                if (targetTransform == null) return;
+
                 Transform camTransform = _mainCamera.transform;
 
                 Vector3 destPos = targetTransform.position + _cameraOffset;
@@ -249,7 +251,7 @@ namespace Managers {
             CurrentControllable = null;
             _controllables.Clear();
             
-            _player.gameObject.SetActive(false);
+            _player.Deactivate();
             foreach (var c in clones) Destroy(c.gameObject);
             
             await UniTask.Delay(TimeSpan.FromSeconds(3));

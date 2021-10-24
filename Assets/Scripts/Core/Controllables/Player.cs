@@ -14,12 +14,22 @@ public sealed class Player : Controllable
     }
 
     /// <summary>
-    /// Actives the qubit and adds the qubits if it is deactivated. 
+    /// Actives the player and adds the qubits if it is already deactivated. 
     /// </summary>
     public void Activate() {
         if (!gameObject.activeSelf) {
             gameObject.SetActive(true);
             _addInitQubits();
+        }
+    }
+
+    /// <summary>
+    /// Deactivates the player and clear the qubits if it is already activated.
+    /// </summary>
+    public void Deactivate() {
+        if (gameObject.activeSelf) {
+            gameObject.SetActive(false);
+            _clear();
         }
     }
 

@@ -98,8 +98,6 @@ public sealed partial class QubitCircuit {
                 _qubits.Add((qcIndex, qubit));
                 _QCIndexToQSIndex[qcIndex] = _qubits.Count - 1;
 
-                Debug.Log($"I am {_controllable.name} and my qubit is at {qubit.transform.position}. QCIndex: {qcIndex}; QSIndex: {_qubits.Count - 1}");
-
                 _compositeQuantumState = _vectorKroneckerProduct(qubit.QuantumStateVector, _compositeQuantumState);
             } else throw new NotImplementedException();
         }
