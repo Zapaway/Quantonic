@@ -71,7 +71,7 @@ namespace StateMachines.CSM {
                     _isFinishedJump = true;
                 } 
                 else {
-                    // TODO death here or something
+                    await _ctrlManager.DestroyCurrentControllable();
                 }
             }
             bool isCanceled = await _jumping().AttachExternalCancellation(_cancelJumpSource.Token).SuppressCancellationThrow();

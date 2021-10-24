@@ -247,7 +247,7 @@ namespace Managers {
             // don't allow anyone to open up the qubit panels
             ActiveQQVPanelMode(false);
             
-            IEnumerable<Controllable> clones = _controllables.Where(x => x is Clone);
+            Clone[] clones = _controllables.Where(x => x is Clone).OfType<Clone>().ToArray();
             CurrentControllable = null;
             _controllables.Clear();
             
@@ -271,6 +271,15 @@ namespace Managers {
         public async UniTask DestroyCurrentControllable() {
             if (_currControllable == _player) {
                 await DisablePlayer();
+            } 
+            else {
+                await _csm.ChangeState(StandingState);
+                ActiveQQVPanelMode(false);
+
+                SwitchControllable();
+                Destroy(_controllables.RemoveFromBack().gameObject);
+
+                InQQVPanelMode(false);
             }
             throw new NotImplementedException();
         }

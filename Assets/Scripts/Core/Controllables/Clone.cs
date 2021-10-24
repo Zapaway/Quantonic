@@ -9,4 +9,10 @@ public sealed class Clone : Controllable
     {
         base.Awake();
     }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        _clear();
+    }
 }
