@@ -62,8 +62,8 @@ namespace Managers {
                 _currControllable = value;
             }
         }
-        public Rigidbody2D CurrentRB => CurrentControllable?.GetComponent<Rigidbody2D>();
-        public BoxCollider2D CurrentBox => CurrentControllable?.GetComponent<BoxCollider2D>();
+        public Rigidbody2D CurrentRB => CurrentControllable?.Rigidbody2D;
+        public BoxCollider2D CurrentBox => CurrentControllable?.BoxCollider2D;
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
         private Player _player;
 

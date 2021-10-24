@@ -18,6 +18,12 @@ using StateMachines.QSM;
 [RequireComponent(typeof(BoxCollider2D), typeof(Rigidbody2D))]
 public abstract class Controllable : MonoBehaviour
 {
+    // components of controllable
+    private BoxCollider2D _boxCollider2D;
+    public BoxCollider2D BoxCollider2D => _boxCollider2D;
+    private Rigidbody2D _rigidbody2D;
+    public Rigidbody2D Rigidbody2D => _rigidbody2D;
+
     // qubits of controllable
     private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
@@ -39,6 +45,9 @@ public abstract class Controllable : MonoBehaviour
     #region Unity Events
     protected virtual void Awake() {
         _subcirc = StageControlManager.Instance.circ.GetOrCreateQubitSubcircuit(this);
+
+        _boxCollider2D = GetComponent<BoxCollider2D>();
+        _rigidbody2D = GetComponent<Rigidbody2D>();
 
         _qsmState = new QSMState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
         _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
@@ -64,13 +73,12 @@ public abstract class Controllable : MonoBehaviour
     protected virtual void OnEnable() {
         if (_notNearGateCancellationSource != null) _notNearGateCancellationSource.Dispose();
         _notNearGateCancellationSource = new CancellationTokenSource();
+        _freezeControllable(this, false);
     }
 
     protected virtual void OnDisable() {
         _notNearGateCancellationSource.Cancel();
-
-        // clear out every single qubit
-        // _subcirc.Clear();
+        _freezeControllable(this, true);
     }
 
     protected virtual void OnDestroy() {
@@ -83,6 +91,11 @@ public abstract class Controllable : MonoBehaviour
             _addQubit();
             Destroy(other.gameObject);
         }
+    }
+
+    private void _freezeControllable(Controllable controllable, bool isFreeze) {
+        if (isFreeze) controllable.Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
+        else controllable.Rigidbody2D.constraints = RigidbodyConstraints2D.FreezeRotation;
     }
     #endregion Unity Events
 
