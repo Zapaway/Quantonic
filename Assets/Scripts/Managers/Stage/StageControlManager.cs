@@ -242,7 +242,7 @@ namespace Managers {
         /// Destroy everything when disabling the player.
         /// </summary>
         public async UniTask DisablePlayer() {
-            await _csm.ChangeState(StandingState);
+            if (_csm.CurrentState != StandingState) await _csm.ChangeState(StandingState);
 
             // don't allow anyone to open up the qubit panels
             ActiveQQVPanelMode(false);
@@ -270,10 +270,11 @@ namespace Managers {
         /// </summary>
         public async UniTask DestroyCurrentControllable() {
             if (_currControllable == _player) {
+                StageUIManager.Instance.PauseTimer();
                 await DisablePlayer();
             } 
-            else {
-                await _csm.ChangeState(StandingState);
+            else if (_currControllable is Clone) {
+                if (_csm.CurrentState != StandingState) await _csm.ChangeState(StandingState);
                 ActiveQQVPanelMode(false);
 
                 SwitchControllable();
@@ -281,7 +282,6 @@ namespace Managers {
 
                 InQQVPanelMode(false);
             }
-            throw new NotImplementedException();
         }
         #endregion Controllable Methods
     }

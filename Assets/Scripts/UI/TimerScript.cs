@@ -16,8 +16,6 @@ public sealed class TimerScript : MonoBehaviour
         if (_onTimerRanOut != null) await _onTimerRanOut();
     }
 
-    private int _testCount = 0;
-
     private void Awake() {
         _timerText = GetComponent<TextMeshProUGUI>();
         _setTimerText(_currSeconds);  // ensure that timer is set to init seconds
@@ -47,7 +45,6 @@ public sealed class TimerScript : MonoBehaviour
             
             if (timerRunOutActionAsync != null) {
                 _onTimerRanOut += async () => await timerRunOutActionAsync();
-                _testCount++;
             }
         }
     }

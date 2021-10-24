@@ -68,11 +68,8 @@ namespace StateMachines.CSM {
                 float onGroundY = _checkIfAboveGround();
                 if (onGroundY != 0f) {
                     transform.position = new Vector2(transform.position.x, onGroundY);
-                    _isFinishedJump = true;
                 } 
-                else {
-                    await _ctrlManager.DestroyCurrentControllable();
-                }
+                _isFinishedJump = true;
             }
             bool isCanceled = await _jumping().AttachExternalCancellation(_cancelJumpSource.Token).SuppressCancellationThrow();
         }

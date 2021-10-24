@@ -28,6 +28,9 @@ namespace StateMachines.CSM {
             if (_isGrounded && _isJump) {
                 await _stateMachine.ChangeState(_ctrlManager.JumpingState);
             }
+            else if (!_isGrounded) {
+                await _ctrlManager.DestroyCurrentControllable();
+            }
         } 
         public override async UniTask PhysicsUpdate() {
             await base.PhysicsUpdate();
