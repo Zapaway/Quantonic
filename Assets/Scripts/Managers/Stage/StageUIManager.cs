@@ -174,7 +174,11 @@ namespace Managers
                     );
                     await UniTask.WhenAll(renderingTasks);
 
-                    _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
+                    _qqvScript.SelectQubitRepresentation(
+                        _selectedRepresentationIndex == qubitCount 
+                            ? --_selectedRepresentationIndex 
+                            : _selectedRepresentationIndex
+                    );
                     SetQDPPanel();
                 }
                 #endregion QQV Elements Toggles
