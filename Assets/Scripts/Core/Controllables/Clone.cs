@@ -9,9 +9,4 @@ public sealed class Clone : Controllable
     {
         base.Awake();
     }
-
-    protected override async UniTask Start()
-    {
-        await base.Start();
-    }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -21,12 +22,15 @@ namespace StateMachines.CSM {
         private const float _jumpDuration = 5;
         private bool _isFinishedJump;  // use this instead of _isGrounded as it is more reliable (accurate)
 
+        private CancellationTokenSource _cancelJumpSource;
+
         public JumpingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
 
         public override async UniTask Enter() {
             await base.Enter();
             
             _isFinishedJump = false;
+            _cancelJumpSource = new CancellationTokenSource();
             Jump().Forget();
         } 
         public override async UniTask HandleInput() {
@@ -46,27 +50,31 @@ namespace StateMachines.CSM {
         } 
         public override async UniTask Exit() {
             await base.Exit();
+
+            // just in case if it is a forced exit, then the controllable has to stop jumping/being in the air
+            if (!_isFinishedJump) _cancelJumpSource.Cancel();
+
+            _cancelJumpSource.Dispose();
         } 
 
         private async UniTaskVoid Jump() {
             Transform transform = _ctrlManager.CurrentControllable.transform;
             Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
             
-            rigidbody.gravityScale = 0f;  // allow the object to stay up in the air 
+            async UniTask _jumping() {
+                transform.Translate(Vector3.up * _jumpHeight);
+                await UniTask.Delay(TimeSpan.FromSeconds(_jumpDuration), ignoreTimeScale: false);
 
-            transform.Translate(Vector3.up * _jumpHeight);
-            await UniTask.Delay(TimeSpan.FromSeconds(_jumpDuration), ignoreTimeScale: false);
-
-            float onGroundY = _checkIfAboveGround();
-            if (onGroundY != 0f) {
-                transform.position = new Vector2(transform.position.x, onGroundY);
-                _isFinishedJump = true;
-            } 
-            else {
-                // TODO death here or something
+                float onGroundY = _checkIfAboveGround();
+                if (onGroundY != 0f) {
+                    transform.position = new Vector2(transform.position.x, onGroundY);
+                    _isFinishedJump = true;
+                } 
+                else {
+                    // TODO death here or something
+                }
             }
-
-            rigidbody.gravityScale = 1f;  
+            bool isCanceled = await _jumping().AttachExternalCancellation(_cancelJumpSource.Token).SuppressCancellationThrow();
         }
         
         private float _checkIfAboveGround() {

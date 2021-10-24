@@ -6,15 +6,24 @@ using Cysharp.Threading.Tasks;
 
 public sealed class Player : Controllable
 {
-    protected override void Awake()
+    protected override async UniTask Start()
     {
-        base.Awake();
-    }
-
-    protected override async UniTask Start() {
         await base.Start();
 
-        // all players should start with one qubit
+        _addInitQubits();
+    }
+
+    /// <summary>
+    /// Actives the qubit and adds the qubits if it is deactivated. 
+    /// </summary>
+    public void Activate() {
+        if (!gameObject.activeSelf) {
+            gameObject.SetActive(true);
+            _addInitQubits();
+        }
+    }
+
+    private void _addInitQubits() {
         _addQubit();
         _test();
     }
@@ -22,7 +31,6 @@ public sealed class Player : Controllable
     protected override void OnDestroy()
     {
         base.OnDestroy();
-
         // // TODO: add conditoinal here to see if the stage ended or not
         // throw new NotSupportedException("Since the stage was not complete, you must use enabling to hide the player.");
     }
@@ -33,6 +41,7 @@ public sealed class Player : Controllable
         // _addQubit();
         // _addQubit();
     }
+
 
     // private async UniTaskVoid Testing2() {
     //     // /// remove

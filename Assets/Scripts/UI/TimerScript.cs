@@ -7,7 +7,7 @@ public sealed class TimerScript : MonoBehaviour
 {
     private TextMeshProUGUI _timerText;
     private const float _initalSeconds = 100;
-    private float _currSeconds = _initalSeconds;
+    private float _currSeconds = _initalSeconds + 1;
 
     // used for event-based handling
     private bool _isRunning = false; 
@@ -16,10 +16,11 @@ public sealed class TimerScript : MonoBehaviour
         if (_onTimerRanOut != null) await _onTimerRanOut();
     }
 
+    private int _testCount = 0;
+
     private void Awake() {
         _timerText = GetComponent<TextMeshProUGUI>();
-
-        ResetTimer();  // ensure that timer is set to init seconds
+        _setTimerText(_currSeconds);  // ensure that timer is set to init seconds
     }
 
     private async UniTaskVoid Update() {
@@ -28,12 +29,10 @@ public sealed class TimerScript : MonoBehaviour
             _setTimerText(_currSeconds);
             
             if (_currSeconds < 1) {
-                StopTimer(keepTimerRunOutAction: true);
+                PauseTimer();
                 _setTimerText(0);
 
                 await _invokeTimerRanOut();
-
-                ResetTimer();
             }
         }
     }
@@ -46,34 +45,38 @@ public sealed class TimerScript : MonoBehaviour
         if (!_isRunning) {
             _isRunning = true;
             
-            _onTimerRanOut += async () => {
-                if (timerRunOutActionAsync != null) await timerRunOutActionAsync();
-            };
+            if (timerRunOutActionAsync != null) {
+                _onTimerRanOut += async () => await timerRunOutActionAsync();
+                _testCount++;
+            }
         }
-    }
-    private void _startTimer() {
-
     }
 
     /// <summary>
-    /// Stop the timer if it isn't idle already.
+    /// Pause the timer if it isn't idle already. Keep the time out action. 
     /// </summary>
-    public void StopTimer(bool keepTimerRunOutAction = false) {
-        if (_isRunning) {
-            _isRunning = false;
-            if (keepTimerRunOutAction == false) _onTimerRanOut = null;
-        };
+    public void PauseTimer() {
+        if (_isRunning) _isRunning = false;
     }
 
+    /// <summary>
+    /// Reset the timer.
+    /// </summary>
     public void ResetTimer(bool keepTimerRunOutAction = false) {
-        StopTimer(keepTimerRunOutAction);
+        PauseTimer();
+        if (!keepTimerRunOutAction) _resetTimerRunOutAction(); 
 
-        _currSeconds = _initalSeconds;
+        _currSeconds = _initalSeconds + 1;
         _setTimerText(_currSeconds);
     }
 
     private void _setTimerText(float seconds) {
         _timerText.SetText($"{Mathf.FloorToInt(seconds)} µs");
     }
+
+    private void _resetTimerRunOutAction() {
+        _onTimerRanOut = null;
+    }
+
     #endregion Timer Actions
 }

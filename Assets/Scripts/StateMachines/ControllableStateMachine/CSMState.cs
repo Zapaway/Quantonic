@@ -47,12 +47,16 @@ namespace StateMachines.CSM {
 
         private bool CheckIfGrounded() {
             BoxCollider2D col = _ctrlManager.CurrentBox;
-            Collider2D overlap = Physics2D.OverlapBox(
-                col.bounds.center, col.bounds.size, 
-                0f, _ctrlManager.PlatformLayerMask
-            );
+            
+            if (col != null) {
+                Collider2D overlap = Physics2D.OverlapBox(
+                    col.bounds.center, col.bounds.size, 
+                    0f, _ctrlManager.PlatformLayerMask
+                );
 
-            return overlap != null ? true : false;
+                return overlap != null ? true : false;
+            } 
+            return false;
         }
     }
 }

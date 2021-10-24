@@ -68,6 +68,9 @@ public abstract class Controllable : MonoBehaviour
 
     protected virtual void OnDisable() {
         _notNearGateCancellationSource.Cancel();
+
+        // clear out every single qubit
+        _subcirc.Clear();
     }
 
     protected virtual void OnDestroy() {

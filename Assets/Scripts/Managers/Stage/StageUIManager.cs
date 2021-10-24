@@ -341,7 +341,6 @@ namespace Managers
                             bool wasInserted = (e.NewStartingIndex != ctrlable.QubitCount - 1);
                             int currentQubitCount = ctrlable.QubitCount;
 
-                            // if added
                             if (!wasInserted) { 
                                 // note that this will never have a null value as the subcirc only accepts value tuples
                                 (_, Qubit qubit) = e.NewItems[0] as (int, Qubit)? ?? default; 
@@ -391,9 +390,6 @@ namespace Managers
                             RefreshArrowButtons();
                             RefreshAllQubitRepresentationsUnsafe().Forget();
                         } break;
-
-                        case NotifyCollectionChangedAction.Reset:  
-                            break;
                     }
                 }
 
@@ -490,8 +486,8 @@ namespace Managers
             _timerScript.StartTimer(_timerRunOutActionAsync);
         }
 
-        public void StopTimer() {
-            _timerScript.StopTimer();
+        public void PauseTimer() {
+            _timerScript.PauseTimer();
         }
 
         public void ResetTimer() {

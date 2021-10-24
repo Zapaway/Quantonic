@@ -1,10 +1,10 @@
 using System;
-using System.Collections;
+using System.Linq;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 using Nito.Collections;
+using testing = System.Diagnostics;
 
 using StateMachines.CSM;
 
@@ -27,7 +27,7 @@ namespace Managers {
     /// <description>Keeps track of ControllableState</description>
     /// </item>
     /// <item>
-    /// <description>Keeps track of composite quantum state </description>
+    /// <description>Keeps track of composite quantum state</description>
     /// </item>
     /// </list></summary>
     public sealed class StageControlManager : Manager<StageControlManager>
@@ -85,6 +85,9 @@ namespace Managers {
         private StandingState _standingState;
         public StandingState StandingState => _standingState;
 
+        // keeps track of stage's state
+        private bool _isStageFinished = false;
+        public bool IsStageFinished => _isStageFinished;
         #endregion Fields/Properties
 
         #region Event Methods
@@ -92,7 +95,6 @@ namespace Managers {
         {
             base.Awake();
 
-            // create stage inputs
             _stageInputs = new StageInputs();
 
             // set up qubit circuit to listen to the current controllable changed event
@@ -102,10 +104,8 @@ namespace Managers {
             CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer(DisablePlayer);
             _controllables.AddToBack(CurrentControllable);
 
-            // set up main camera
             _mainCamera = Camera.main;
 
-            // initalize the controllable states
             _jumpingState = new JumpingState(this, _csm);
             _standingState = new StandingState(this, _csm);
         }
@@ -127,15 +127,17 @@ namespace Managers {
             if (IsToggleQVVTriggered()) StageUIManager.Instance.ToggleQubitPanels();
             if (IsSwitchTriggered() && _controllables.Count > 1 && IsControllableStanding()) SwitchControllable();
             
-            await _csm.CurrentState.HandleInput();
-            await _csm.CurrentState.LogicUpdate();
+            if (_currControllable != null) {
+                await _csm.CurrentState.HandleInput();
+                await _csm.CurrentState.LogicUpdate();
+            }
         }
 
         private async UniTaskVoid FixedUpdate() {
-            await _csm.CurrentState.PhysicsUpdate();
-
-            // camera update
             if (_currControllable != null) {
+                await _csm.CurrentState.PhysicsUpdate();
+
+                // camera update
                 Transform targetTransform = _currControllable.transform;
                 Transform camTransform = _mainCamera.transform;
 
@@ -208,6 +210,11 @@ namespace Managers {
             StageUIManager.Instance.SetQubitPanelsActive(option);
             SetToggleQQVInputActive(!option);
         }
+
+        public void ActiveQQVPanelMode(bool option) {
+            StageUIManager.Instance.SetQubitPanelsActive(option);
+            SetToggleQQVInputActive(option);
+        }
         #endregion Control Modes
 
         #region Controllable Methods
@@ -230,10 +237,28 @@ namespace Managers {
         }
 
         /// <summary>
-        /// Destroy everything by disabling the player.
+        /// Destroy everything when disabling the player.
         /// </summary>
         public async UniTask DisablePlayer() {
-            throw new NotImplementedException();
+            await _csm.ChangeState(StandingState);
+
+            // don't allow anyone to open up the qubit panels
+            ActiveQQVPanelMode(false);
+            
+            IEnumerable<Controllable> clones = _controllables.Where(x => x is Clone);
+            CurrentControllable = null;
+            _controllables.Clear();
+            
+            _player.gameObject.SetActive(false);
+            foreach (var c in clones) Destroy(c.gameObject);
+            
+            await UniTask.Delay(TimeSpan.FromSeconds(3));
+
+            StageUIManager.Instance.ResetTimer();
+            CurrentControllable = _player = SpawnManager.Instance.RespawnPlayer(_player, DisablePlayer);
+            _controllables.AddToBack(CurrentControllable);
+
+            InQQVPanelMode(false);
         }
 
         /// <summary>
@@ -242,6 +267,9 @@ namespace Managers {
         /// If it is a player, then it will disable the player.
         /// </summary>
         public async UniTask DestroyCurrentControllable() {
+            if (_currControllable == _player) {
+                await DisablePlayer();
+            }
             throw new NotImplementedException();
         }
         #endregion Controllable Methods

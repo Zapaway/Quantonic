@@ -19,7 +19,7 @@ namespace Managers {
         
         // checkpoints
         private GameObject[] _checkpoints;
-        // TODO: Add and store checkpoint, along with recent checkpoint (for now, the spawning is origin) 
+        private Vector3 _lastestCheckpoint = new Vector2(0, -6.5f);
         //  - see spawnPlayer()
         
         private bool _isPlayerSpawned = false; 
@@ -77,18 +77,37 @@ namespace Managers {
             if (!_isPlayerSpawned) {
                 GameObject player = Instantiate(
                     _playerPrefab,
-                    Vector3.zero,
+                    _lastestCheckpoint,
                     _playerPrefab.transform.rotation
                 );
                 
-                StageUIManager.Instance.TimerRunOutActionAsync = timeRunOutActionAsync;
-                StageUIManager.Instance.StartTimer();
-                
-                _isPlayerSpawned = true;
+                _completePlayerSetup(timeRunOutActionAsync);
                 return player.GetComponent<Player>();
             } 
 
             return null;
+        }
+        /// <summary>
+        /// Respawn the player (by creating or enabling) and start the timer.
+        /// </summary>
+        public Player RespawnPlayer(Player player, Func<UniTask> timeRunOutActionAsync) {
+            _isPlayerSpawned = player != null;
+
+            if (_isPlayerSpawned) {
+                player.gameObject.transform.position = _lastestCheckpoint;
+                player.Activate();
+
+                _completePlayerSetup(timeRunOutActionAsync);
+            }
+            else player = SpawnPlayer(timeRunOutActionAsync);
+
+            return player;
+        }
+        private void _completePlayerSetup(Func<UniTask> timeRunOutActionAsync) {
+            StageUIManager.Instance.TimerRunOutActionAsync = timeRunOutActionAsync;
+            StageUIManager.Instance.StartTimer();
+                
+            _isPlayerSpawned = true;
         }
 
         /// <summary>
