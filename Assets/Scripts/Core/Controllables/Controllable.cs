@@ -87,7 +87,7 @@ public abstract class Controllable : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if (other.CompareTag("Qubit")) {
+        if (other.tag.Contains("Qubit")) {
             _addQubit();
             Destroy(other.gameObject);
         }

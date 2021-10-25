@@ -28,6 +28,9 @@ namespace Managers {
         protected override void Awake()
         {
             base.Awake();
+
+            // find all checkpoints (first one should always be spawn point)
+            _checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
         }
 
         #region Instantiation Methods
