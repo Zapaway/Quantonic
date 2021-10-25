@@ -1,9 +1,8 @@
 TODO:
-    - create finish line
-    - create enemy 
+    - create finish line and checkpoints
     - create necessary visual cues (e.g. type of gate)
     - add measurement gate
-    - add gate wall
+    - add gate wall 
     * add effects
 
     -> OPEN TimerScript

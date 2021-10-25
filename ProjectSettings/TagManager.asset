@@ -9,6 +9,7 @@ TagManager:
   - Enemy
   - ControllableWave
   - EnemyWave
+  - Enemy|Killable
   layers:
   - Default
   - TransparentFX
