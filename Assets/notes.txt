@@ -1,6 +1,7 @@
 TODO:
     - create finish line and checkpoints
     - create necessary visual cues (e.g. type of gate)
+    - change enemies to disable instead of destroy itself
     - add measurement gate
     - add gate wall 
     * add effects
@@ -13,3 +14,6 @@ TODO:
 BUGS:
     - teleporting down near the edge brings you out
     - fix "entangled" and such
+    - resetting should respawn qubits 
+    - resetting should reset qubits to their previous state
+    - resetting should enable any enemies 

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -18,19 +19,29 @@ namespace Managers {
         [SerializeField] private GameObject _playerWavePrefab;
         
         // checkpoints
-        private GameObject[] _checkpoints;
-        private Vector3 _lastestCheckpoint = new Vector2(0, -6.5f);
-        //  - see spawnPlayer()
+        private Vector3 _spawnPoint;
+        private Vector3 _lastestCheckpoint;  // first should always be spawn point that is the location of the spawn manager
+        private CheckpointScript[] _checkpoints;
+
+        // used for perserving player state so that respawning will revert to the appropiate previous states
+        private sealed class LocalSaveStageState {
+            public GameObject[] enemiesDisabled;
+            // add more
+        }
         
         private bool _isPlayerSpawned = false; 
-        public bool IsPlayerSpawned => _isPlayerSpawned;
 
         protected override void Awake()
         {
             base.Awake();
 
-            // find all checkpoints (first one should always be spawn point)
-            _checkpoints = GameObject.FindGameObjectsWithTag("Checkpoint");
+            _spawnPoint = transform.position;
+            _checkpoints = (
+                from checkpointGo 
+                in GameObject.FindGameObjectsWithTag("Checkpoint") 
+                select checkpointGo.GetComponent<CheckpointScript>()
+            ).ToArray();
+            ResetCheckpoint();
         }
 
         #region Instantiation Methods
@@ -150,14 +161,25 @@ namespace Managers {
         
         #endregion Instantiation Methods
 
-        #region Deletion Methods
-        public void DestroyEveryControllable() {
-
+        #region Checkpoint (Save Point) Methods
+        /// <summary>
+        /// Set the checkpoint to the touched checkpoint and teleport there.
+        /// </summary>
+        public void SetCheckpoint(CheckpointScript checkpointScript) {
+            Transform checkTransform = checkpointScript.gameObject.transform;
+            transform.position = _lastestCheckpoint = (
+                checkTransform.position - Vector3.up * checkTransform.localScale.y * 2
+            ); 
         }
-        public void DestroyCurrentControllable() {
 
+        /// </summary>
+        /// Set the checkpoint to the spawnpoint, teleport the manager there, and reset all states of the checkpoints.
+        /// <summary>
+        public void ResetCheckpoint() {
+            transform.position = _lastestCheckpoint = _spawnPoint;
+            foreach (var chkpScript in _checkpoints) chkpScript.ResetCheckpointState();
         }
-        #endregion Deletion Methods
+        #endregion Checkpoint (Save Point) Methods
     }
 }
 

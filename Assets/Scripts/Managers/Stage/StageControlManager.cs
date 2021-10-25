@@ -101,7 +101,7 @@ namespace Managers {
             circ.InitQubitCircuit(this);
 
             // player should always be the default current controllable
-            CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer(DisablePlayer);
+            CurrentControllable = _player = SpawnManager.Instance.SpawnPlayer(TimeOutAction);
             _controllables.AddToBack(CurrentControllable);
 
             _mainCamera = Camera.main;
@@ -257,10 +257,18 @@ namespace Managers {
             await UniTask.Delay(TimeSpan.FromSeconds(3));
 
             StageUIManager.Instance.ResetTimer();
-            CurrentControllable = _player = SpawnManager.Instance.RespawnPlayer(_player, DisablePlayer);
+            CurrentControllable = _player = SpawnManager.Instance.RespawnPlayer(_player, TimeOutAction);
             _controllables.AddToBack(CurrentControllable);
 
             InQQVPanelMode(false);
+        }
+
+        /// <summary>
+        /// When the timer goes out, use this action.
+        /// </summary>
+        public async UniTask TimeOutAction() {
+            SpawnManager.Instance.ResetCheckpoint();
+            await DisablePlayer();
         }
 
         /// <summary>
