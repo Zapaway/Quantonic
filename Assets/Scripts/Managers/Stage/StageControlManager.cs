@@ -66,6 +66,7 @@ namespace Managers {
         public BoxCollider2D CurrentBox => CurrentControllable?.BoxCollider2D;
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
         private Player _player;
+        public int PlayerID => _player.GetInstanceID();
 
         // camera for following current controllable
         private Camera _mainCamera; 
@@ -267,7 +268,7 @@ namespace Managers {
         /// When the timer goes out, use this action.
         /// </summary>
         public async UniTask TimeOutAction() {
-            SpawnManager.Instance.ResetCheckpoint();
+            SpawnManager.Instance.ResetCheckpoint(_player);
             await DisablePlayer();
         }
 

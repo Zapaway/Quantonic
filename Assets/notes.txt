@@ -21,3 +21,6 @@ BUGS:
     - resetting should respawn qubits 
     - resetting should reset qubits to their previous state
     - resetting should enable any enemies 
+
+DID:
+    - saving and loading state in the beginning works!

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using sysnum = System.Numerics;
 using System.Threading;
 using UnityEngine;
+using MathNet.Numerics.LinearAlgebra;
 using Cysharp.Threading.Tasks;
 
 using Managers;
@@ -27,7 +28,7 @@ public abstract class Controllable : MonoBehaviour
     // qubits of controllable
     private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
-    public (int qcIndex, double probsZero, double probsOne)[] SubcircCopy => _subcirc.Copy();
+    public Vector<sysnum.Complex>[] SubcircVectors => _subcirc.Vectors;
 
     // determines what abilities can be used with the qubits
     private QSM _qsm = new QSM();
@@ -107,6 +108,12 @@ public abstract class Controllable : MonoBehaviour
     protected Qubit _addQubit() {
         var (_, qubit) = _subcirc.Add();
         return qubit;
+    }
+    /// <summary>
+    /// Get an available qubit, set its quantum state, and give it to the controllable.
+    /// </summary>
+    protected Qubit _addQubit(QuantumState state) {
+        return _addQubit().SetQuantumState(state);
     }
 
     /// <summary>

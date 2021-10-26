@@ -55,8 +55,8 @@ public sealed class Qubit : MonoBehaviour
         _camera.targetTexture = _renderTexture;
         
         // initalize rest of qubit information
-        _quantumState = QuantumFactory.MakeQuantumState(_initialState);
         _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
+        SetQuantumState(QuantumFactory.MakeQuantumState(_initialState));
     }
 
     /// <summary>
@@ -67,6 +67,20 @@ public sealed class Qubit : MonoBehaviour
         await UniTask.Yield();
 
         _quantumState.ApplyUnaryOperator(unaryOperator);
+        _updatePos();
+    }
+
+    /// <summary>
+    /// Set a quantum state for the qubit.
+    /// </summary>
+    public Qubit SetQuantumState(QuantumState state) {
+        _quantumState = state;
+        _updatePos();
+
+        return this;
+    }
+
+    private void _updatePos() {
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
     }

@@ -16,6 +16,8 @@ using Quantum.Operators;
 /// </summary>
 public interface IQubitSubcircuit {
     int Count {get;}
+    Vector<sysnum.Complex>[] Vectors {get;}
+
     RenderTexture GetRenderTexture(int index, bool isQCIndex);
     (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex);
 
@@ -27,16 +29,15 @@ public interface IQubitSubcircuit {
     /// "Add" a qubit to the qubit subcirc by explicitly enabling a qubit with the circuit index.
     /// </summary>
     (IQubitSubcircuit subcirc, Qubit qubit) Add(int qcIndex);
+    /// <summary>
+    /// Add an available qubit with the specified quantum state onto the qubit subcircuit.
+    /// </summary>
+    (IQubitSubcircuit subcirc, Qubit qubit) Add(QuantumState state);
 
     /// <summary>
     /// Remove a controllable's subcircuit and set the qubits found in it inactive on the qubit circuit.
     /// </summary>
     void Clear();
-
-    /// <summary>
-    /// Return the current qcIndices and quantum probabilities in respect to these indices.
-    /// </summary>
-    (int qcIndex, double probsZero, double probsOne)[] Copy(); 
 
     /// <summary>
     /// Remove a specific qubit from the subcircuit and set it inactive on the qubit circuit.
@@ -69,6 +70,7 @@ public sealed partial class QubitCircuit {
         private readonly Controllable _controllable;
         private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;  // the higher the qs index, the more binary value
         public int Count => _qubits.Count;
+        public Vector<sysnum.Complex>[] Vectors => (from qubitInfo in _qubits select qubitInfo.qubit.QuantumStateVector.Clone()).ToArray();
 
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
         private readonly Dictionary<int, int> _QCIndexToQSIndex; 
@@ -98,6 +100,12 @@ public sealed partial class QubitCircuit {
 
             return (this, qubit);
         }
+        public (IQubitSubcircuit, Qubit) Add(QuantumState state) {
+            var (_, avalQubit) = Add();
+            avalQubit.SetQuantumState(state);
+
+            return (this, avalQubit);
+        }
         private void _add(int qcIndex, Qubit qubit) {
             if (qcIndex != -1) {
                 _qubits.Add((qcIndex, qubit));
@@ -117,9 +125,6 @@ public sealed partial class QubitCircuit {
             _qubits.Clear();  // although not needed to get rid of entire subcircuit instance, we need notification of clearance
         }
 
-        /*
-            TODO - Work on fixing composite state.
-        */
         public (IQubitSubcircuit, int) RemoveAt(int index, bool isQCIndex) {
             (int qsIndex, int qcIndex, Qubit qubit) = _getQubitInfo(index, isQCIndex);
             return (this, _removeAt(qsIndex, qcIndex, qubit));
@@ -164,14 +169,6 @@ public sealed partial class QubitCircuit {
         public (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex) {
             (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
             return (qubit.DescriptionString, qubit.Probabilities.ground, qubit.Probabilities.excited);
-        }
-
-        public (int qcIndex, double probsZero, double probsOne)[] Copy() {
-            return (from qubitInfo in _qubits select (
-                qubitInfo.qcIndex, 
-                qubitInfo.qubit.Probabilities.ground,
-                qubitInfo.qubit.Probabilities.excited
-            )).ToArray();
         }
         #endregion Getters and Setters
 

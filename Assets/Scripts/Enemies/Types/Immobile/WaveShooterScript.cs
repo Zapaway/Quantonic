@@ -48,6 +48,7 @@ public sealed class WaveShooterScript : ImmobileEnemy, IShooting, IDeath
     }
     public void DeathAction() {
         gameObject.SetActive(false);
+        SpawnManager.Instance.AddUnactivatedRespawnableEnemy(gameObject);
     }
 
     /// <summary>

@@ -15,10 +15,10 @@ public class CheckpointScript : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other) {
-        if (!_isTouched && other.CompareTag("Controllable")) {
+        if (!_isTouched && other.CompareTag("Controllable") && other.gameObject.GetInstanceID() == StageControlManager.Instance.PlayerID) {
             _isTouched = true;
             _spriteRenderer.sprite = _touched;
-            SpawnManager.Instance.SetCheckpoint(this);
+            SpawnManager.Instance.SetCheckpoint(this, other.GetComponent<Player>());
         }
     }
 

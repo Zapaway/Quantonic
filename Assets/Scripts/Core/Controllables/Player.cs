@@ -4,6 +4,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
+using Quantum;
+using Managers;
+
 public sealed class Player : Controllable
 {
     protected override async UniTask Start()
@@ -11,15 +14,18 @@ public sealed class Player : Controllable
         await base.Start();
 
         _addInitQubits();
+        SpawnManager.Instance.SaveLocalState(this);
     }
 
     /// <summary>
     /// Actives the player and adds the qubits if it is already deactivated. 
     /// </summary>
-    public void Activate() {
+    public void Activate(QuantumState[] states = null) {
         if (!gameObject.activeSelf) {
             gameObject.SetActive(true);
-            _addInitQubits();
+
+            if (states == null) _addInitQubits();
+            else _addPrevQubits(states);
         }
     }
 
@@ -37,12 +43,10 @@ public sealed class Player : Controllable
         _addQubit();
         _test();
     }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        // // TODO: add conditoinal here to see if the stage ended or not
-        // throw new NotSupportedException("Since the stage was not complete, you must use enabling to hide the player.");
+    private void _addPrevQubits(QuantumState[] states) {
+        foreach (var state in states) {
+            _addQubit(state);
+        }
     }
 
     private void _test() {
@@ -51,26 +55,4 @@ public sealed class Player : Controllable
         _addQubit();
         // _addQubit();
     }
-
-
-    // private async UniTaskVoid Testing2() {
-    //     // /// remove
-    //     // await UniTask.Delay(TimeSpan.FromSeconds(2));
-    //     // _subcirc.RemoveAt(3, isQCIndex: false);  // qubit3
-
-    //     // /// replace 
-    //     // await UniTask.Delay(TimeSpan.FromSeconds(2));
-    //     // Qubit newQubit2 = _addQubitFromPrefab(qubit2.transform.position); 
-    //     // newQubit2.name = "meow";
-    //     // Destroy(qubit2.gameObject);
-    //     // _subcirc[2] = newQubit2;
-
-    //     // /// move
-    //     // await UniTask.Delay(TimeSpan.FromSeconds(2));
-    //     // _subcirc.Move(0, 1);
-
-    //     // /// reset
-    //     // await UniTask.Delay(TimeSpan.FromSeconds(2));
-    //     // _subcirc.Clear();
-    // }
 }
