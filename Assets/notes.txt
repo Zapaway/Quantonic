@@ -6,10 +6,14 @@ TODO:
     - add gate wall 
     * add effects
 
-    -> OPEN TimerScript
     -> OPEN SpawnManager
-    -> OPEN StageControlManager
-    -> OPEN StageUIManager
+    -> OPEN QubitSubcircuit
+    -> OPEN StageControlManager 
+    -> OPEN Qubit
+    -> OPEN QuantumState
+    -> OPEN TimerScript
+    -> OPEN Controllable
+    -> OPEN Player
 
 BUGS:
     - teleporting down near the edge brings you out

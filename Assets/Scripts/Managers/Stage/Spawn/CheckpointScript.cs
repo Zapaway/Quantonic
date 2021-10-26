@@ -23,7 +23,9 @@ public class CheckpointScript : MonoBehaviour
     }
 
     public void ResetCheckpointState() {
-        _isTouched = false;
-        _spriteRenderer.sprite = _untouched;
+        if (_isTouched) {
+            _isTouched = false;
+            _spriteRenderer.sprite = _untouched;
+        }
     }
 }

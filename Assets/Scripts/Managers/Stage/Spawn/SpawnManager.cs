@@ -7,10 +7,20 @@ using Cysharp.Threading.Tasks;
 
 namespace Managers {
     /// <summary>
-    /// Handles all spawning and despawning in a stage,
-    /// except for when the player starts (handled in ControlManager).
-    /// Also contains prefabs for instantiation.
-    /// </summary>
+    /// <list type="bullet">
+    /// <item>
+    /// <description>Handles all spawning and despawning in a stage, except for when the player starts (handled in ControlManager).</description>
+    /// </item>
+    /// <item>
+    /// <description>Contains prefabs for instantiation</description>
+    /// </item>
+    /// <item>
+    /// <description>Keeps track of checkpoints (teleports to the checkpoint)</description>
+    /// </item>
+    /// <item>
+    /// <description>Saves information about player when checkpoints are triggered</description>
+    /// </item>
+    /// </list></summary>
     public sealed class SpawnManager : Manager<SpawnManager>
     {
         [SerializeField] private GameObject _qubitPrefab;  // default is the ground state
@@ -25,8 +35,8 @@ namespace Managers {
 
         // used for perserving player state so that respawning will revert to the appropiate previous states
         private sealed class LocalSaveStageState {
-            public GameObject[] enemiesDisabled;
-            // add more
+            public List<GameObject> enemiesDisabled = new List<GameObject>();
+            public (int qcIndex, double probsZero, double probsOne)[] playerSubcircInfo;
         }
         
         private bool _isPlayerSpawned = false; 

@@ -6,7 +6,7 @@ using Cysharp.Threading.Tasks;
 public sealed class TimerScript : MonoBehaviour
 {
     private TextMeshProUGUI _timerText;
-    private const float _initalSeconds = 100;
+    private const float _initalSeconds = 15;
     private float _currSeconds = _initalSeconds + 1;
 
     // used for event-based handling

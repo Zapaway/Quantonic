@@ -34,6 +34,11 @@ public interface IQubitSubcircuit {
     void Clear();
 
     /// <summary>
+    /// Return the current qcIndices and quantum probabilities in respect to these indices.
+    /// </summary>
+    (int qcIndex, double probsZero, double probsOne)[] Copy(); 
+
+    /// <summary>
     /// Remove a specific qubit from the subcircuit and set it inactive on the qubit circuit.
     /// </summary>
     (IQubitSubcircuit subcirc, int avalQCIndex) RemoveAt(int index, bool isQCIndex);
@@ -159,6 +164,14 @@ public sealed partial class QubitCircuit {
         public (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex) {
             (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
             return (qubit.DescriptionString, qubit.Probabilities.ground, qubit.Probabilities.excited);
+        }
+
+        public (int qcIndex, double probsZero, double probsOne)[] Copy() {
+            return (from qubitInfo in _qubits select (
+                qubitInfo.qcIndex, 
+                qubitInfo.qubit.Probabilities.ground,
+                qubitInfo.qubit.Probabilities.excited
+            )).ToArray();
         }
         #endregion Getters and Setters
 
