@@ -35,9 +35,10 @@ namespace Managers {
 
         // used for perserving player state so that respawning will revert to the appropiate previous states
         private sealed class LocalSaveStageState {
-            public List<GameObject> enemiesDisabled = new List<GameObject>();
+            public List<GameObject> respawnableEnemiesDisabled = new List<GameObject>();
             public (int qcIndex, double probsZero, double probsOne)[] playerSubcircInfo;
         }
+        private LocalSaveStageState _latestSaveState = new LocalSaveStageState();
         
         private bool _isPlayerSpawned = false; 
 
@@ -92,21 +93,21 @@ namespace Managers {
 
             return res;
         }
-        
 
         /// <summary>
         /// Spawn a player and start the timer. 
         /// </summary>
         public Player SpawnPlayer(Func<UniTask> timeRunOutActionAsync) {
             if (!_isPlayerSpawned) {
-                GameObject player = Instantiate(
+                GameObject playerObj = Instantiate(
                     _playerPrefab,
                     _lastestCheckpoint,
                     _playerPrefab.transform.rotation
                 );
                 
                 _completePlayerSetup(timeRunOutActionAsync);
-                return player.GetComponent<Player>();
+                Player player = playerObj.GetComponent<Player>();
+                
             } 
 
             return null;
@@ -171,7 +172,7 @@ namespace Managers {
         
         #endregion Instantiation Methods
 
-        #region Checkpoint (Save Point) Methods
+        #region Checkpoint and Save Point Methods
         /// <summary>
         /// Set the checkpoint to the touched checkpoint and teleport there.
         /// </summary>
@@ -189,7 +190,29 @@ namespace Managers {
             transform.position = _lastestCheckpoint = _spawnPoint;
             foreach (var chkpScript in _checkpoints) chkpScript.ResetCheckpointState();
         }
-        #endregion Checkpoint (Save Point) Methods
+
+        /// <summary>
+        /// Add onto the disabled respawnable enemy list.
+        /// </summary>
+        public SpawnManager AddDisabledRespawnableEnemy(GameObject enemyObj) {
+            _latestSaveState.respawnableEnemiesDisabled.Add(enemyObj);
+            return this;
+        }
+
+        /// <summary>
+        /// Save player quantum state and reset the disabled respawnable enemy list from here.
+        /// </summary>
+        public SpawnManager SaveLocalState(Player player) {
+            _latestSaveState.playerSubcircInfo = player.SubcircCopy;
+            
+            return this;
+        }
+
+        /// <summary>
+        /// Load player quantum state and enable every enemy from the respawnable enemy list from here.
+        /// </summary>
+        
+        #endregion Checkpoint and Save Point Methods
     }
 }
 

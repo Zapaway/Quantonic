@@ -47,7 +47,7 @@ public sealed class WaveShooterScript : ImmobileEnemy, IShooting, IDeath
         waveObj.GetComponent<EnemyWaveScript>().KillControllableAction = _kill;
     }
     public void DeathAction() {
-        Destroy(gameObject);
+        gameObject.SetActive(false);
     }
 
     /// <summary>

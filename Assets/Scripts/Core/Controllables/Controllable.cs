@@ -27,6 +27,7 @@ public abstract class Controllable : MonoBehaviour
     // qubits of controllable
     private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
+    public (int qcIndex, double probsZero, double probsOne)[] SubcircCopy => _subcirc.Copy();
 
     // determines what abilities can be used with the qubits
     private QSM _qsm = new QSM();
