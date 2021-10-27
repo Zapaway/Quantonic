@@ -194,9 +194,14 @@ namespace Managers
                 /// automatically wait for a result if a cancellation token is passed.
                 /// </para>
                 /// </summary>
+                /// <param name="checkForSpecialCase">
+                /// If not null, it will use this to check for special cases. When executing this,
+                /// if it returns true, then it will not allow the qubit(s) to be submitted.
+                /// </param>
                 public async UniTask<(bool isCanceled, int[] indices)> WaitForSubmitResults(
                     QQVSubmitMode mode = QQVSubmitMode.Default, 
-                    CancellationToken token = default
+                    CancellationToken token = default,
+                    Func<int, bool> checkForSpecialCase = null
                 ) {
                     // default results
                     (bool isCanceled, int[] indices) results = (false, null);
@@ -210,6 +215,11 @@ namespace Managers
                     Updates the submitted qubit index array with one qubit index. */
                     async UniTask SubmitSingleMode((int repIndex, int qubitIndex) qubitRep) {
                         await UniTask.Yield();
+                        
+                        if (checkForSpecialCase != null && checkForSpecialCase(qubitRep.qubitIndex)) {
+                            return;
+                        }
+
                         _submittedQubitIndex = new int[1]{ qubitRep.qubitIndex };
                         SetQubitPanelsActive(true);
                     }  
@@ -479,7 +489,12 @@ namespace Managers
                     Texture qubitTexture = controllable.GetRenderTextureUnsafe(qubitIndex);
                     (string descString, double groundProb, double excitedProb) = controllable.GetQubitInfoUnsafe(qubitIndex);
 
-                    _qdpScript.SetQDP(qubitTexture, qubitIndex, descString, groundProb, excitedProb, QuantumState.ProbabilityToStringFunc);
+                    Func<double, string> probabilityToStringFunc = QuantumState.ProbabilityToStringFunc;
+                    if (controllable.CheckIfQubitTarget(qubitIndex)) {
+                        groundProb = excitedProb = 0;
+                        probabilityToStringFunc = x => "--- (see control)";
+                    }
+                    _qdpScript.SetQDP(qubitTexture, qubitIndex, descString, groundProb, excitedProb, probabilityToStringFunc);
                 }
                 #endregion Getters and Setters
             #endregion QDP Methods

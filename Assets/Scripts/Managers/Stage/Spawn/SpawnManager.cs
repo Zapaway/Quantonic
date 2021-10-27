@@ -45,6 +45,7 @@ namespace Managers {
             public List<GameObject> respawnableEnemiesUnactivated = new List<GameObject>();
             public List<GameObject> respawnableQubitCollectablesUnactivated = new List<GameObject>();
             public QuantumState[] playerQuantumStates;
+            public (int controlQSIndex, int targetQSIndex)[] playerEntanglementInfo;
         }
         private LocalSaveStageState _latestSaveState = new LocalSaveStageState();
         
@@ -233,6 +234,8 @@ namespace Managers {
         /// </summary>
         public SpawnManager SaveLocalState(Player player) {
             _latestSaveState.playerQuantumStates = (from sv in player.SubcircVectors select new QuantumState(sv[0], sv[1])).ToArray();
+            _latestSaveState.playerEntanglementInfo = player.SubcircEntanglementInfo;
+            
             _clearRespawnablesInLocal();
 
             return this;
@@ -242,6 +245,16 @@ namespace Managers {
         /// </summary>
         public SpawnManager LoadLocalState(Player player) {
             player.Activate(_latestSaveState.playerQuantumStates);
+
+            int entangleCount = _latestSaveState.playerEntanglementInfo.Count();
+            List<int> entangledControlQSIndices = new List<int>(entangleCount/2);
+            for (int i = 0; i < entangleCount; ++i) {
+                var (controlQSIndex, targetQSIndex) = _latestSaveState.playerEntanglementInfo[i];
+                if (controlQSIndex == -1 || entangledControlQSIndices.Contains(controlQSIndex)) continue;
+
+                player.ApplyForcedEntanglement(controlQSIndex, targetQSIndex);
+                entangledControlQSIndices.Add(controlQSIndex);
+            }
 
             _setGameObjectsActive(_latestSaveState.respawnableEnemiesUnactivated);
             _setGameObjectsActive(_latestSaveState.respawnableQubitCollectablesUnactivated);

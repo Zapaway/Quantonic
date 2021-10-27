@@ -25,10 +25,13 @@ public abstract class Controllable : MonoBehaviour
     private Rigidbody2D _rigidbody2D;
     public Rigidbody2D Rigidbody2D => _rigidbody2D;
 
+
     // qubits of controllable
     private IQubitSubcircuit _subcirc;   
     public int QubitCount => _subcirc.Count;
     public Vector<sysnum.Complex>[] SubcircVectors => _subcirc.Vectors;
+    public (int controlQSIndex, int targetQSIndex)[] SubcircEntanglementInfo => _subcirc.EntanglementInfo;
+
 
     // determines what abilities can be used with the qubits
     private QSM _qsm = new QSM();
@@ -38,11 +41,20 @@ public abstract class Controllable : MonoBehaviour
     private MultipleState _multiState;
     public MultipleState MultiState => _multiState;
 
+
     // used for checking if the controllable is busy
     private CancellationTokenSource _notNearGateCancellationSource = new CancellationTokenSource();
     private bool _listenForNotNearGateCancellation = false;  // makes sure cancellation of a token doesn't happen twice
     public bool IsBusy => _listenForNotNearGateCancellation;
     [HideInInspector] public bool reachedOtherSideOfGate = false;
+
+
+    // special cases gates can use if they want to check for any entangled qubits (returning true means prevents, and false is opposite)
+    public Func<int, bool> PreventEntangledQubits => (qsIndex) => CheckIfQubitEntangled(qsIndex);
+    public Func<int, bool> PreventTargetedQubits => (qsIndex) => CheckIfQubitTarget(qsIndex);
+
+    private List<int> _allowedQSIndices = new List<int>(1);  // if empty, it is assumed that all qs indices are allowed
+    public Func<int, bool> PreventUnallowedQubits => (qsIndex) => CheckIfQubitIsNotAllowed(qsIndex);
 
     #region Unity Events
     protected virtual void Awake() {
@@ -138,6 +150,31 @@ public abstract class Controllable : MonoBehaviour
         return _subcirc.GetQubitInfoUnsafe(qsIndex, isQCIndex: false);
     } 
 
+    /// <summary>
+    /// Check if the selected qubit via qsIndex is a target qubit.
+    /// </summary>
+    public bool CheckIfQubitTarget(int qsIndex) {
+        return _subcirc.IsQubitTarget(qsIndex, isQCIndex: false);
+    }
+    /// <summary>
+    /// Check if the selected qubit via qsIndex is a control qubit.
+    /// </summary>
+    public bool CheckIfQubitControl(int qsIndex) {
+        return _subcirc.IsQubitControl(qsIndex, isQCIndex: false);
+    }
+    /// <summary>
+    /// Check if the selected qubit via qsIndex is entangled.
+    /// </summary>
+    public bool CheckIfQubitEntangled(int qsIndex) {
+        return _subcirc.IsQubitEntangled(qsIndex, isQCIndex: false);
+    }
+    /// <summary>
+    /// Check if the selected qubit is the qubit that can only be selected.
+    /// </summary>
+    public bool CheckIfQubitIsNotAllowed(int qsIndex) {
+        return _allowedQSIndices.Count == 0 ? false : !_allowedQSIndices.Contains(qsIndex);
+    }
+
     public void SubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _subcirc.Subscribe(eventHandler);
     }
@@ -145,8 +182,22 @@ public abstract class Controllable : MonoBehaviour
         _subcirc.Unsubscribe(eventHandler);
     }
     #endregion Subcircuit Manipulation
-
+    
     #region Select Qubits
+    /// <summary>
+    /// If the qubit is not an entangled control type, then allow any qubits to be submitted.
+    /// If the qubit is of entangled control type, then only its targetted qubit can be submitted.
+    /// </summary>
+    /// <returns> If the inputted qsIndex is entangled or not. </returns>
+    public bool SetAllowedQubitsForSubmissionBasedOnType(int qsIndex) {
+        _allowedQSIndices = new List<int>(1);
+
+        var res = _subcirc.GetEntangledQSIndexPair(qsIndex, isQCIndex: false);
+        if (res.targetQSIndex != -1) _allowedQSIndices = new List<int>(1) { res.targetQSIndex };
+
+        return _allowedQSIndices.Count > 0;
+    }
+
     /// <summary>
     /// Ask for one qubit.
     /// </summary>
@@ -154,12 +205,13 @@ public abstract class Controllable : MonoBehaviour
     /// Automatically execute success case if the operation wasn't cancelled.
     /// If put to false, user is responsible of executing success case.
     /// </param>
-    public async UniTask<int> AskForSingleQubitIndex(bool autoSuccess=true) {
+    public async UniTask<int> AskForSingleQubitIndex(bool autoSuccess=true, Func<int, bool> specialCase=null) {
         _listenForNotNearGateCancellation = true;
 
         var (isCancelled, res) = await StageUIManager.Instance.WaitForSubmitResults(
             StageUIManager.QQVSubmitMode.Single, 
-            _notNearGateCancellationSource.Token        
+            _notNearGateCancellationSource.Token,
+            specialCase       
         );
         if (!isCancelled && autoSuccess) _gateOperationSuccess();
 
@@ -172,23 +224,67 @@ public abstract class Controllable : MonoBehaviour
     /// <summary>
     /// Ask for one qubit at a time. Goes until n times.
     /// </summary>
-    public async UniTask<List<int>> AskForMultipleSingleQubitIndices(int n) {
+    /// <param name="firstSpecialCase">
+    /// If not null, only the first selected index will execute this case.
+    /// </param>
+    /// <param name="transitionalFirstCase">
+    /// If not null, the input of the first special case (if not null) will be used to set up for 
+    /// the executing of the future special cases. Do note that the bool must return if it is entangled or not.
+    /// </param>
+    /// <param name="considerEntangledCase">
+    /// If true and "transitionalFirstCase" is not null,
+    /// it will prevent non-entangled qubits to pick currently entangled qubits. It will also only allow an
+    /// entangled qubit to choose from a certain selection of qubits.
+    /// </param>
+    public async UniTask<List<int>> AskForMultipleSingleQubitIndices(
+        int n, 
+        Func<int, bool> firstSpecialCase=null,
+        Func<int, bool> transitionalFirstCase=null,
+        bool considerEntangledCase=false
+    ) {
         await UniTask.Yield();
         
         if (n > _subcirc.Count) return null;
 
         List<int> res = new List<int>(n);  // qubit indices
+        bool isFirstQubitEntangled = false;
 
-        for (int _ = 0; _ < n; ++_) {
-            int qubitIndex = await AskForSingleQubitIndex(autoSuccess: false);
+        for (int i = 0; i < n; ++i) {
+            // determine the special case
+            Func<int, bool> specialCase = null;
+            bool isOnFirstSpecialCase = firstSpecialCase != null && i == 0;
+            if (isOnFirstSpecialCase) {
+                specialCase = firstSpecialCase;
+            }
+            else if (considerEntangledCase) {
+                specialCase = isFirstQubitEntangled ? PreventUnallowedQubits : PreventEntangledQubits;
+            }
+            
+            // to prevent any duplicates
+            Func<int, bool> preventDuplicateCase = (int qsIndex) => {
+                return res.Contains(qsIndex) || (specialCase?.Invoke(qsIndex) ?? false);
+            };
+            
+            // wait fr indices
+            int qubitIndex = await AskForSingleQubitIndex(
+                autoSuccess: false, 
+                preventDuplicateCase
+            );
             if (qubitIndex == -1) break; // operation was cancelled
             
+            // add into the results
             StageUIManager.Instance.DisableQubitRepInteract(qubitIndex).Forget();
             res.Add(qubitIndex);
+
+            // execute the transitional case if applicable
+            if (isOnFirstSpecialCase && transitionalFirstCase != null) {
+                isFirstQubitEntangled = transitionalFirstCase(qubitIndex);
+            }
         }
 
         // reset
         UniTask.WhenAll(from i in res select StageUIManager.Instance.EnableQubitRepInteract(i)).Forget();
+        if (_allowedQSIndices.Count > 0) _allowedQSIndices = new List<int>(1);
 
         if (res.Count == n) {
             _gateOperationSuccess();
@@ -225,13 +321,19 @@ public abstract class Controllable : MonoBehaviour
 
     /// <summary>
     /// Apply a binary operator on qubit pair(s) within the subcircuit.
-    /// TODO: Update the QSM of controllable.
     /// </summary>
     public async UniTask ApplyBinaryOperator(
         BinaryOperator binaryOperator, 
         int[] qsPair
     ) {
         await _subcirc.ApplyBinaryOperator(binaryOperator, qsPair, isQCPair: false);
+    }
+
+    /// <summary>
+    /// Force entanglement upon two qubits. Not recommended to use unless if you are loading in quantum states.
+    /// </summary>
+    public void ApplyForcedEntanglement(int controlQSIndex, int targetQSIndex) {
+        _subcirc.ForceEntanglement(controlQSIndex, targetQSIndex);
     }
     #endregion Applying Methods
 }

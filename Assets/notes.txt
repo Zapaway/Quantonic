@@ -1,26 +1,15 @@
 TODO:
-    - create finish line and checkpoints
+    - create finish line (measurement gate)
     - create necessary visual cues (e.g. type of gate)
-    - change enemies to disable instead of destroy itself
-    - add measurement gate
     - add gate wall 
+    - create text that states what is happening (slightly above player - e.g. "you cannot jump yet")
     * add effects
-
-    -> OPEN SpawnManager
-    -> OPEN QubitSubcircuit
-    -> OPEN StageControlManager 
-    -> OPEN Qubit
-    -> OPEN QuantumState
-    -> OPEN TimerScript
-    -> OPEN Controllable
-    -> OPEN Player
 
 BUGS:
     - teleporting down near the edge brings you out
-    - fix "entangled" and such
-    - resetting should respawn qubits 
-    - resetting should reset qubits to their previous state
-    - resetting should enable any enemies 
+    
+    - dont allow clone from entangled qubits
+    - dont allow target entangled qubits to be passed into unary gates
+    - dont allow controlled entangled qubits to entangle with other qubits except the one that it is with (for deentanglement)
+    - 
 
-DID:
-    - saving and loading state in the beginning works!

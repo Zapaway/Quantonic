@@ -27,13 +27,16 @@ namespace StateMachines.QSM {
         } 
         public override async UniTask HandleInput() {            
             await base.HandleInput();
+
+            int qsIndex = _uiManager.QubitRepIndexToQSIndex(_uiManager.SelectedRepIndex);
             if (
                 _ctrlManager.IsSplitToggled() && 
                 _controllable.QubitCount > 1 &&
                 _uiManager.AreQubitPanelsDisplayed && 
                 !_controllable.IsBusy &&
                 _hasAvalSpace &&
-                _ctrlManager.IsControllableStanding()
+                _ctrlManager.IsControllableStanding() &&
+                !_controllable.CheckIfQubitEntangled(qsIndex)
                 ) 
             {
                 // create clone and add it to deque
@@ -42,7 +45,6 @@ namespace StateMachines.QSM {
                 _ctrlManager.AddControllableToBack(clone);
 
                 // transfter qubit from curr qubitsubcirc to the clone's, update qubitcirc, and reflect change on ui
-                int qsIndex = _uiManager.QubitRepIndexToQSIndex(_uiManager.SelectedRepIndex);
                 _ctrlManager.circ.TransferQubits(_controllable, clone, new[] {qsIndex});
             }
         } 

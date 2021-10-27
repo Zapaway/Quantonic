@@ -38,13 +38,23 @@ public sealed class BinaryGate : Gate<BinaryOperator>
     {
         StageControlManager.Instance.InQQVPanelMode(true);
 
-        List<int> res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
+        List<int> res;
+        if (_operator is IControlledOperator<BinaryOperator>) {
+            res = await OccupiedControllable.AskForMultipleSingleQubitIndices(
+                _capacity, 
+                OccupiedControllable.PreventTargetedQubits,
+                OccupiedControllable.SetAllowedQubitsForSubmissionBasedOnType,
+                considerEntangledCase: true
+            );
+        }
+        else {
+            res = await OccupiedControllable.AskForMultipleSingleQubitIndices(_capacity);
+        }
         
         if (res != null) {
             base.GateCollisionAction(collision).Forget();
             _apply(OccupiedControllable, res.ToArray());
         }
-    
 
         StageControlManager.Instance.InQQVPanelMode(false);
     }

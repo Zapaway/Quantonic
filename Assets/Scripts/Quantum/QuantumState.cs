@@ -10,7 +10,9 @@ namespace Quantum {
     public enum QuantumStateDescription {
         Ground, 
         Excited,
-        Superposition    
+        Superposition,
+        EntangledControl,
+        EntangledTarget
     }
 
     /// <summary>
@@ -53,6 +55,25 @@ namespace Quantum {
         public void ApplyUnaryOperator(UnaryOperator unaryOperator) {
             _state *= unaryOperator.Matrix;
             UpdateProbabilities();
+        }
+
+        /// <summary>
+        /// Check if this quantum state qualifies for an entangled control, and if so, change it to that.
+        /// </summary>
+        public bool CheckIfEntangledCtrl() {
+            bool res = _desc == QuantumStateDescription.Superposition;
+            if (res) _desc = QuantumStateDescription.EntangledControl;
+
+            return res;
+        }
+        /// <summary>
+        /// Check if this quantum state is an entangled target, and if so, reflect it on its desc.
+        /// </summary>
+        public bool CheckIfEntangledTar(QuantumState qsControl) {
+            bool res = qsControl._desc == QuantumStateDescription.EntangledControl;
+            if (res) _desc = QuantumStateDescription.EntangledTarget;
+
+            return res;
         }
 
         public void UpdateProbabilities() {
@@ -112,6 +133,10 @@ namespace Quantum {
                     return "Excited";
                 case QuantumStateDescription.Superposition:
                     return _probsZero == 0.5 ? "Max Superposition" : "Superposition";
+                case QuantumStateDescription.EntangledControl:
+                    return "Entangled (Control)";
+                case QuantumStateDescription.EntangledTarget:
+                    return "Entangled (Target)";
                 default:
                     return "";
             }

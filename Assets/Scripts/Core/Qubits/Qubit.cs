@@ -49,6 +49,10 @@ public sealed class Qubit : MonoBehaviour
     public string DescriptionString => _quantumState.DescriptionToString();
     public (double ground, double excited) Probabilities => (_quantumState.ProbsZero, _quantumState.ProbsOne);
 
+    // entangled pair data
+    private (Qubit control, Qubit target)? _entangledPair = null;
+    public (Qubit control, Qubit target) EntangledPair => (_entangledPair?.control, _entangledPair?.target);
+
     private void Awake() {
         // initalize render texture
         _renderTexture = new RenderTexture(_renderTextureDesc);
@@ -59,6 +63,7 @@ public sealed class Qubit : MonoBehaviour
         ResetQuantumState();
     }
 
+    #region Quantum State Operations
     /// <summary>
     /// After applying the unary operator, update its position. This method by itself 
     /// does not notify Controllable of any changes.
@@ -68,6 +73,40 @@ public sealed class Qubit : MonoBehaviour
 
         _quantumState.ApplyUnaryOperator(unaryOperator);
         _updatePos();
+    }
+
+    /// <summary>
+    /// Transform this qubit into an entangled control and the other qubit to an entangled target.
+    /// </summary>
+    /// <returns> Successfully turned both qubits into an entangled pair or not. (If they are already transformed, return false.) </returns>
+    public bool AttemptTransformToControl(Qubit attemptTarget) {
+        if (_entangledPair != null) return false;
+
+        _quantumState.CheckIfEntangledCtrl();
+        bool res = attemptTarget._quantumState.CheckIfEntangledTar(_quantumState);
+        if (res) {
+            attemptTarget._entangledPair = _entangledPair = (this, attemptTarget);
+        }
+
+        Debug.Log(res);
+
+        return res;
+    }
+
+    /// <summary>
+    /// Revert this qubit back to its state and kill the entangled pair. Note that this will not revert the target qubit's quantum state desc.
+    /// </summary>
+    /// <returns> Successfully removed the entangled pair. (If they are already removed, return false.) </returns>
+    public bool AttemptRevertToRegular() {
+        if (_entangledPair == null) return false;
+
+        bool res = _quantumState.Description == QuantumStateDescription.EntangledControl;
+        if (res) {
+            _quantumState.UpdateProbabilities();
+            _setBothQubitsEntangledPairsNull();
+        }
+
+        return res;
     }
 
     /// <summary>
@@ -84,11 +123,21 @@ public sealed class Qubit : MonoBehaviour
     /// Set the quantum state to the default one.
     /// </summary>
     public Qubit ResetQuantumState() {
+        _setBothQubitsEntangledPairsNull();
         return SetQuantumState(QuantumFactory.MakeQuantumState(_initialState));
     }
+    #endregion Quantum State Operations
 
     private void _updatePos() {
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
+    }
+
+    private void _setBothQubitsEntangledPairsNull() {
+        _entangledPair?.target._setEntangledPairNull();
+        _entangledPair = null;
+    }
+    private void _setEntangledPairNull() {
+        _entangledPair = null;
     }
 }

@@ -17,9 +17,14 @@ using Quantum.Operators;
 public interface IQubitSubcircuit {
     int Count {get;}
     Vector<sysnum.Complex>[] Vectors {get;}
+    (int controlQSIndex, int targetQSIndex)[] EntanglementInfo {get;}
 
     RenderTexture GetRenderTexture(int index, bool isQCIndex);
     (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex);
+    bool IsQubitTarget(int index, bool isQCIndex);
+    bool IsQubitControl(int index, bool isQCIndex);
+    bool IsQubitEntangled(int index, bool isQCIndex);
+    (int controlQSIndex, int targetQSIndex) GetEntangledQSIndexPair(int index, bool isQCIndex);
 
     /// <summary>
     /// Add an available qubit onto the qubit subcircuit.
@@ -57,6 +62,10 @@ public interface IQubitSubcircuit {
     /// the zero index is the control and the one index is the target.
     /// </summary>
     UniTask ApplyBinaryOperator(BinaryOperator binaryOperator, int[] indexPair, bool isQCPair);
+    /// <summary>
+    /// Force entanglement upon two qubits. Not recommended to use unless if you are loading in quantum states.
+    /// </summary>
+    void ForceEntanglement(int controlQSIndex, int targetQSIndex);
 }
 
 public sealed partial class QubitCircuit {
@@ -71,6 +80,9 @@ public sealed partial class QubitCircuit {
         private readonly ObservableCollection<(int qcIndex, Qubit qubit)> _qubits;  // the higher the qs index, the more binary value
         public int Count => _qubits.Count;
         public Vector<sysnum.Complex>[] Vectors => (from qubitInfo in _qubits select qubitInfo.qubit.QuantumStateVector.Clone()).ToArray();
+        public (int controlQSIndex, int targetQSIndex)[] EntanglementInfo => (
+            from i in Enumerable.Range(0, _qubits.Count) select GetEntangledQSIndexPair(i, isQCIndex: false)
+        ).ToArray();
 
         // serves to relate a quantum circuit index to the appropiate index in the subcircuit
         private readonly Dictionary<int, int> _QCIndexToQSIndex; 
@@ -168,7 +180,45 @@ public sealed partial class QubitCircuit {
 
         public (string descString, double ground, double excited) GetQubitInfoUnsafe(int index, bool isQCIndex) {
             (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
-            return (qubit.DescriptionString, qubit.Probabilities.ground, qubit.Probabilities.excited);
+            string descString = qubit.DescriptionString;
+
+            if (qubit.Description == QuantumStateDescription.EntangledControl) 
+                descString += $" with [{_getQubitInfo(qubit.EntangledPair.target).qsIndex}]";
+            else if (qubit.Description == QuantumStateDescription.EntangledTarget)
+                descString += $" with [{_getQubitInfo(qubit.EntangledPair.control).qsIndex}]";
+
+            return (descString, qubit.Probabilities.ground, qubit.Probabilities.excited);
+        }
+
+        public bool IsQubitTarget(int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return qubit.Description == QuantumStateDescription.EntangledTarget;
+        }
+        public bool IsQubitControl(int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return qubit.Description == QuantumStateDescription.EntangledControl;
+        }
+        public bool IsQubitEntangled(int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            return qubit.EntangledPair != (null, null);        
+        }
+
+        public (int controlQSIndex, int targetQSIndex) GetEntangledQSIndexPair(int index, bool isQCIndex) {
+            (_, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
+            int controlQSIndex = -1, targetQSIndex = -1;
+
+            if (qubit.EntangledPair != (null, null)) {
+                if (qubit.Description == QuantumStateDescription.EntangledControl) {
+                    controlQSIndex = index;
+                    targetQSIndex = _getQubitInfo(qubit.EntangledPair.target).qsIndex;
+                }
+                else {
+                    controlQSIndex = _getQubitInfo(qubit.EntangledPair.control).qsIndex;
+                    targetQSIndex = index;
+                }
+            }
+
+            return (controlQSIndex, targetQSIndex);
         }
         #endregion Getters and Setters
 
@@ -193,14 +243,25 @@ public sealed partial class QubitCircuit {
                 bool didChange = await _updateCompositeState(ctrlledOp, controlQSIndex, targetQSIndex);
                 if (didChange) {
                     await _applyOneUnaryOperator(ctrlledOp.TargetUnaryOperator, targetQSIndex, isQCIndex: false);
+
+                    if (controlQubit.Description == QuantumStateDescription.EntangledControl) {
+                        controlQubit.AttemptRevertToRegular();
+                    } else controlQubit.AttemptTransformToControl(targetQubit);
                 }
             } 
             else {
                 _updateCompositeState(binaryOperator, controlQSIndex, targetQSIndex);
             }
         }
+        public void ForceEntanglement(int controlQSIndex, int targetQSIndex) {
+            ( _, _, Qubit controlQubit) = _getQubitInfo(controlQSIndex, isQCIndex: false);
+            (_, _, Qubit targetQubit) = _getQubitInfo(targetQSIndex, isQCIndex: false);
+
+            controlQubit.AttemptTransformToControl(targetQubit);
+        }
         /// <summary>
         /// Apply a unary operator on one qubit. Returns the qubit's subcirc index.
+        /// Note that it does not care if the affected qubit is entangled.
         /// </summary>
         private async UniTask<int> _applyOneUnaryOperator(UnaryOperator unaryOperator, int index, bool isQCIndex) {
             (int qsIndex, _, Qubit qubit) = _getQubitInfo(index, isQCIndex);
@@ -369,6 +430,20 @@ public sealed partial class QubitCircuit {
             }
 
             return (qsIndex, qcIndex, qubit);
+        }
+        /// <summary>
+        /// Find all indices about the given qubit. 
+        /// </summary>
+        private (int qsIndex, int qcIndex) _getQubitInfo(Qubit qubit) {
+            for (int qsIndex = 0; qsIndex < _qubits.Count; ++qsIndex) {
+                var info = _qubits[qsIndex];
+
+                if (info.qubit == qubit) {
+                    return (qsIndex, info.qcIndex);
+                }
+            }
+
+            return (-1, -1);  // fail case
         }
     }
 }

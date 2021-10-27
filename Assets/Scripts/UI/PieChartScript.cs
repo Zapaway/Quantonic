@@ -16,6 +16,11 @@ public class PieChartScript : MonoBehaviour
         double currSum = 0;
 
         for (int i = 0; i < values.Length; ++i) {
+            if (values[i] == 0) {
+                _pieLayers[i].fillAmount = 0;
+                continue;
+            }
+
             currSum += values[i];
             _pieLayers[i].fillAmount = (float)(currSum/total);
         }
