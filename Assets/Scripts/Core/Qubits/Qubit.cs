@@ -56,7 +56,7 @@ public sealed class Qubit : MonoBehaviour
         
         // initalize rest of qubit information
         _blochSphereCoords = Vector3.right * _blochSphere.transform.position.x;
-        SetQuantumState(QuantumFactory.MakeQuantumState(_initialState));
+        ResetQuantumState();
     }
 
     /// <summary>
@@ -78,6 +78,13 @@ public sealed class Qubit : MonoBehaviour
         _updatePos();
 
         return this;
+    }
+
+    /// <summary>
+    /// Set the quantum state to the default one.
+    /// </summary>
+    public Qubit ResetQuantumState() {
+        return SetQuantumState(QuantumFactory.MakeQuantumState(_initialState));
     }
 
     private void _updatePos() {

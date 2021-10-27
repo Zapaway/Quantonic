@@ -66,7 +66,7 @@ namespace Managers {
         public BoxCollider2D CurrentBox => CurrentControllable?.BoxCollider2D;
         private Deque<Controllable> _controllables = new Deque<Controllable>(); 
         private Player _player;
-        public int PlayerID => _player.GetInstanceID();
+        public int PlayerGameObjID => _player.gameObject.GetInstanceID();
 
         // camera for following current controllable
         private Camera _mainCamera; 
@@ -242,7 +242,10 @@ namespace Managers {
         /// <summary>
         /// Destroy everything when disabling the player.
         /// </summary>
-        public async UniTask DisablePlayer() {
+        /// <param name="shouldResetLocal">
+        /// If true, it will reset the local state instead of load in the previous one.
+        /// </param>
+        public async UniTask DisablePlayer(bool shouldResetLocal = false) {
             if (_csm.CurrentState != StandingState) await _csm.ChangeState(StandingState);
 
             // don't allow anyone to open up the qubit panels
@@ -258,7 +261,7 @@ namespace Managers {
             await UniTask.Delay(TimeSpan.FromSeconds(3));
 
             StageUIManager.Instance.ResetTimer();
-            CurrentControllable = _player = SpawnManager.Instance.RespawnPlayer(_player, TimeOutAction);
+            CurrentControllable = _player = SpawnManager.Instance.RespawnPlayer(_player, TimeOutAction, shouldResetLocal);
             _controllables.AddToBack(CurrentControllable);
 
             InQQVPanelMode(false);
@@ -268,8 +271,8 @@ namespace Managers {
         /// When the timer goes out, use this action.
         /// </summary>
         public async UniTask TimeOutAction() {
-            SpawnManager.Instance.ResetCheckpoint(_player);
-            await DisablePlayer();
+            SpawnManager.Instance.ResetCheckpoint();
+            await DisablePlayer(shouldResetLocal: true);
         }
 
         /// <summary>

@@ -9,9 +9,7 @@ TagManager:
   - Enemy
   - ControllableWave
   - EnemyWave
-  - Enemy|Killable
   - Enemy|Respawn
-  - Enemy|Killable|Respawn
   - Qubit|Respawn
   - Checkpoint
   layers:

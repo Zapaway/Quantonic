@@ -75,7 +75,7 @@ GameObject:
   - component: {fileID: 7263037872875863547}
   m_Layer: 0
   m_Name: In-Place Shooter
-  m_TagString: Enemy|Killable|Respawn
+  m_TagString: Enemy|Respawn
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

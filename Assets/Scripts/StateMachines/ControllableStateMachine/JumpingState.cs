@@ -58,20 +58,23 @@ namespace StateMachines.CSM {
         } 
 
         private async UniTaskVoid Jump() {
-            Transform transform = _ctrlManager.CurrentControllable.transform;
-            Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
-            
-            async UniTask _jumping() {
-                transform.Translate(Vector3.up * _jumpHeight);
-                await UniTask.Delay(TimeSpan.FromSeconds(_jumpDuration), ignoreTimeScale: false);
+            try {
+                Transform transform = _ctrlManager.CurrentControllable?.transform;
+                Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
+                        
+                async UniTask _jumping() {
+                    transform.Translate(Vector3.up * _jumpHeight);
+                    await UniTask.Delay(TimeSpan.FromSeconds(_jumpDuration), ignoreTimeScale: false);
 
-                float onGroundY = _checkIfAboveGround();
-                if (onGroundY != 0f) {
-                    transform.position = new Vector2(transform.position.x, onGroundY);
-                } 
-                _isFinishedJump = true;
+                    float onGroundY = _checkIfAboveGround();
+                    if (onGroundY != 0f) {
+                        transform.position = new Vector2(transform.position.x, onGroundY);
+                    } 
+                    _isFinishedJump = true;
+                }
+                bool isCanceled = await _jumping().AttachExternalCancellation(_cancelJumpSource.Token).SuppressCancellationThrow();
             }
-            bool isCanceled = await _jumping().AttachExternalCancellation(_cancelJumpSource.Token).SuppressCancellationThrow();
+            catch (Exception e) { Debug.Log(e); };
         }
         
         private float _checkIfAboveGround() {

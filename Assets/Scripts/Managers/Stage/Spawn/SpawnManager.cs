@@ -11,7 +11,7 @@ namespace Managers {
     /// <summary>
     /// <list type="bullet">
     /// <item>
-    /// <description>Handles all spawning and despawning in a stage, except for when the player starts (handled in ControlManager).</description>
+    /// <description>Handles all spawning and despawning in a stage, except for when the player starts (handled in ControlManager)</description>
     /// </item>
     /// <item>
     /// <description>Contains prefabs for instantiation</description>
@@ -25,19 +25,25 @@ namespace Managers {
     /// </list></summary>
     public sealed class SpawnManager : Manager<SpawnManager>
     {
+        /// prefabs
         [SerializeField] private GameObject _qubitPrefab;  // default is the ground state
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private GameObject _clonePrefab;
         [SerializeField] private GameObject _playerWavePrefab;
         
-        // checkpoints
+        /// checkpoints
         private Vector3 _spawnPoint;
         private Vector3 _lastestCheckpoint;  // first should always be spawn point that is the location of the spawn manager
         private CheckpointScript[] _checkpoints;
 
+        /// scene data
+        private GameObject[] _respawnableEnemies;  // all enemies that can be respawned will be tagged as "Enemy|Respawn"
+        private GameObject[] _respawnableQubitCollectables;  // all qubit collectables will be tagged as "Qubit|Respawn"
+        
         // used for perserving player state so that respawning will revert to the appropiate previous states
         private sealed class LocalSaveStageState {
             public List<GameObject> respawnableEnemiesUnactivated = new List<GameObject>();
+            public List<GameObject> respawnableQubitCollectablesUnactivated = new List<GameObject>();
             public QuantumState[] playerQuantumStates;
         }
         private LocalSaveStageState _latestSaveState = new LocalSaveStageState();
@@ -48,6 +54,11 @@ namespace Managers {
         {
             base.Awake();
 
+            // gather all respawnable objs
+            _respawnableEnemies = GameObject.FindGameObjectsWithTag("Enemy|Respawn");
+            _respawnableQubitCollectables = GameObject.FindGameObjectsWithTag("Qubit|Respawn");
+
+            // gather checkpoint info 
             _spawnPoint = transform.position;
             _checkpoints = (
                 from checkpointGo 
@@ -117,12 +128,17 @@ namespace Managers {
         /// <summary>
         /// Respawn the player (by creating or enabling) and start the timer.
         /// </summary>
-        public Player RespawnPlayer(Player player, Func<UniTask> timeRunOutActionAsync) {
+        /// <param name="shouldResetLocal">
+        /// If true, it will reset the local state instead of load in the previous one.
+        /// </param>
+        public Player RespawnPlayer(Player player, Func<UniTask> timeRunOutActionAsync, bool shouldResetLocal = false) {
             _isPlayerSpawned = player != null;
 
             if (_isPlayerSpawned) {
                 player.gameObject.transform.position = _lastestCheckpoint;
-                LoadLocalState(player);
+
+                if (shouldResetLocal) _resetLocalState(player);
+                else LoadLocalState(player);
 
                 _completePlayerSetup(timeRunOutActionAsync);
             }
@@ -178,6 +194,9 @@ namespace Managers {
         /// <summary>
         /// Set the checkpoint to the touched checkpoint and teleport there.
         /// </summary>
+        /// <param name="player">
+        /// If player is not null, then it will save the local state.
+        /// </param>
         public void SetCheckpoint(CheckpointScript checkpointScript, Player player = null) {
             Transform checkTransform = checkpointScript.gameObject.transform;
             transform.position = _lastestCheckpoint = (
@@ -186,15 +205,12 @@ namespace Managers {
 
             if (player != null) SaveLocalState(player);
         }
-
         /// </summary>
         /// Set the checkpoint to the spawnpoint, teleport the manager there, and reset all states of the checkpoints.
         /// <summary>
-        public void ResetCheckpoint(Player player = null) {
+        public void ResetCheckpoint() {
             transform.position = _lastestCheckpoint = _spawnPoint;
             foreach (var chkpScript in _checkpoints) chkpScript.ResetCheckpointState();
-
-            if (player != null) LoadLocalState(player);
         }
 
         /// <summary>
@@ -204,27 +220,54 @@ namespace Managers {
             _latestSaveState.respawnableEnemiesUnactivated.Add(enemyObj);
             return this;
         }
+        /// <summary>
+        /// Add onto the unactivated qubit collectable list.
+        /// </summary>
+        public SpawnManager AddUnactivatedQubitCollectable(GameObject qubitCollectableObj) {
+            _latestSaveState.respawnableQubitCollectablesUnactivated.Add(qubitCollectableObj);
+            return this;
+        }
 
         /// <summary>
         /// Save player quantum state and clear the unenabled respawnable enemy list from here.
         /// </summary>
         public SpawnManager SaveLocalState(Player player) {
             _latestSaveState.playerQuantumStates = (from sv in player.SubcircVectors select new QuantumState(sv[0], sv[1])).ToArray();
-            _latestSaveState.respawnableEnemiesUnactivated.Clear();
-            foreach (var thing in _latestSaveState.playerQuantumStates) Debug.Log(thing.State);
+            _clearRespawnablesInLocal();
+
             return this;
         }
-
         /// <summary>
-        /// Activate the player with their last saved player quantum state. Also activate every enemy from the respawnable enemy list from here.
+        /// Activate the player with their last saved player quantum state. Also activate every respawnable.
         /// </summary>
         public SpawnManager LoadLocalState(Player player) {
             player.Activate(_latestSaveState.playerQuantumStates);
 
-            foreach (GameObject enemyObj in _latestSaveState.respawnableEnemiesUnactivated) enemyObj.SetActive(true);
-            _latestSaveState.respawnableEnemiesUnactivated.Clear();
+            _setGameObjectsActive(_latestSaveState.respawnableEnemiesUnactivated);
+            _setGameObjectsActive(_latestSaveState.respawnableQubitCollectablesUnactivated);
+            _clearRespawnablesInLocal();
 
             return this;
+        }
+        /// <summary>
+        /// Reset the local state and enable every game object that is respawnable. Activate the player too with initial qubits.
+        /// </summary>
+        private SpawnManager _resetLocalState(Player player) {
+            player.Activate();
+            SaveLocalState(player);
+
+            _setGameObjectsActive(_respawnableEnemies);
+            _setGameObjectsActive(_respawnableQubitCollectables);
+
+            return this;
+        }   
+
+        private void _setGameObjectsActive(IEnumerable<GameObject> gameObjects) {
+            foreach (var go in gameObjects) go.SetActive(true);
+        }
+        private void _clearRespawnablesInLocal() {
+            _latestSaveState.respawnableEnemiesUnactivated.Clear();
+            _latestSaveState.respawnableQubitCollectablesUnactivated.Clear();
         }
         #endregion Checkpoint and Save Point Methods
     }

@@ -11,7 +11,7 @@ public sealed class ControllableWaveScript : MonoBehaviour
             Destroy(gameObject);
             Destroy(other.gameObject);
         }
-        else if (other.tag.Contains("Enemy") && other.tag.Contains("Killable")) {
+        else if (other.tag.Contains("Enemy") && other.tag.Contains("Respawn")) {
             Destroy(gameObject);
             other.GetComponent<IDeath>().DeathAction();
         }

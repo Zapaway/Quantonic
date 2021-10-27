@@ -91,7 +91,8 @@ public abstract class Controllable : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         if (other.tag.Contains("Qubit")) {
             _addQubit();
-            Destroy(other.gameObject);
+            other.gameObject.SetActive(false);
+            SpawnManager.Instance.AddUnactivatedQubitCollectable(other.gameObject);
         }
     }
 

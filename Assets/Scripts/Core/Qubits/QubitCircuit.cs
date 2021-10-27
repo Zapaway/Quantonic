@@ -138,7 +138,10 @@ public sealed partial class QubitCircuit
 
     private void _clear(Dictionary<int, int>.KeyCollection qcIndices) {
         foreach (int qcIndex in qcIndices) {
-            _setActiveQubit(_allQubits[qcIndex], false);
+            Qubit qubit = _allQubits[qcIndex];
+
+            _setActiveQubit(qubit, false);
+            qubit.ResetQuantumState();
         }
     }
 
