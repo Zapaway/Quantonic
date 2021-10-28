@@ -68,7 +68,7 @@ public sealed class TimerScript : MonoBehaviour
     }
 
     private void _setTimerText(float seconds) {
-        _timerText.SetText($"{Mathf.FloorToInt(seconds)} µs");
+        _timerText?.SetText($"{Mathf.FloorToInt(seconds)} µs");
     }
 
     private void _resetTimerRunOutAction() {

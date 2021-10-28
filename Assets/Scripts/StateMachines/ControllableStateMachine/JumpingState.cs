@@ -76,19 +76,5 @@ namespace StateMachines.CSM {
             }
             catch (Exception e) { Debug.Log(e); };
         }
-        
-        private float _checkIfAboveGround() {
-            BoxCollider2D col = _ctrlManager.CurrentBox;
-            RaycastHit2D hit = Physics2D.BoxCast(
-                col.bounds.center, col.bounds.size, 
-                0f, Vector2.down, Mathf.Infinity, 
-                _ctrlManager.PlatformLayerMask
-            );
-
-            // adjust for controllable to "teleport on"
-            return hit.collider == null 
-                ? 0f 
-                : hit.transform.position.y + _ctrlManager.CurrentControllable.transform.localScale.y; 
-        }
     }
 }

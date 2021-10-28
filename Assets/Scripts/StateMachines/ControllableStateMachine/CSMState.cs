@@ -58,5 +58,26 @@ namespace StateMachines.CSM {
             } 
             return false;
         }
+
+        protected float _checkIfAboveGround() {
+            BoxCollider2D col = _ctrlManager.CurrentBox;
+            RaycastHit2D hit = Physics2D.BoxCast(
+                col.bounds.center, col.bounds.size, 
+                0f, Vector2.down, Mathf.Infinity, 
+                _ctrlManager.PlatformLayerMask
+            );
+
+            Debug.Log(hit.transform.position.y + hit.transform.localScale.y);
+            Debug.Log(hit.transform.position.y + _ctrlManager.CurrentControllable.transform.localScale.y);
+
+            // adjust for controllable to "teleport on"
+            return hit.collider == null 
+                ? 0f 
+                : (
+                    (hit.transform.position.y + _ctrlManager.CurrentControllable.transform.localScale.y) 
+                    + 
+                    (hit.transform.position.y + hit.transform.localScale.y)
+                )/2; 
+        }
     }
 }

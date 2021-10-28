@@ -502,15 +502,15 @@ namespace Managers
 
         #region Timer Methods
         public void StartTimer() {
-            _timerScript.StartTimer(_timerRunOutActionAsync);
+            _timerScript?.StartTimer(_timerRunOutActionAsync);
         }
 
         public void PauseTimer() {
-            _timerScript.PauseTimer();
+            _timerScript?.PauseTimer();
         }
 
         public void ResetTimer() {
-            _timerScript.ResetTimer();
+            _timerScript?.ResetTimer();
         }
         #endregion Timer Methods
     }

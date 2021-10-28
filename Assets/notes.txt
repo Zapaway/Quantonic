@@ -5,11 +5,4 @@ TODO:
     - create text that states what is happening (slightly above player - e.g. "you cannot jump yet")
     * add effects
 
-BUGS:
-    - teleporting down near the edge brings you out
-    
-    - dont allow clone from entangled qubits
-    - dont allow target entangled qubits to be passed into unary gates
-    - dont allow controlled entangled qubits to entangle with other qubits except the one that it is with (for deentanglement)
-    - 
 
