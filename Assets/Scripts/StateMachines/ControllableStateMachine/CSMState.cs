@@ -67,9 +67,6 @@ namespace StateMachines.CSM {
                 _ctrlManager.PlatformLayerMask
             );
 
-            Debug.Log(hit.transform.position.y + hit.transform.localScale.y);
-            Debug.Log(hit.transform.position.y + _ctrlManager.CurrentControllable.transform.localScale.y);
-
             // adjust for controllable to "teleport on"
             return hit.collider == null 
                 ? 0f 
