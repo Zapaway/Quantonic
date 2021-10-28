@@ -313,5 +313,11 @@ namespace Managers {
             }
         }
         #endregion Controllable Methods
+
+        #region Camera Methods
+        public void MakeVisible(GameObject go) {
+            throw new NotImplementedException();
+        }
+        #endregion Camera Methods
     }
 }

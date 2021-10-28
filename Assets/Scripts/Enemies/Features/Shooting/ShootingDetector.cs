@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
-[RequireComponent(typeof(CircleCollider2D))]
+[RequireComponent(typeof(Collider2D))]
 public sealed class ShootingDetector : MonoBehaviour
 {
     private Action<Collider2D> _triggeredEnterAction;

@@ -43,4 +43,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c2eeccb651968b94aa1528939b1837ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _qubitPrefab: {fileID: 0}
+  _qubitPrefab: {fileID: 967471473964972377, guid: 5900a4902699538418b7257815d71fdb, type: 3}
+  _playerPrefab: {fileID: 748523834017275443, guid: 26f21e490a9934e4b9a34d3e945a3147, type: 3}
+  _clonePrefab: {fileID: 3375531578766206820, guid: a576503b30c0a5945be20f21cf03992d, type: 3}
+  _playerWavePrefab: {fileID: 202610486060802705, guid: 98d43f7bdc0313c4290471ae237b25a8, type: 3}

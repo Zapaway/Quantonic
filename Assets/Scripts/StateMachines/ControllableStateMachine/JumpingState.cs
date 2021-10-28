@@ -19,7 +19,7 @@ namespace StateMachines.CSM {
     public sealed class JumpingState : CSMState
     { 
         private const float _jumpHeight = 5;  // how far does the controllable teleport up (DO NOT SET THIS TO ZERO)
-        private const float _jumpDuration = 5;
+        private const float _jumpDuration = 3;
         private bool _isFinishedJump;  // use this instead of _isGrounded as it is more reliable (accurate)
 
         private CancellationTokenSource _cancelJumpSource;
@@ -39,13 +39,11 @@ namespace StateMachines.CSM {
         public override async UniTask LogicUpdate() {
             await base.LogicUpdate();
 
-            if (_isFinishedJump) {
-                await _stateMachine.ChangeState(_ctrlManager.StandingState);
-            } else {
-                // TODO Add death here.
-            }
+            if (_isFinishedJump) await _stateMachine.ChangeState(_ctrlManager.StandingState);
         } 
         public override async UniTask PhysicsUpdate() {
+            if (_gameObjectAbove) throw new NotImplementedException();
+
             await base.PhysicsUpdate();
         } 
         public override async UniTask Exit() {
