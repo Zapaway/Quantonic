@@ -42,8 +42,6 @@ namespace StateMachines.CSM {
             if (_isFinishedJump) await _stateMachine.ChangeState(_ctrlManager.StandingState);
         } 
         public override async UniTask PhysicsUpdate() {
-            if (_gameObjectAbove) throw new NotImplementedException();
-
             await base.PhysicsUpdate();
         } 
         public override async UniTask Exit() {

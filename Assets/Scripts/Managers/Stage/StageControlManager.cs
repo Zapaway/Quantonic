@@ -71,6 +71,7 @@ namespace Managers {
         // camera for following current controllable
         private Camera _mainCamera; 
         private const float _smoothCameraSpeed = 0.125f;
+        private Vector3 _originalCameraOffset;
         [SerializeField] private Vector3 _cameraOffset;
 
         // layers
@@ -106,6 +107,7 @@ namespace Managers {
             _controllables.AddToBack(CurrentControllable);
 
             _mainCamera = Camera.main;
+            _originalCameraOffset = _cameraOffset;
 
             _jumpingState = new JumpingState(this, _csm);
             _standingState = new StandingState(this, _csm);
@@ -315,9 +317,7 @@ namespace Managers {
         #endregion Controllable Methods
 
         #region Camera Methods
-        public void MakeVisible(GameObject go) {
-            throw new NotImplementedException();
-        }
+
         #endregion Camera Methods
     }
 }

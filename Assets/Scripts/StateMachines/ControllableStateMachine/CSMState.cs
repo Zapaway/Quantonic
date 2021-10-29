@@ -13,8 +13,6 @@ namespace StateMachines.CSM {
         protected float _sidewaysInput;
         protected float _moveSpeed;
         protected bool _isGrounded;
-
-        protected GameObject _gameObjectAbove;
         
         public CSMState(StageControlManager controlManager, CSM stateMachine)
         {
@@ -42,7 +40,6 @@ namespace StateMachines.CSM {
 
             Rigidbody2D rigidbody = _ctrlManager.CurrentRB;
             if (rigidbody != null) rigidbody.velocity = new Vector2(_moveSpeed * _sidewaysInput, rigidbody.velocity.y);
-            _gameObjectAbove = _checkIfAboveGroundGameObject();
         } 
         public virtual async UniTask Exit() {
             await UniTask.Yield();
@@ -78,21 +75,6 @@ namespace StateMachines.CSM {
                     + 
                     (hit.transform.position.y + hit.transform.localScale.y)
                 )/2; 
-        }
-        protected GameObject _checkIfAboveGroundGameObject() {
-            BoxCollider2D col = _ctrlManager.CurrentBox;
-            
-            if (col != null) {
-                RaycastHit2D hit = Physics2D.BoxCast(
-                    col.bounds.center, col.bounds.size, 
-                    0f, Vector2.down, Mathf.Infinity, 
-                    _ctrlManager.PlatformLayerMask
-                );
-
-                // adjust for controllable to "teleport on"
-                return hit.collider != null ? hit.collider.gameObject : null; 
-            }
-            return null;
         }
     }
 }
