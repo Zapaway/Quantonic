@@ -92,7 +92,6 @@ namespace Quantum {
         }
         #endregion Operations
         
-        // #TODO Add toUnityRotation method
         #region To Unity
         /// <summary>
         /// Turn the quantum state's position on the Bloch sphere to a Unity position.
@@ -107,13 +106,16 @@ namespace Quantum {
                 (float)(yOperator.Matrix * densityMatrix).Trace().Real
             );
         }
-        /// <summary> 
-        /// Get Unity rotations based on the quantum state's position on the Bloch sphere.
-        /// This is assuming that the GameObject (representing the quantum state) shows its
-        /// positive x-, y-, and z-axis towards the camera.
-        /// </summary>
+
         public void ToUnityRotation() {
-            // return type should be Vector3; void is placeholder
+            double theta = 2 * sys.Math.Acos(_state[0].Real);
+            double phi = sys.Math.Acos(_state[1].Real / (sys.Math.Sin(theta/2)));
+            if (sys.Double.IsNaN(theta)) theta = 0;
+            if (sys.Double.IsNaN(phi)) phi = 0;
+
+            Debug.Log(
+                $"Theta: {theta} | Phi: {phi}"
+            );
         }
         #endregion To Unity
 

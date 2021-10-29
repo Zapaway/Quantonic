@@ -87,9 +87,7 @@ public sealed class Qubit : MonoBehaviour
         if (res) {
             attemptTarget._entangledPair = _entangledPair = (this, attemptTarget);
         }
-
-        Debug.Log(res);
-
+        
         return res;
     }
 
@@ -131,6 +129,7 @@ public sealed class Qubit : MonoBehaviour
     private void _updatePos() {
         Vector3 unityPos = QuantumFactory.GetUnityPosition(_quantumState);
         _quantumStateIndicator.transform.position = unityPos + _blochSphereCoords;
+        _quantumState.ToUnityRotation();
     }
 
     private void _setBothQubitsEntangledPairsNull() {
