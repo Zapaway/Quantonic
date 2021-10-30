@@ -65,7 +65,12 @@ public interface IQubitSubcircuit {
     /// <summary>
     /// Force entanglement upon two qubits. Not recommended to use unless if you are loading in quantum states.
     /// </summary>
-    void ForceEntanglement(int controlQSIndex, int targetQSIndex);
+    UniTask ForceEntanglement(int controlQSIndex, int targetQSIndex);
+
+    /// <summary>
+    /// Recalculate composite state with the current qubits in the list.
+    /// </summary>
+    void RecalculateCompositeState();
 }
 
 public sealed partial class QubitCircuit {
@@ -160,7 +165,7 @@ public sealed partial class QubitCircuit {
             // now a qubit can be removed from the subcirc, since the dictionary and the qubits are updated
             _qubits.RemoveAt(qsIndex);
 
-            _compositeQuantumState = _recalculateCompositeState();
+            RecalculateCompositeState();
             return qcIndex;
         }
 
@@ -253,9 +258,17 @@ public sealed partial class QubitCircuit {
                 _updateCompositeState(binaryOperator, controlQSIndex, targetQSIndex);
             }
         }
-        public void ForceEntanglement(int controlQSIndex, int targetQSIndex) {
-            ( _, _, Qubit controlQubit) = _getQubitInfo(controlQSIndex, isQCIndex: false);
+        public async UniTask ForceEntanglement(int controlQSIndex, int targetQSIndex) {
+            (_, _, Qubit controlQubit) = _getQubitInfo(controlQSIndex, isQCIndex: false);
             (_, _, Qubit targetQubit) = _getQubitInfo(targetQSIndex, isQCIndex: false);
+
+            _updateCompositeState(QuantumFactory.pauliXOperator, new[] {targetQSIndex});
+            var cnot = (IControlledOperator<BinaryOperator>)QuantumFactory.cnotOperator;
+            bool didChange = await _updateCompositeState(
+                cnot, 
+                controlQSIndex, 
+                targetQSIndex
+            );
 
             controlQubit.AttemptTransformToControl(targetQubit);
         }
@@ -389,7 +402,7 @@ public sealed partial class QubitCircuit {
         /// <summary>
         /// Recalculate composite state with the current qubits in the list.
         /// </summary>
-        private Vector<sysnum.Complex> _recalculateCompositeState() {
+        public void RecalculateCompositeState() {
             Vector<sysnum.Complex> res = Vector<sysnum.Complex>.Build.Dense(1, sysnum.Complex.One);
 
             for (int i = _qubits.Count() - 1; i >= 0; --i) {
@@ -397,7 +410,7 @@ public sealed partial class QubitCircuit {
                 res = _vectorKroneckerProduct(res, qubit.QuantumStateVector);
             }
 
-            return res;
+            _compositeQuantumState = res;
         }
 
         private Vector<sysnum.Complex> _vectorKroneckerProduct(Vector<sysnum.Complex> b, Vector<sysnum.Complex> a) {

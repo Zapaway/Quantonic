@@ -139,7 +139,7 @@ namespace Managers {
                 player.gameObject.transform.position = _lastestCheckpoint;
 
                 if (shouldResetLocal) _resetLocalState(player);
-                else LoadLocalState(player);
+                else LoadLocalState(player).Forget();
 
                 _completePlayerSetup(timeRunOutActionAsync);
             }
@@ -185,6 +185,7 @@ namespace Managers {
                 originPosition,
                 Quaternion.Euler(0, 0, aimAng)
             );
+            SoundManager.Instance.StageSounds.PlayWaveShootSFX();
             await UniTask.WaitUntil(() => waveObj == null);  // wait until wave is destroyed
         }
         
@@ -243,8 +244,9 @@ namespace Managers {
         /// <summary>
         /// Activate the player with their last saved player quantum state. Also activate every respawnable.
         /// </summary>
-        public SpawnManager LoadLocalState(Player player) {
+        public async UniTask<SpawnManager> LoadLocalState(Player player) {
             player.Activate(_latestSaveState.playerQuantumStates);
+            player.RecalculateQubitSubcircit();
 
             int entangleCount = _latestSaveState.playerEntanglementInfo.Count();
             List<int> entangledControlQSIndices = new List<int>(entangleCount/2);
@@ -252,7 +254,7 @@ namespace Managers {
                 var (controlQSIndex, targetQSIndex) = _latestSaveState.playerEntanglementInfo[i];
                 if (controlQSIndex == -1 || entangledControlQSIndices.Contains(controlQSIndex)) continue;
 
-                player.ApplyForcedEntanglement(controlQSIndex, targetQSIndex);
+                await player.ApplyForcedEntanglement(controlQSIndex, targetQSIndex);
                 entangledControlQSIndices.Add(controlQSIndex);
             }
 

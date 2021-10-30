@@ -9,14 +9,16 @@ namespace StateMachines.CSM {
     public abstract class CSMState : IState
     {
         protected StageControlManager _ctrlManager;
+        protected SoundManager _soundManager;
         protected CSM _stateMachine;
         protected float _sidewaysInput;
         protected float _moveSpeed;
         protected bool _isGrounded;
         
-        public CSMState(StageControlManager controlManager, CSM stateMachine)
+        public CSMState(StageControlManager controlManager, SoundManager soundManager, CSM stateMachine)
         {
             _ctrlManager = controlManager;
+            _soundManager = soundManager; 
             _stateMachine = stateMachine;
         }
 
@@ -61,6 +63,8 @@ namespace StateMachines.CSM {
 
         protected float _checkIfAboveGround() {
             BoxCollider2D col = _ctrlManager.CurrentBox;
+            if (col == null) return 0f;
+            
             RaycastHit2D hit = Physics2D.BoxCast(
                 col.bounds.center, col.bounds.size, 
                 0f, Vector2.down, Mathf.Infinity, 

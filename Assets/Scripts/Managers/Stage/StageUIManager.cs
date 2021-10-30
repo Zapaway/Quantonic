@@ -489,12 +489,19 @@ namespace Managers
                     Texture qubitTexture = controllable.GetRenderTextureUnsafe(qubitIndex);
                     (string descString, double groundProb, double excitedProb) = controllable.GetQubitInfoUnsafe(qubitIndex);
 
+                    bool originallyExcited = excitedProb == 1;  // if false, then its orignally grounded
                     Func<double, string> probabilityToStringFunc = QuantumState.ProbabilityToStringFunc;
+
                     if (controllable.CheckIfQubitTarget(qubitIndex)) {
-                        groundProb = excitedProb = 0;
-                        probabilityToStringFunc = x => "--- (see control)";
+                        groundProb = 0; excitedProb = -1;  // used for knowing what probability it is currently on, not for probabilty
+                        probabilityToStringFunc = x => {
+                            if (x == 0) return $"ctrl |{(originallyExcited ? 0 : 1)}> → this";
+                            else if (x == -1) return $"ctrl |{(originallyExcited ? 1 : 0)}> → this";
+                            return "(error)";
+                        };
                     }
                     _qdpScript.SetQDP(qubitTexture, qubitIndex, descString, groundProb, excitedProb, probabilityToStringFunc);
+                    SoundManager.Instance.StageSounds.PlayBlipSelectSFX();
                 }
                 #endregion Getters and Setters
             #endregion QDP Methods

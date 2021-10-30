@@ -39,6 +39,9 @@ namespace UIScripts.QDP {
 
             _groundStateProbText.SetText("0: " + doubleToString(groundStateProb));
             _excitedStateProbText.SetText("1: " + doubleToString(excitedStateProb));
+            
+            if (groundStateProb < 0) groundStateProb = 0;
+            if (excitedStateProb < 0) excitedStateProb = 0;
             _pieChart.SetValues(new double[] {groundStateProb, excitedStateProb});
         }
         #endregion Helpers

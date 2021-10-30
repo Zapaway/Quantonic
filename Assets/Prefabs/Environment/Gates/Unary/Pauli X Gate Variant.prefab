@@ -25,9 +25,21 @@ PrefabInstance:
       value: Pauli X Gate Variant
       objectReference: {fileID: 0}
     - target: {fileID: 1509384071780994070, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: b79d33ce7efe8fe46b2504296628e0f5, type: 3}
+    - target: {fileID: 1509384071780994070, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: d4a3b732d72e2b643a7ce7b8c828b0f9, type: 2}
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+    - target: {fileID: 3394107474796955377, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 2.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 3394107474796955377, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2.56
+      objectReference: {fileID: 0}
     - target: {fileID: 7232022803277292995, guid: cf529de56f04d9e42bc181228ce6f43a, type: 3}
       propertyPath: m_RootOrder
       value: 0

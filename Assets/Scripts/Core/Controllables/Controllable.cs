@@ -63,8 +63,8 @@ public abstract class Controllable : MonoBehaviour
         _boxCollider2D = GetComponent<BoxCollider2D>();
         _rigidbody2D = GetComponent<Rigidbody2D>();
 
-        _qsmState = new QSMState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
-        _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, this, _qsm);
+        _qsmState = new QSMState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, SoundManager.Instance, this, _qsm);
+        _multiState = new MultipleState(StageControlManager.Instance, StageUIManager.Instance, SpawnManager.Instance, SoundManager.Instance, this, _qsm);
     }
 
     protected virtual async UniTask Start() {
@@ -104,6 +104,7 @@ public abstract class Controllable : MonoBehaviour
         if (other.tag.Contains("Qubit")) {
             _addQubit();
             other.gameObject.SetActive(false);
+            SoundManager.Instance.StageSounds.PlayPickupSFX();
             SpawnManager.Instance.AddUnactivatedQubitCollectable(other.gameObject);
         }
     }
@@ -180,6 +181,13 @@ public abstract class Controllable : MonoBehaviour
     }
     public void UnsubscribeToSubcircuitCollection(NotifyCollectionChangedEventHandler eventHandler) {
         _subcirc.Unsubscribe(eventHandler);
+    }
+
+    /// <summary>
+    /// Recalculate composite state with the current qubits in the list.
+    /// </summary>
+    public void RecalculateQubitSubcircit() {
+        _subcirc.RecalculateCompositeState();
     }
     #endregion Subcircuit Manipulation
     
@@ -332,8 +340,8 @@ public abstract class Controllable : MonoBehaviour
     /// <summary>
     /// Force entanglement upon two qubits. Not recommended to use unless if you are loading in quantum states.
     /// </summary>
-    public void ApplyForcedEntanglement(int controlQSIndex, int targetQSIndex) {
-        _subcirc.ForceEntanglement(controlQSIndex, targetQSIndex);
+    public async UniTask ApplyForcedEntanglement(int controlQSIndex, int targetQSIndex) {
+        await _subcirc.ForceEntanglement(controlQSIndex, targetQSIndex);
     }
     #endregion Applying Methods
 }

@@ -35,6 +35,7 @@ public sealed class Player : Controllable
     public void Deactivate() {
         if (gameObject.activeSelf) {
             gameObject.SetActive(false);
+            SoundManager.Instance.StageSounds.PlayExplosionSFX();
             _clear();
         }
     }

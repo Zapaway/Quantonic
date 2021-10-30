@@ -15,9 +15,10 @@ namespace StateMachines.QSM {
             StageControlManager ctrlManager, 
             StageUIManager stageUIManager,
             SpawnManager spawnManager, 
+            SoundManager soundManager,
             Controllable controllable, 
             QSM stateMachine
-            ) : base(ctrlManager, stageUIManager, spawnManager, controllable, stateMachine) 
+            ) : base(ctrlManager, stageUIManager, spawnManager, soundManager, controllable, stateMachine) 
         {
             _radiusOfChecking += controllable.transform.localScale.x * 2;  // multiplied since clones will need to be at least right next to the controllable
         }

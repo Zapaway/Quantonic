@@ -11,7 +11,7 @@ using Quantum.Operators;
 /// </summary>
 [RequireComponent(typeof(BoxCollider2D))]
 public abstract class Gate<T> : MonoBehaviour where T : QuantumOperator {
-    private float _offsetWhenExit = 1;  // used to calculate end pos of lerp animation 
+    private float _offsetWhenExit = 2.55f;  // used to calculate end pos of lerp animation 
     private float _lerpSpeed = 5;  // how fast should the animation be
     private Controllable _occupiedControllable;
     protected Controllable OccupiedControllable => _occupiedControllable;

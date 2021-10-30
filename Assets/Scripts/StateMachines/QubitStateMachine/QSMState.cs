@@ -1,5 +1,6 @@
 using System;
 using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 using Managers;
 
@@ -12,32 +13,33 @@ namespace StateMachines.QSM {
         protected StageControlManager _ctrlManager;
         protected StageUIManager _uiManager;
         protected SpawnManager _spawnManager;
+        protected SoundManager _soundManager;
         protected Controllable _controllable;
         protected QSM _stateMachine;
 
-        private int _currSpawnedWaves;
+        private int _currSpawnedWaves = 0;
         protected int CurrSpawnedWaves => _currSpawnedWaves;
         private bool _isNotOnCooldown = true;
-        private const float _cooldownSec = 1.5f;
+        private const float _cooldownSec = 0.3f;
 
         public QSMState(
             StageControlManager ctrlManager, 
             StageUIManager stageUIManager,
             SpawnManager spawnManager, 
+            SoundManager soundManager,
             Controllable controllable, 
             QSM stateMachine
         ) {
             _ctrlManager = ctrlManager;
             _uiManager = stageUIManager;
             _spawnManager = spawnManager;
+            _soundManager = soundManager;
             _controllable = controllable;
             _stateMachine = stateMachine;
         }
 
         public virtual async UniTask Enter() {
             await UniTask.Yield();
-
-            _currSpawnedWaves = 0;
         } 
         public virtual async UniTask HandleInput() {            
             await UniTask.Yield();

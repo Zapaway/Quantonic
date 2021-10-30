@@ -49,6 +49,9 @@ TagManager:
   - name: Foreground
     uniqueID: 3317354947
     locked: 0
+  - name: Gate Foreground
+    uniqueID: 610371679
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

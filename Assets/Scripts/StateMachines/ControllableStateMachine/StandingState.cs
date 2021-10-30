@@ -13,7 +13,7 @@ namespace StateMachines.CSM {
     { 
         private bool _isJump;
         
-        public StandingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
+        public StandingState(StageControlManager controlManager, SoundManager soundManager, CSM stateMachine) : base(controlManager, soundManager, stateMachine) {}
         
         public override async UniTask Enter() {
             await base.Enter();
@@ -29,7 +29,11 @@ namespace StateMachines.CSM {
                 await _stateMachine.ChangeState(_ctrlManager.JumpingState);
             }
             else if (!_isGrounded) {
-                await _ctrlManager.DestroyCurrentControllable();
+                float onGroundY = _checkIfAboveGround();
+                Transform transform = _ctrlManager.CurrentControllable?.transform;
+
+                if (onGroundY != 0f && transform != null) transform.position = new Vector2(transform.position.x, onGroundY);
+                else await _ctrlManager.DestroyCurrentControllable();
             }
         } 
         public override async UniTask PhysicsUpdate() {

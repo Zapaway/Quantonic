@@ -71,7 +71,9 @@ namespace Quantum {
         /// </summary>
         public bool CheckIfEntangledTar(QuantumState qsControl) {
             bool res = qsControl._desc == QuantumStateDescription.EntangledControl;
-            if (res) _desc = QuantumStateDescription.EntangledTarget;
+            if (res && (_desc == QuantumStateDescription.Ground || _desc == QuantumStateDescription.Excited)) {
+                _desc = QuantumStateDescription.EntangledTarget;
+            }
 
             return res;
         }
@@ -106,17 +108,6 @@ namespace Quantum {
                 (float)(yOperator.Matrix * densityMatrix).Trace().Real
             );
         }
-
-        public void ToUnityRotation() {
-            double theta = 2 * sys.Math.Acos(_state[0].Real);
-            double phi = sys.Math.Acos(_state[1].Real / (sys.Math.Sin(theta/2)));
-            if (sys.Double.IsNaN(theta)) theta = 0;
-            if (sys.Double.IsNaN(phi)) phi = 0;
-
-            Debug.Log(
-                $"Theta: {theta} | Phi: {phi}"
-            );
-        }
         #endregion To Unity
 
         #region String Representations
@@ -147,6 +138,13 @@ namespace Quantum {
 
         internal Matrix<sysnum.Complex> MakeDensityMatrix() {
             return _state.OuterProduct(_state);
+        }
+
+        private double _fixedArcCosine(double radians) {
+            if (radians > 1) radians = 1;
+            else if (radians < -1) radians = -1;
+
+            return Trig.Acos(radians);
         }
     }
 }

@@ -24,7 +24,7 @@ namespace StateMachines.CSM {
 
         private CancellationTokenSource _cancelJumpSource;
 
-        public JumpingState(StageControlManager controlManager, CSM stateMachine) : base(controlManager, stateMachine) {}
+        public JumpingState(StageControlManager controlManager, SoundManager soundManager, CSM stateMachine) : base(controlManager, soundManager, stateMachine) {}
 
         public override async UniTask Enter() {
             await base.Enter();
@@ -32,6 +32,7 @@ namespace StateMachines.CSM {
             _isFinishedJump = false;
             _cancelJumpSource = new CancellationTokenSource();
             Jump().Forget();
+            _soundManager.StageSounds.PlayJumpSFX();
         } 
         public override async UniTask HandleInput() {
             await base.HandleInput();

@@ -1,4 +1,6 @@
+using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 using Managers;
 
@@ -8,6 +10,7 @@ public class CheckpointScript : MonoBehaviour
     private SpriteRenderer _spriteRenderer;
     [SerializeField] private Sprite _untouched;
     [SerializeField] private Sprite _touched;
+    [SerializeField] private UnityEvent _actionsToDoWhenTouched;
     private bool _isTouched;
     
     private void Awake() {
@@ -19,6 +22,7 @@ public class CheckpointScript : MonoBehaviour
             _isTouched = true;
             _spriteRenderer.sprite = _touched;
             SpawnManager.Instance.SetCheckpoint(this, other.GetComponent<Player>());
+            SoundManager.Instance.StageSounds.PlayCheckpointTouchedSFX();
         }
     }
 

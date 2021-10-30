@@ -109,8 +109,8 @@ namespace Managers {
             _mainCamera = Camera.main;
             _originalCameraOffset = _cameraOffset;
 
-            _jumpingState = new JumpingState(this, _csm);
-            _standingState = new StandingState(this, _csm);
+            _jumpingState = new JumpingState(this, SoundManager.Instance, _csm);
+            _standingState = new StandingState(this, SoundManager.Instance, _csm);
         }
 
         private void OnEnable() {

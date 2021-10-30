@@ -22,15 +22,47 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6244937117284724053, guid: e57d47283f8656546a830c809ee686ae, type: 3}
       propertyPath: m_Name
-      value: CNOT Gate
+      value: CNOT Gate Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724055, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_Size.x
+      value: 2.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724055, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_Size.y
+      value: 2.55
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724055, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.x
+      value: 2.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724055, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_SpriteTilingProperty.oldSize.y
+      value: 2.56
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724056, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: e1025cae69aaa5942a2a1b7e6e0bf6b5, type: 3}
     - target: {fileID: 6244937117284724056, guid: e57d47283f8656546a830c809ee686ae, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 189cfb7d481cc14478874c9a2cd743ec, type: 2}
+      objectReference: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
     - target: {fileID: 6244937117284724057, guid: e57d47283f8656546a830c809ee686ae, type: 3}
       propertyPath: m_RootOrder
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724057, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 0.775
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724057, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.775
+      objectReference: {fileID: 0}
+    - target: {fileID: 6244937117284724057, guid: e57d47283f8656546a830c809ee686ae, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 0.775
       objectReference: {fileID: 0}
     - target: {fileID: 6244937117284724057, guid: e57d47283f8656546a830c809ee686ae, type: 3}
       propertyPath: m_LocalPosition.x

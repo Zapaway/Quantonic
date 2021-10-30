@@ -47,6 +47,7 @@ public sealed class WaveShooterScript : ImmobileEnemy, IShooting, IDeath
         waveObj.GetComponent<EnemyWaveScript>().KillControllableAction = _kill;
     }
     public void DeathAction() {
+        SoundManager.Instance.StageSounds.PlayEnemyExplosionSFX();
         gameObject.SetActive(false);
         SpawnManager.Instance.AddUnactivatedRespawnableEnemy(gameObject);
     }
