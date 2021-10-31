@@ -42,18 +42,10 @@ public sealed class Player : Controllable
 
     private void _addInitQubits() {
         _addQubit();
-        _test();
     }
     private void _addPrevQubits(QuantumState[] states) {
         foreach (var state in states) {
             _addQubit(state);
         }
-    }
-
-    private void _test() {
-        _addQubit();
-        _addQubit();
-        _addQubit();
-        // _addQubit();
     }
 }

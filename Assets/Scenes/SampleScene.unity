@@ -4610,8 +4610,9 @@ PrefabInstance:
     - target: {fileID: 5526597360854634340, guid: 422d82be821ff3c45bdc73882c8d2dfd, type: 3}
       propertyPath: m_text
       value: "Although the target looks to be in the excited state, \nit is actually
-        in a superposition with the control. This is called \"entanglement\", where
-        the two qubits depend on each other and cannot be described separately"
+        in a superposition with the control. If the control is a superposition, it
+        creates \"entanglement\", where the two qubits depend on each other and cannot
+        be described separately"
       objectReference: {fileID: 0}
     - target: {fileID: 5526597360854634340, guid: 422d82be821ff3c45bdc73882c8d2dfd, type: 3}
       propertyPath: m_fontAsset
@@ -9881,7 +9882,9 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6190911546124653530, guid: ef3d3a47fea4a5643bf7341c693dcf28, type: 3}
       propertyPath: m_text
-      value: So let's get started!
+      value: 'So let''s get started!
+
+        (Make sure to hit every checkpoint!)'
       objectReference: {fileID: 0}
     - target: {fileID: 6190911546124653530, guid: ef3d3a47fea4a5643bf7341c693dcf28, type: 3}
       propertyPath: m_fontAsset
@@ -10210,6 +10213,38 @@ PrefabInstance:
     - target: {fileID: 996813866325010616, guid: 698c617c86e365747a26990cda7f4940, type: 3}
       propertyPath: m_Name
       value: Checkpoint
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetJumpInputActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Managers.StageControlManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_BoolArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 996813866325010620, guid: 698c617c86e365747a26990cda7f4940, type: 3}
+      propertyPath: _actionsToDoWhenTouched.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     - target: {fileID: 996813866325010621, guid: 698c617c86e365747a26990cda7f4940, type: 3}
       propertyPath: m_RootOrder
@@ -11209,8 +11244,8 @@ PrefabInstance:
     - target: {fileID: 5526597360854634340, guid: 422d82be821ff3c45bdc73882c8d2dfd, type: 3}
       propertyPath: m_text
       value: "Woah, what in the world happened? \nSince the first qubit you picked
-        (called the control) was not the ground or excited state, \nthe Pauli-X gate
-        was applied on the other qubit (called the target)"
+        (called the control) was not the ground state, \nthe Pauli-X gate was applied
+        on the other qubit (called the target)"
       objectReference: {fileID: 0}
     - target: {fileID: 5526597360854634340, guid: 422d82be821ff3c45bdc73882c8d2dfd, type: 3}
       propertyPath: m_fontAsset
@@ -13107,8 +13142,40 @@ PrefabInstance:
       value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startWithBareMinimum
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
       propertyPath: _plaformLayerMask.m_Bits
       value: 64
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: SetOnlyMovementActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: Managers.StageControlManager, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 1597645218505151063, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
+      propertyPath: _startupEvents.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 66f40c4c015ba6b4cab2e1b740d263e1, type: 3}
@@ -13733,7 +13800,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9192550539867057174, guid: cc1b114b21f2ab54999c8ed1f772c608, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 531
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 9192550539867057174, guid: cc1b114b21f2ab54999c8ed1f772c608, type: 3}
       propertyPath: m_LocalPosition.y

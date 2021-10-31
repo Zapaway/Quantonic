@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using Cysharp.Threading.Tasks;
 using Nito.Collections;
 using testing = System.Diagnostics;
@@ -92,12 +93,16 @@ namespace Managers {
         public bool IsStageFinished => _isStageFinished;
         #endregion Fields/Properties
 
+        // special mode
+        [SerializeField] private bool _startWithBareMinimum;
+
         #region Event Methods
         protected override void Awake()
         {
             base.Awake();
 
             _stageInputs = new StageInputs();
+            // if (_startWithBareMinimum) SetOnlyMovementActive();
 
             // set up qubit circuit to listen to the current controllable changed event
             circ.InitQubitCircuit(this);
@@ -184,7 +189,35 @@ namespace Managers {
         #endregion Input Getters
 
         #region Input Setters 
-        public void SetControllableInputActive(bool isActive) {
+        /// actions
+        public void SetMovementInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Movement.Enable();
+            else _stageInputs.Controllable.Movement.Disable();
+        }
+        public void SetJumpInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Jump.Enable();
+            else _stageInputs.Controllable.Jump.Disable();
+        }
+        public void SetSplitInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Split.Enable();
+            else _stageInputs.Controllable.Split.Disable();
+        }
+        public void SetSwitchInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.Switch.Enable();
+            else _stageInputs.Controllable.Switch.Disable();
+        }
+        public void SetSpawnWaveInputActive(bool isActive) {
+            if (isActive) _stageInputs.Controllable.SpawnWave.Enable();
+            else _stageInputs.Controllable.SpawnWave.Disable();
+        }
+
+        public void SetToggleQQVInputActive(bool isActive) {
+            if (isActive) _stageInputs.StageUI.ToggleQQV.Enable();
+            else _stageInputs.StageUI.ToggleQQV.Disable();
+        }
+
+        /// action maps
+        public void SetControllableInputActive(bool isActive) {            
             if (isActive) _stageInputs.Controllable.Enable();
             else _stageInputs.Controllable.Disable();
         }
@@ -196,26 +229,29 @@ namespace Managers {
             if (isActive) _stageInputs.PauseMenuUI.Enable();
             else _stageInputs.PauseMenuUI.Disable();
         }
-        public void SetStageControlsActive(bool isActive) {
-            if (isActive) _stageInputs.Enable();
-            else _stageInputs.Disable();
-        }
 
-        public void SetToggleQQVInputActive(bool isActive) {
-            if (isActive) _stageInputs.StageUI.ToggleQQV.Enable();
-            else _stageInputs.StageUI.ToggleQQV.Disable();
-        }
-        public void SetJumpInputActive(bool isActive) {
-            if (isActive) _stageInputs.Controllable.Jump.Enable();
-            else _stageInputs.Controllable.Jump.Disable();
-        }
-
+        /// grouped action maps
         /// <summary>
         /// Playing controls are the inputs from Controllable and Stage UI action maps.
         /// </summary>
         public void SetPlayingControlsActive(bool isActive) {
             SetControllableInputActive(isActive);
             SetStageUIInputActive(isActive);
+        }
+
+        /// special
+        /// <summary>
+        /// Only "A" and "D" will be allowed.
+        /// </summary>
+        public void SetOnlyMovementActive() {
+            SetPlayingControlsActive(false);
+            SetMovementInputActive(true);
+        }
+
+        /// entire
+        public void SetStageControlsActive(bool isActive) {
+            if (isActive) _stageInputs.Enable();
+            else _stageInputs.Disable();
         }
         #endregion Input Setters
 
