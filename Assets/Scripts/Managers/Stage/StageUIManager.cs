@@ -89,9 +89,9 @@ namespace Managers
             StageControlManager ctrlManager = StageControlManager.Instance;
             
             // QQV
-            _qqvScript.SetPanelActive(_areQubitPanelsDisplayed);
-            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
-            _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
+            _qqvScript?.SetPanelActive(_areQubitPanelsDisplayed);
+            _qqvScript?.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
+            _qqvScript?.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
 
             // QDP 
             _qdpScript.SetPanelActive(_areQubitPanelsDisplayed);
@@ -138,11 +138,11 @@ namespace Managers
         /// </summary>
         public void SetQubitPanelsActive(bool isActive) {
             if (isActive) {
-                _qqvScript.SelectQubitRepresentation(_selectedRepresentationIndex);
+                _qqvScript?.SelectQubitRepresentation(_selectedRepresentationIndex);
                 SetQDPPanel();
             }
-            _qqvScript.SetPanelActive(isActive);
-            _qdpScript.SetPanelActive(isActive);
+            _qqvScript?.SetPanelActive(isActive);
+            _qdpScript?.SetPanelActive(isActive);
 
             _areQubitPanelsDisplayed = isActive;
         }
@@ -151,11 +151,11 @@ namespace Managers
                 #region QQV Elements Toggles
                 // Disable/enable interaction of a qubit rep. Visual effects take place immediately.
                 public async UniTask EnableQubitRepInteract(int qubitIndex) {
-                    _qqvScript.SetQubitRepresentationInteractable(qubitIndex, true);
+                    _qqvScript?.SetQubitRepresentationInteractable(qubitIndex, true);
                     await RefreshAllQubitRepresentationsUnsafe();
                 }
                 public async UniTask DisableQubitRepInteract(int qubitIndex) {
-                    _qqvScript.SetQubitRepresentationInteractable(qubitIndex, false);
+                    _qqvScript?.SetQubitRepresentationInteractable(qubitIndex, false);
                     await RefreshAllQubitRepresentationsUnsafe();
                 }
 
@@ -164,16 +164,16 @@ namespace Managers
                         await EnableQubitRepInteract(i);
                     }
 
-                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
-                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
+                    _qqvScript?.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
+                    _qqvScript?.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
                 }
                 public async UniTask DisableAnyInteractions(Controllable controllable) {
                     for (int i = 0; i < controllable.QubitCount; ++i) {
                         await DisableQubitRepInteract(i);
                     }
 
-                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
-                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
+                    _qqvScript?.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
+                    _qqvScript?.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
                 }
 
                 /// <summary>
@@ -192,7 +192,7 @@ namespace Managers
                 public async UniTask RefreshAllQubitRepresentationsUnsafe(Controllable controllable = null) {
                     controllable = controllable ?? StageControlManager.Instance.CurrentControllable;
                     int qubitCount = controllable.QubitCount;
-                    int repCapacity = _qqvScript.RawImageCapacity;
+                    int repCapacity = _qqvScript != null ? _qqvScript.RawImageCapacity : 0;
 
                     IEnumerable<UniTask> renderingTasks = (
                         from i in Enumerable.Range(0, qubitCount < repCapacity ? qubitCount : repCapacity)
@@ -269,7 +269,7 @@ namespace Managers
                             submitSubscriber = SubmitMultiMode;
                             break;
                     }
-                    _qqvScript.RepSubmittedAsyncFunc = submitSubscriber;
+                    if(_qqvScript != null) _qqvScript.RepSubmittedAsyncFunc = submitSubscriber;
 
                     // if not default, wait for the appropiate results
                     switch (mode) {
@@ -285,7 +285,7 @@ namespace Managers
                             results.indices = _submittedQubitIndex?.ToArray();
                             _submittedQubitIndex = null;
 
-                            _qqvScript.RepSubmittedAsyncFunc = SubmitDefaultMode;
+                            if (_qqvScript != null) _qqvScript.RepSubmittedAsyncFunc = SubmitDefaultMode;
                             break;
                         case QQVSubmitMode.Multi:
                             throw new NotImplementedException();
@@ -306,7 +306,7 @@ namespace Managers
 
                 #region Render Texture Methods
                 public int QubitRepIndexToQSIndex(int repIndex) {
-                    return _qqvScript.GetQubitRepresentation(repIndex).Item2;
+                    return _qqvScript != null ? _qqvScript.GetQubitRepresentation(repIndex).Item2 : -1;
                 }
                 public void SetQQVRenderTextures() {  // used in init of qubit circuit
                     StageControlManager.Instance.circ.AddSubcircuitHandler(_qqvHandleChange);
@@ -357,11 +357,11 @@ namespace Managers
                 /// A more efficient and safe way of ensuring that the qqv is reset to the beginning. 
                 /// </summary>
                 public async UniTask EfficientResetQQVToBeginning() {
-                    if (selectedQubitIndex > 0 && selectedQubitIndex < _qqvScript.RawImageCapacity) _qqvScript.SelectQubitRepresentation(0);
+                    if (selectedQubitIndex > 0 && selectedQubitIndex < _qqvScript.RawImageCapacity) _qqvScript?.SelectQubitRepresentation(0);
                     else if (selectedQubitIndex != 0) {
                         while (_avalLeftPresses != 0) {
                             await MoveQQVRenderTextures(QQVMoveOptions.Left);
-                            _qqvScript.SelectQubitRepresentation(0);
+                            _qqvScript?.SelectQubitRepresentation(0);
                         }
                     } 
                 }
@@ -382,15 +382,15 @@ namespace Managers
                         foreach (var (repDest, repSrc) in repPairs.Select(x => direction == QQVMoveOptions.Left ? (x[0], x[1]) : (x[1], x[0]))) {
                             // left: move the right texture to the left one 
                             // right: move the left texture to the right one
-                            var (srcTexture, srcQSIndex) = _qqvScript.GetQubitRepresentation(repSrc);
+                            var (srcTexture, srcQSIndex) = _qqvScript?.GetQubitRepresentation(repSrc);
                             int qsIndex = direction == QQVMoveOptions.Left ? repDest + _qubitLeftIndex : srcQSIndex;
                             // Debug.Log(qsIndex);
-                            _qqvScript.SetQubitRepresentation(repDest, qsIndex, srcTexture); 
+                            _qqvScript?.SetQubitRepresentation(repDest, qsIndex, srcTexture); 
                         }
                     }
 
                     // set the representation that did not get replaced to nothing
-                    _qqvScript.SetQubitRepresentation(
+                    _qqvScript?.SetQubitRepresentation(
                         direction == QQVMoveOptions.Left ? representationIndices.Last() : representationIndices.First(),
                         0,
                         rawImageTexture: null);
@@ -419,7 +419,7 @@ namespace Managers
 
                                 // if there is an available raw image
                                 if (currentQubitCount <= _qqvScript.RawImageCapacity) {   
-                                    _qqvScript.SetQubitRepresentation(
+                                    _qqvScript?.SetQubitRepresentation(
                                         currentQubitCount - 1,  // convert to index
                                         e.NewStartingIndex,  // qsIndex
                                         renderTexture
@@ -472,7 +472,7 @@ namespace Managers
                 private void _setQubitRepresentationUnsafe(int representationIndex, int qubitIndex, Controllable controllable = null) {
                     controllable = controllable ?? StageControlManager.Instance.CurrentControllable;
                     RenderTexture renderTexture = controllable.GetRenderTextureUnsafe(qubitIndex);
-                    _qqvScript.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
+                    _qqvScript?.SetQubitRepresentation(representationIndex, qubitIndex, renderTexture);
                 }
                 /// <summary>
                 /// Set qubit representation based on a new qubit async.
@@ -492,7 +492,7 @@ namespace Managers
                     if (controllable == null) throw new ArgumentNullException();
 
                     // reset everything before refreshing and start on the very left
-                    _qqvScript.ResetQubitRepresentation();
+                    _qqvScript?.ResetQubitRepresentation();
                     _selectedRepresentationIndex = 0;
                     _qubitLeftIndex = 0;
 
@@ -542,11 +542,11 @@ namespace Managers
 
                 private void _updateQQVLeftButtonActive(bool isActive) {
                     _isLeftButtonActive = isActive;
-                    _qqvScript.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
+                    _qqvScript?.SetArrowButtonActive(QQVMoveOptions.Left, _isLeftButtonActive);
                 }
                 private void _updateQQVRightButtonActive(bool isActive) {
                     _isRightButtonActive = isActive;
-                    _qqvScript.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
+                    _qqvScript?.SetArrowButtonActive(QQVMoveOptions.Right, _isRightButtonActive);
                 }
                 #endregion Arrow Button Helpers 
             #endregion QQV Methods
