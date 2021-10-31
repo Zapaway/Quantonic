@@ -65,13 +65,16 @@ namespace StateMachines.QSM {
         } 
 
         private bool _isThereSpace() {
-            Collider2D collider = Physics2D.OverlapCircle(
-                _controllable.transform.position,
-                _radiusOfChecking,
-                _ctrlManager.DefaultLayerMask
-            );
+            if (_controllable != null) {
+                Collider2D collider = Physics2D.OverlapCircle(
+                    _controllable.transform.position,
+                    _radiusOfChecking,
+                    _ctrlManager.DefaultLayerMask
+                );
 
-            return collider == null;
+                return collider == null;
+            }
+            return false;
         } 
     }
 }

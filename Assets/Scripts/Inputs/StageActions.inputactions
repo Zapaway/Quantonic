@@ -327,9 +327,9 @@
             "id": "1cfddcdf-7238-4473-9eb6-02696c8a9084",
             "actions": [
                 {
-                    "name": "New action",
+                    "name": "TogglePauseMenu",
                     "type": "Button",
-                    "id": "7117a6b5-d746-4596-8727-68ca6b015189",
+                    "id": "911bd8f8-5571-4901-ac9c-20b4f36faeb3",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": ""
@@ -338,12 +338,12 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "23d3ba5c-b0ab-462d-8196-8af023aaca22",
-                    "path": "",
+                    "id": "fa48b09c-4879-4960-bf1b-a0deed2b85a9",
+                    "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
-                    "groups": "",
-                    "action": "New action",
+                    "groups": "KeyboardMouse",
+                    "action": "TogglePauseMenu",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

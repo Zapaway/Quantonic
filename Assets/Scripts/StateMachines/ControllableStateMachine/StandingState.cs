@@ -30,10 +30,12 @@ namespace StateMachines.CSM {
             }
             else if (!_isGrounded) {
                 float onGroundY = _checkIfAboveGround();
-                Transform transform = _ctrlManager.CurrentControllable?.transform;
+                if (_ctrlManager.CurrentControllable != null) {
+                    Transform transform = _ctrlManager.CurrentControllable?.transform;
 
-                if (onGroundY != 0f && transform != null) transform.position = new Vector2(transform.position.x, onGroundY);
-                else await _ctrlManager.DestroyCurrentControllable();
+                    if (onGroundY != 0f && transform != null) transform.position = new Vector2(transform.position.x, onGroundY);
+                    else await _ctrlManager.DestroyCurrentControllable();
+                }
             }
         } 
         public override async UniTask PhysicsUpdate() {

@@ -340,9 +340,9 @@ public class @StageInputs : IInputActionCollection, IDisposable
             ""id"": ""1cfddcdf-7238-4473-9eb6-02696c8a9084"",
             ""actions"": [
                 {
-                    ""name"": ""New action"",
+                    ""name"": ""TogglePauseMenu"",
                     ""type"": ""Button"",
-                    ""id"": ""7117a6b5-d746-4596-8727-68ca6b015189"",
+                    ""id"": ""911bd8f8-5571-4901-ac9c-20b4f36faeb3"",
                     ""expectedControlType"": ""Button"",
                     ""processors"": """",
                     ""interactions"": """"
@@ -351,12 +351,12 @@ public class @StageInputs : IInputActionCollection, IDisposable
             ""bindings"": [
                 {
                     ""name"": """",
-                    ""id"": ""23d3ba5c-b0ab-462d-8196-8af023aaca22"",
-                    ""path"": """",
+                    ""id"": ""fa48b09c-4879-4960-bf1b-a0deed2b85a9"",
+                    ""path"": ""<Keyboard>/escape"",
                     ""interactions"": """",
                     ""processors"": """",
-                    ""groups"": """",
-                    ""action"": ""New action"",
+                    ""groups"": ""KeyboardMouse"",
+                    ""action"": ""TogglePauseMenu"",
                     ""isComposite"": false,
                     ""isPartOfComposite"": false
                 }
@@ -400,7 +400,7 @@ public class @StageInputs : IInputActionCollection, IDisposable
         m_StageUI_RightClick = m_StageUI.FindAction("RightClick", throwIfNotFound: true);
         // Pause Menu UI
         m_PauseMenuUI = asset.FindActionMap("Pause Menu UI", throwIfNotFound: true);
-        m_PauseMenuUI_Newaction = m_PauseMenuUI.FindAction("New action", throwIfNotFound: true);
+        m_PauseMenuUI_TogglePauseMenu = m_PauseMenuUI.FindAction("TogglePauseMenu", throwIfNotFound: true);
     }
 
     public void Dispose()
@@ -596,12 +596,12 @@ public class @StageInputs : IInputActionCollection, IDisposable
     // Pause Menu UI
     private readonly InputActionMap m_PauseMenuUI;
     private IPauseMenuUIActions m_PauseMenuUIActionsCallbackInterface;
-    private readonly InputAction m_PauseMenuUI_Newaction;
+    private readonly InputAction m_PauseMenuUI_TogglePauseMenu;
     public struct PauseMenuUIActions
     {
         private @StageInputs m_Wrapper;
         public PauseMenuUIActions(@StageInputs wrapper) { m_Wrapper = wrapper; }
-        public InputAction @Newaction => m_Wrapper.m_PauseMenuUI_Newaction;
+        public InputAction @TogglePauseMenu => m_Wrapper.m_PauseMenuUI_TogglePauseMenu;
         public InputActionMap Get() { return m_Wrapper.m_PauseMenuUI; }
         public void Enable() { Get().Enable(); }
         public void Disable() { Get().Disable(); }
@@ -611,16 +611,16 @@ public class @StageInputs : IInputActionCollection, IDisposable
         {
             if (m_Wrapper.m_PauseMenuUIActionsCallbackInterface != null)
             {
-                @Newaction.started -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
-                @Newaction.performed -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
-                @Newaction.canceled -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnNewaction;
+                @TogglePauseMenu.started -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnTogglePauseMenu;
+                @TogglePauseMenu.performed -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnTogglePauseMenu;
+                @TogglePauseMenu.canceled -= m_Wrapper.m_PauseMenuUIActionsCallbackInterface.OnTogglePauseMenu;
             }
             m_Wrapper.m_PauseMenuUIActionsCallbackInterface = instance;
             if (instance != null)
             {
-                @Newaction.started += instance.OnNewaction;
-                @Newaction.performed += instance.OnNewaction;
-                @Newaction.canceled += instance.OnNewaction;
+                @TogglePauseMenu.started += instance.OnTogglePauseMenu;
+                @TogglePauseMenu.performed += instance.OnTogglePauseMenu;
+                @TogglePauseMenu.canceled += instance.OnTogglePauseMenu;
             }
         }
     }
@@ -654,6 +654,6 @@ public class @StageInputs : IInputActionCollection, IDisposable
     }
     public interface IPauseMenuUIActions
     {
-        void OnNewaction(InputAction.CallbackContext context);
+        void OnTogglePauseMenu(InputAction.CallbackContext context);
     }
 }

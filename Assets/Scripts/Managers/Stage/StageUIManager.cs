@@ -617,9 +617,11 @@ namespace Managers
             _measurementResultText.SetText($"{bit}{_measurementResultText.text}");
         }
         
-        public void SetMeasurementText(int deci) {
+        public void SetMeasurementText(int deci, string additonalText = null) {
+            if (additonalText == null) additonalText = "";
+
             _measurementResultText.alignment = TextAlignmentOptions.Midline;
-            _measurementResultText.SetText($"You got the value '{deci}'");
+            _measurementResultText.SetText($"You got the value '{deci}'" + additonalText);
         }
         #endregion Measurement Result Methods
     }

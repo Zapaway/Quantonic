@@ -91,10 +91,14 @@ namespace Managers {
         // keeps track of stage's state
         private bool _isStageFinished = false;
         public bool IsStageFinished => _isStageFinished;
-        #endregion Fields/Properties
 
         // special mode
         [SerializeField] private bool _startWithBareMinimum;
+
+        // pause mode
+        private bool _isPaused;
+        private bool _wasPanelActiveBeforePause;
+        #endregion Fields/Properties
 
         #region Event Methods
         protected override void Awake()
@@ -121,6 +125,7 @@ namespace Managers {
         private void OnEnable() {
             _stageInputs.Controllable.Enable();
             _stageInputs.StageUI.Enable();
+            _stageInputs.PauseMenuUI.Enable();
         }
 
         private void OnDisable() {
@@ -129,6 +134,12 @@ namespace Managers {
 
         private async UniTaskVoid Start() {
             await _csm.InitializeState(_standingState);
+
+            // set up pause menu actions
+            GameManager gameManager = GameManager.Instance;
+            gameManager.AddResumeButtonListener(ResumeAction);
+            gameManager.AddResetButtonListener(ResetAction);
+            gameManager.AddQuitButtonListener(QuitAction);
         }
 
         private async UniTaskVoid Update() {
@@ -138,6 +149,11 @@ namespace Managers {
             if (_currControllable != null) {
                 await _csm.CurrentState.HandleInput();
                 await _csm.CurrentState.LogicUpdate();
+            }
+
+            if (IsTogglePauseMenuTriggered()) {
+                _isPaused = !_isPaused;
+                ActivePauseMode(_isPaused);
             }
         }
 
@@ -177,6 +193,9 @@ namespace Managers {
         }
         public bool IsToggleQVVTriggered() {
             return _stageInputs?.StageUI.ToggleQQV.triggered ?? false;
+        }
+        public bool IsTogglePauseMenuTriggered() {
+            return _stageInputs?.PauseMenuUI.TogglePauseMenu.triggered ?? false;
         }
         
         public bool MovementOccured() {
@@ -222,8 +241,8 @@ namespace Managers {
             else _stageInputs.Controllable.Disable();
         }
         public void SetStageUIInputActive(bool isActive) {
-            if (isActive) _stageInputs.Controllable.Enable();
-            else _stageInputs.Controllable.Disable();
+            if (isActive) _stageInputs.StageUI.Enable();
+            else _stageInputs.StageUI.Disable();
         }
         public void SetPauseMenuUIInputActive(bool isActive) {
             if (isActive) _stageInputs.PauseMenuUI.Enable();
@@ -251,7 +270,10 @@ namespace Managers {
         /// entire
         public void SetStageControlsActive(bool isActive) {
             if (isActive) _stageInputs.Enable();
-            else _stageInputs.Disable();
+            else {
+                ActivePauseMode(false);
+                _stageInputs.Disable();
+            }
         }
         #endregion Input Setters
 
@@ -259,11 +281,31 @@ namespace Managers {
         public void InQQVPanelMode(bool option) {
             StageUIManager.Instance.SetQubitPanelsActive(option);
             SetToggleQQVInputActive(!option);
+            SetPauseMenuUIInputActive(!option);
         }
 
         public void ActiveQQVPanelMode(bool option) {
             StageUIManager.Instance.SetQubitPanelsActive(option);
             SetToggleQQVInputActive(option);
+            SetPauseMenuUIInputActive(option);
+        }
+
+        public void ActivePauseMode(bool option) {
+            GameManager.Instance.SetPauseMenuActive(option);
+            _isPaused = option;
+            SetPlayingControlsActive(!option);
+            
+            if (option) {
+                _wasPanelActiveBeforePause = StageUIManager.Instance.AreQubitPanelsDisplayed;
+                StageUIManager.Instance.SetQubitPanelsActive(!option);
+
+                Time.timeScale = 0;
+            }
+            else {
+                if (_wasPanelActiveBeforePause) StageUIManager.Instance.SetQubitPanelsActive(true);
+
+                Time.timeScale = 1;
+            }
         }
         #endregion Control Modes
 
@@ -361,8 +403,19 @@ namespace Managers {
         }
         #endregion Controllable Methods
 
-        #region Camera Methods
+        #region Pause Menu Methods
+        public void ResumeAction() {
+            ActivePauseMode(false);
+        }
 
-        #endregion Camera Methods
+        public void ResetAction() {
+            ResumeAction();
+            DisablePlayer().Forget();
+        }
+
+        public void QuitAction() {
+            GameManager.Instance.ReturnToStartMenu();
+        }
+        #endregion Pause Menu Methods
     }
 }
