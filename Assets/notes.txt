@@ -1,8 +1,4 @@
 TODO:
-    - create finish line (measurement gate)
-    - create necessary visual cues (e.g. type of gate)
     - add gate wall 
-    - create text that states what is happening (slightly above player - e.g. "you cannot jump yet")
-    * add effects
 
 

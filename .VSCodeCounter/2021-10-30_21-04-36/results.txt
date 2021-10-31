@@ -1,0 +1,115 @@
+Date : 2021-10-30 21:04:36
+Directory : d:\Unity Projects\Quantonic\Assets\Scripts
+Total : 64 files,  3936 codes, 795 comments, 718 blanks, all 5449 lines
+
+Languages
++----------+------------+------------+------------+------------+------------+
+| language | files      | code       | comment    | blank      | total      |
++----------+------------+------------+------------+------------+------------+
+| C#       |         64 |      3,936 |        795 |        718 |      5,449 |
++----------+------------+------------+------------+------------+------------+
+
+Directories
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| path                                                                                               | files      | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+| .                                                                                                  |         64 |      3,936 |        795 |        718 |      5,449 |
+| AddOns                                                                                             |          3 |         58 |         11 |         11 |         80 |
+| Core                                                                                               |         11 |        975 |        288 |        233 |      1,496 |
+| Core\Abilities                                                                                     |          1 |         17 |          0 |          4 |         21 |
+| Core\Controllables                                                                                 |          3 |        273 |         92 |         64 |        429 |
+| Core\Gates                                                                                         |          4 |        198 |         40 |         45 |        283 |
+| Core\Qubits                                                                                        |          3 |        487 |        156 |        120 |        763 |
+| Enemies                                                                                            |         10 |        162 |         24 |         38 |        224 |
+| Enemies\Features                                                                                   |          5 |         58 |         15 |         15 |         88 |
+| Enemies\Features\Shooting                                                                          |          3 |         45 |          6 |         11 |         62 |
+| Enemies\Types                                                                                      |          4 |         86 |          9 |         18 |        113 |
+| Enemies\Types\Immobile                                                                             |          3 |         79 |          6 |         16 |        101 |
+| Enemies\Types\Mobile                                                                               |          1 |          7 |          3 |          2 |         12 |
+| Environment                                                                                        |          3 |         66 |          0 |         18 |         84 |
+| Inputs                                                                                             |          3 |        800 |         13 |         33 |        846 |
+| Managers                                                                                           |          7 |        853 |        253 |        191 |      1,297 |
+| Managers\Global                                                                                    |          3 |         85 |         13 |         18 |        116 |
+| Managers\Stage                                                                                     |          3 |        747 |        234 |        168 |      1,149 |
+| Quantum                                                                                            |         10 |        308 |         71 |         49 |        428 |
+| Quantum\Operators                                                                                  |          8 |        118 |         41 |         20 |        179 |
+| Quantum\Operators\Binary                                                                           |          2 |         36 |         18 |          5 |         59 |
+| Quantum\Operators\Unary                                                                            |          5 |         66 |         15 |         10 |         91 |
+| StateMachines                                                                                      |          9 |        327 |         48 |         66 |        441 |
+| StateMachines\ControllableStateMachine                                                             |          4 |        165 |         19 |         35 |        219 |
+| StateMachines\QubitStateMachine                                                                    |          3 |        135 |         13 |         21 |        169 |
+| UI                                                                                                 |          8 |        387 |         87 |         79 |        553 |
+| UI\QDP                                                                                             |          1 |         35 |          8 |          8 |         51 |
+| UI\QQV                                                                                             |          4 |        262 |         60 |         47 |        369 |
++----------------------------------------------------------------------------------------------------+------------+------------+------------+------------+------------+
+
+Files
++----------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| filename                                                                                           | language | code       | comment    | blank      | total      |
++----------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+
+| d:\Unity Projects\Quantonic\Assets\Scripts\AddOns\CustomButton.cs                                  | C#       |         10 |          4 |          1 |         15 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\AddOns\DontDestroyOnLoad.cs                             | C#       |          9 |          0 |          1 |         10 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\AddOns\WaveMoveScript.cs                                | C#       |         39 |          7 |          9 |         55 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Abilities\ControllableWaveScript.cs                | C#       |         17 |          0 |          4 |         21 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Controllables\Clone.cs                             | C#       |         18 |          0 |          4 |         22 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Controllables\Controllable.cs                      | C#       |        211 |         85 |         51 |        347 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Controllables\Player.cs                            | C#       |         44 |          7 |          9 |         60 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Gates\BinaryGate.cs                                | C#       |         53 |          4 |          9 |         66 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Gates\Gate.cs                                      | C#       |         70 |         27 |         17 |        114 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Gates\MultiGate.cs                                 | C#       |         24 |          4 |          7 |         35 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Gates\UnaryGate.cs                                 | C#       |         51 |          5 |         12 |         68 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Qubits\Qubit.cs                                    | C#       |         86 |         34 |         22 |        142 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Qubits\QubitCircuit.cs                             | C#       |         97 |         34 |         26 |        157 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Core\Qubits\QubitSubcircuit.cs                          | C#       |        304 |         88 |         72 |        464 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Enemy.cs                                        | C#       |         18 |          0 |          5 |         23 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Features\ICollision.cs                          | C#       |          8 |          6 |          2 |         16 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Features\IDeath.cs                              | C#       |          5 |          3 |          2 |         10 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Features\Shooting\EnemyWaveScript.cs            | C#       |         18 |          0 |          4 |         22 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Features\Shooting\IShooting.cs                  | C#       |          6 |          6 |          2 |         14 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Features\Shooting\ShootingDetector.cs           | C#       |         21 |          0 |          5 |         26 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Types\Immobile\FireScript.cs                    | C#       |         15 |          0 |          3 |         18 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Types\Immobile\ImmobileEnemy.cs                 | C#       |          6 |          0 |          3 |          9 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Types\Immobile\WaveShooterScript.cs             | C#       |         58 |          6 |         10 |         74 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Enemies\Types\Mobile\MobileEnemy.cs                     | C#       |          7 |          3 |          2 |         12 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Environment\CheckpointScript.cs                         | C#       |         30 |          0 |          6 |         36 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Environment\MeasurementTriggerScript.cs                 | C#       |         17 |          0 |          7 |         24 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Environment\SignScript.cs                               | C#       |         19 |          0 |          5 |         24 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Inputs\CursorController.cs                              | C#       |         19 |          3 |          5 |         27 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Inputs\GlobalActions.cs                                 | C#       |        143 |          3 |         13 |        159 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Inputs\StageActions.cs                                  | C#       |        638 |          7 |         15 |        660 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Global\GameManager.cs                          | C#       |         15 |          3 |          2 |         20 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Global\GlobalControlManager.cs                 | C#       |         53 |         10 |         12 |         75 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Global\SoundManager.cs                         | C#       |         17 |          0 |          4 |         21 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Manager.cs                                     | C#       |         21 |          6 |          5 |         32 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Stage\SpawnManager.cs                          | C#       |        177 |         68 |         46 |        291 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Stage\StageControlManager.cs                   | C#       |        223 |         55 |         54 |        332 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Managers\Stage\StageUIManager.cs                        | C#       |        347 |        111 |         68 |        526 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Binary\CNOTOperator.cs                | C#       |         19 |          9 |          3 |         31 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Binary\SWAPOperator.cs                | C#       |         17 |          9 |          2 |         28 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\QuantumOperator.cs                    | C#       |         16 |          8 |          5 |         29 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Unary\HadamardOperator.cs             | C#       |         16 |          3 |          2 |         21 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Unary\IdentityOperator.cs             | C#       |         10 |          3 |          2 |         15 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Unary\PauliXOperator.cs               | C#       |         13 |          3 |          2 |         18 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Unary\PauliYOperator.cs               | C#       |         12 |          3 |          2 |         17 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\Operators\Unary\PauliZOperator.cs               | C#       |         15 |          3 |          2 |         20 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\QuantumFactory.cs                               | C#       |         80 |         11 |          8 |         99 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\Quantum\QuantumState.cs                                 | C#       |        110 |         19 |         21 |        150 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\ControllableStateMachine\CSM.cs           | C#       |          3 |          5 |          1 |          9 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\ControllableStateMachine\CSMState.cs      | C#       |         70 |          1 |         14 |         85 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\ControllableStateMachine\JumpingState.cs  | C#       |         54 |         10 |         14 |         78 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\ControllableStateMachine\StandingState.cs | C#       |         38 |          3 |          6 |         47 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\IState.cs                                 | C#       |         10 |          4 |          2 |         16 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\QubitStateMachine\MultipleState.cs        | C#       |         65 |          3 |         10 |         78 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\QubitStateMachine\QSM.cs                  | C#       |          3 |          3 |          0 |          6 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\QubitStateMachine\QSMState.cs             | C#       |         67 |          7 |         11 |         85 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\StateMachines\StateMachine.cs                           | C#       |         17 |         12 |          8 |         37 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\Panel.cs                                             | C#       |         14 |          6 |          4 |         24 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\PieChartScript.cs                                    | C#       |         21 |          3 |          5 |         29 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\QDP\QDPScript.cs                                     | C#       |         35 |          8 |          8 |         51 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\QQV\QQVArrowButtonScript.cs                          | C#       |         16 |          3 |          2 |         21 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\QQV\QQVEvents.cs                                     | C#       |         36 |          9 |          5 |         50 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\QQV\QQVQubitRawImageScript.cs                        | C#       |         70 |          8 |         14 |         92 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\QQV\QQVScript.cs                                     | C#       |        140 |         40 |         26 |        206 |
+| d:\Unity Projects\Quantonic\Assets\Scripts\UI\TimerScript.cs                                       | C#       |         55 |         10 |         15 |         80 |
+| Total                                                                                              |          |      3,936 |        795 |        718 |      5,449 |
++----------------------------------------------------------------------------------------------------+----------+------------+------------+------------+------------+

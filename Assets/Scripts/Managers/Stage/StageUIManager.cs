@@ -7,6 +7,7 @@ using System.Threading;
 using UnityEngine;
 using UnityEngine.UI;
 using Cysharp.Threading.Tasks;
+using TMPro;
 
 using Quantum;
 using UIScripts.QQV;
@@ -52,6 +53,7 @@ namespace Managers
                 private bool _isLeftButtonActive = false;
                 private int _avalRightPresses = 0;
                 private bool _isRightButtonActive = false;
+
                 #endregion Quick Qubit Viewer (QQV) Data
 
                 #region Qubit Display Panel (QDP) Data
@@ -66,6 +68,10 @@ namespace Managers
                 set => _timerRunOutActionAsync = value;
             }
             #endregion Timer Data
+
+            #region Measurement Result Data
+            [SerializeField] private TextMeshProUGUI _measurementResultText;
+            #endregion Measurement Result Data
         #endregion Data
 
         #region Event Methods
@@ -90,25 +96,29 @@ namespace Managers
             // QDP 
             _qdpScript.SetPanelActive(_areQubitPanelsDisplayed);
 
+            // MRT
+            SetMeasurementTextActive(false);
+
             // whenever there is a change in controllable value, refresh to reflect ui changes
             StageControlManager.Instance.OnCurrentControllableChanged += async (object sender, OnCurrentControllableChangedEventArgs e) => {
                 if (e.NewValue != null) {
-                    // reset everything before refreshing and start on the very left
-                    _qqvScript.ResetQubitRepresentation();
-                    _selectedRepresentationIndex = 0;
-                    _qubitLeftIndex = 0;
+                    await _resetQQVToBeginning(e.NewValue);
+                    // // reset everything before refreshing and start on the very left
+                    // _qqvScript.ResetQubitRepresentation();
+                    // _selectedRepresentationIndex = 0;
+                    // _qubitLeftIndex = 0;
 
-                    // set the QDP panel to reflect the new controllable
-                    SetQDPPanel(e.NewValue);
+                    // // set the QDP panel to reflect the new controllable
+                    // SetQDPPanel(e.NewValue);
 
-                    // activate the right arrow button if needed
-                    int diff = e.NewValue.QubitCount - _qqvScript.RawImageCapacity;
-                    if (diff > 0) {
-                        _avalRightPresses = diff;
-                        _updateQQVRightButtonActive(true);
-                    }
+                    // // activate the right arrow button if needed
+                    // int diff = e.NewValue.QubitCount - _qqvScript.RawImageCapacity;
+                    // if (diff > 0) {
+                    //     _avalRightPresses = diff;
+                    //     _updateQQVRightButtonActive(true);
+                    // }
 
-                    await RefreshAllQubitRepresentationsUnsafe(e.NewValue);
+                    // await RefreshAllQubitRepresentationsUnsafe(e.NewValue);
                 }
             }; 
         }
@@ -144,10 +154,26 @@ namespace Managers
                     _qqvScript.SetQubitRepresentationInteractable(qubitIndex, true);
                     await RefreshAllQubitRepresentationsUnsafe();
                 }
-
                 public async UniTask DisableQubitRepInteract(int qubitIndex) {
-                _qqvScript.SetQubitRepresentationInteractable(qubitIndex, false);
-                await RefreshAllQubitRepresentationsUnsafe();
+                    _qqvScript.SetQubitRepresentationInteractable(qubitIndex, false);
+                    await RefreshAllQubitRepresentationsUnsafe();
+                }
+
+                public async UniTask EnableAnyInteractions(Controllable controllable) {
+                    for (int i = 0; i < controllable.QubitCount; ++i) {
+                        await EnableQubitRepInteract(i);
+                    }
+
+                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
+                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
+                }
+                public async UniTask DisableAnyInteractions(Controllable controllable) {
+                    for (int i = 0; i < controllable.QubitCount; ++i) {
+                        await DisableQubitRepInteract(i);
+                    }
+
+                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Left, false);
+                    _qqvScript.SetArrowButtonInteractable(QQVMoveOptions.Right, false);
                 }
 
                 /// <summary>
@@ -310,6 +336,36 @@ namespace Managers
                     await RefreshAllQubitRepresentationsUnsafe();
                 }
                 /// <summary>
+                /// Forcibly move the render textures right, even if there are no more avail right presses.
+                /// It also does not allow the user move left.
+                /// </summary>
+                public async UniTask ForceMoveQQVRenderTexturesRight(Controllable controllable) {
+                    await UniTask.Yield();
+                
+                    if (_avalRightPresses > 0) await MoveQQVRenderTextures(QQVMoveOptions.Right);
+                    else {
+                        _qubitLeftIndex++;
+                        _shiftQQVRenderTextures(QQVMoveOptions.Left, new int[] {0, 1, 2});
+
+                        // just in case if the qubit index goes out of range
+                        SetQDPPanel(qubitIndex: _qubitLeftIndex < controllable.QubitCount ? _qubitLeftIndex : 0);
+                    }
+
+                    _updateQQVLeftButtonActive(false);
+                }
+                /// <summary>
+                /// A more efficient and safe way of ensuring that the qqv is reset to the beginning. 
+                /// </summary>
+                public async UniTask EfficientResetQQVToBeginning() {
+                    if (selectedQubitIndex > 0 && selectedQubitIndex < _qqvScript.RawImageCapacity) _qqvScript.SelectQubitRepresentation(0);
+                    else if (selectedQubitIndex != 0) {
+                        while (_avalLeftPresses != 0) {
+                            await MoveQQVRenderTextures(QQVMoveOptions.Left);
+                            _qqvScript.SelectQubitRepresentation(0);
+                        }
+                    } 
+                }
+                /// <summary>
                 /// Shift the currently displayed render textures to the left or right one time (ends up reseting one qubit rep).
                 /// </summary>
                 /// <param name="representationIndices">
@@ -428,6 +484,30 @@ namespace Managers
                     await UniTask.Yield();
                     _setQubitRepresentationUnsafe(representationIndex, qubitIndex, controllable);
                 }
+
+                /// <summary>
+                /// Resets the entire QQV panel and goes back to the first qubit.
+                /// </summary>
+                private async UniTask _resetQQVToBeginning(Controllable controllable) {
+                    if (controllable == null) throw new ArgumentNullException();
+
+                    // reset everything before refreshing and start on the very left
+                    _qqvScript.ResetQubitRepresentation();
+                    _selectedRepresentationIndex = 0;
+                    _qubitLeftIndex = 0;
+
+                    // set the QDP panel to reflect the new controllable
+                    SetQDPPanel(controllable);
+
+                    // activate the right arrow button if needed
+                    int diff = controllable.QubitCount - _qqvScript.RawImageCapacity;
+                    if (diff > 0) {
+                        _avalRightPresses = diff;
+                        _updateQQVRightButtonActive(true);
+                    }
+
+                    await RefreshAllQubitRepresentationsUnsafe(controllable);
+                }
                 #endregion Render Texture Methods
             
                 #region Arrow Button Helpers 
@@ -520,5 +600,27 @@ namespace Managers
             _timerScript?.ResetTimer();
         }
         #endregion Timer Methods
+
+        #region Measurement Result Methods 
+        public void SetMeasurementTextActive(bool isActive) {
+            _measurementResultText.gameObject.SetActive(isActive);
+        }
+        public void ClearMeasurementText() {
+            _measurementResultText.SetText("");
+        }
+
+        /// <summary>
+        /// Adds bits from the left side.
+        /// </summary>
+        public void AddBitToMeasurementText(char bit) {
+            _measurementResultText.alignment = TextAlignmentOptions.MidlineRight;
+            _measurementResultText.SetText($"{bit}{_measurementResultText.text}");
+        }
+        
+        public void SetMeasurementText(int deci) {
+            _measurementResultText.alignment = TextAlignmentOptions.Midline;
+            _measurementResultText.SetText($"You got the value '{deci}'");
+        }
+        #endregion Measurement Result Methods
     }
 }

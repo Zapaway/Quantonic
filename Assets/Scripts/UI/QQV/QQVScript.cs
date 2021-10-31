@@ -187,6 +187,16 @@ namespace UIScripts.QQV {
         }
 
         /// <summary>
+        /// Allow the specified arrow to be seen, but change its interactability.
+        /// </summary>
+        public void SetArrowButtonInteractable(QQVMoveOptions dir, bool isInteractable) {
+            Button button = dir == QQVMoveOptions.Left ? _leftButton : _rightButton;
+
+            if (isInteractable) button.interactable = true;
+            else button.interactable = false;
+        }
+
+        /// <summary>
         /// Select a qubit representation.
         /// </summary>
         private QubitRepresentation _getQubitRepresentation(int representationIndex) {

@@ -44,14 +44,13 @@ namespace UIScripts.QQV {
             only invoke the move execution event IF the key pressed is the same as the targeted key press
             and the indicator is active
             */
-            if (eventDir == _moveDirection) {
+            if (eventDir == _moveDirection && _button.interactable) {
                 switch (eventDir) {
                     case MoveDirection.Left:
                     case MoveDirection.Right:
                         if (_indicator.activeInHierarchy) {
                             var eventArgs = new QQVMoveExecEventArgs{Arrow = (QQVMoveOptions)eventDir};
                             QQVEvents.InvokeMoveExecuted(this, eventArgs);
-                            
                         }
                         break;
                 }
@@ -59,15 +58,15 @@ namespace UIScripts.QQV {
         }
 
         public void OnSelect(BaseEventData eventData) {
-            _invokeRepresentationSelected();
+            if (_button.interactable) _invokeRepresentationSelected();
         }  
 
         public void OnSubmit(BaseEventData eventData) {
-            _invokeRepresentationSubmitted();
+            if (_button.interactable) _invokeRepresentationSubmitted();
         }
 
         public void OnPointerClick(PointerEventData eventData) {
-            if (eventData.button == PointerEventData.InputButton.Left) {
+            if (eventData.button == PointerEventData.InputButton.Left && _button.interactable) {
                 _invokeRepresentationSubmitted();
             }
         }

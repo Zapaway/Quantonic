@@ -192,6 +192,15 @@ namespace Managers {
             if (isActive) _stageInputs.Controllable.Enable();
             else _stageInputs.Controllable.Disable();
         }
+        public void SetPauseMenuUIInputActive(bool isActive) {
+            if (isActive) _stageInputs.PauseMenuUI.Enable();
+            else _stageInputs.PauseMenuUI.Disable();
+        }
+        public void SetStageControlsActive(bool isActive) {
+            if (isActive) _stageInputs.Enable();
+            else _stageInputs.Disable();
+        }
+
         public void SetToggleQQVInputActive(bool isActive) {
             if (isActive) _stageInputs.StageUI.ToggleQQV.Enable();
             else _stageInputs.StageUI.ToggleQQV.Disable();

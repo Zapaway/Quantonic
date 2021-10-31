@@ -71,6 +71,12 @@ public interface IQubitSubcircuit {
     /// Recalculate composite state with the current qubits in the list.
     /// </summary>
     void RecalculateCompositeState();
+
+    /// <summary>
+    /// Randomly returns a bitstring in the form of a decimal if there is some probability. 
+    /// Does not account for weight. Does not collapse the composite quantum state.
+    /// </summary>
+    int GetMeasurementResult();
 }
 
 public sealed partial class QubitCircuit {
@@ -423,6 +429,21 @@ public sealed partial class QubitCircuit {
             return Vector<sysnum.Complex>.Build.DenseOfEnumerable(resList.SelectMany(e => e));
         }
         #endregion Quantum Operations
+
+        #region Measurement Methods
+        /// <summary>
+        /// Randomly returns a bitstring in the form of a decimal if there is some probability. 
+        /// Does not account for weight. Does not collapse the composite quantum state.
+        /// </summary>
+        public int GetMeasurementResult() {
+            var possibleDecis = (
+                from i in Enumerable.Range(0, _compositeQuantumState.Count()) 
+                where _compositeQuantumState[i].Real > 0 || _compositeQuantumState[i].Imaginary > 0
+                select i
+            ).ToList();
+            return possibleDecis[UnityEngine.Random.Range(0, possibleDecis.Count)];
+        }
+        #endregion Measurement Methods
 
         /// <summary>
         /// Get all information about a qubit, which includes itself, its index in the subcirc,

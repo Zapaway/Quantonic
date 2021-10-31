@@ -11,9 +11,14 @@ namespace UIScripts.QQV {
     internal sealed class QQVArrowButtonScript : MonoBehaviour, IPointerClickHandler
     {
         [SerializeField] private QQVMoveOptions _qqvDirection; 
+        [SerializeField] private Button _button;
+
+        private void Awake() {
+            _button = GetComponent<Button>();
+        }
 
         public void OnPointerClick(PointerEventData eventData) {
-            if (eventData.button == PointerEventData.InputButton.Left) {
+            if (eventData.button == PointerEventData.InputButton.Left && _button.interactable) {
                 QQVEvents.InvokeMoveExecuted(this, new QQVMoveExecEventArgs{Arrow = _qqvDirection});
             }
         }

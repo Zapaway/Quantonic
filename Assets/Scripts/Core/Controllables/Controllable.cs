@@ -189,6 +189,14 @@ public abstract class Controllable : MonoBehaviour
     public void RecalculateQubitSubcircit() {
         _subcirc.RecalculateCompositeState();
     }
+
+    /// <summary>
+    /// "Measures" the composite state. 
+    /// </summary>
+    /// <returns> Randomly chosen decimal number. </returns>
+    public int MeasureQubitSubcircuit() {
+        return _subcirc.GetMeasurementResult();
+    }
     #endregion Subcircuit Manipulation
     
     #region Select Qubits

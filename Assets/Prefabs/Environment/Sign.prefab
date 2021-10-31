@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 5526597360042568463}
   - component: {fileID: 5526597360042568462}
   - component: {fileID: 5526597360042568461}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   - component: {fileID: 5526597360854634339}
   - component: {fileID: 5526597360854634341}
   - component: {fileID: 5526597360854634340}
-  m_Layer: 5
+  m_Layer: 2
   m_Name: Sign Text
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -248,7 +248,7 @@ GameObject:
   - component: {fileID: 8511106361583434244}
   - component: {fileID: 3141507866532767421}
   - component: {fileID: 140033006969182759}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Sign
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -313,7 +313,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -977612349
-  m_SortingLayer: -1
+  m_SortingLayer: -2
   m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: 97614bc71e8277e4c9e1ec4461310cc3, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
