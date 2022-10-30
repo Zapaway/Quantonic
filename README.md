@@ -1,5 +1,5 @@
 # Quantonic
-[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]<br />The offical source code for the game, Quantonic. It is a 2D platformer that simulates quantum computing.<br />Made by Kenneth Chap
+[![CC BY-NC-SA 4.0][cc-by-nc-sa-shield]][cc-by-nc-sa]<br />The offical source code for the game, Quantonic. It is a 2D platformer that simulates quantum computing.<br />**Made by Kenneth Chap**
  
 *This work is licensed under a
 [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License][cc-by-nc-sa].*
