@@ -36,13 +36,17 @@ namespace Managers {
             SceneManager.LoadScene(buildIndex);
         }
 
-        public void LoadNextScene() {
+        public async UniTask LoadSceneAsync(int buildIndex) {
+            _resetAllListeners();
+            await SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
+        }
+
+        public async UniTask LoadNextScene() {
             int currIndex = SceneManager.GetActiveScene().buildIndex;
-            LoadScene(currIndex + 1);
+            await LoadSceneAsync(currIndex + 1);
         }
 
         public void QuitGame() {
-            Debug.Log("I QUIT");
             Application.Quit();
         }
         #endregion General Methods

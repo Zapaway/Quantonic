@@ -55,7 +55,7 @@ public sealed class MeasurementTriggerScript : MonoBehaviour
         await _waitForSeconds(_cooldownBeforeLoadingNextScene);
 
         Destroy(player.gameObject);
-        gameManager.LoadNextScene();
+        await gameManager.LoadNextScene();
     }
 
     private async UniTask _waitForSeconds(float seconds) {

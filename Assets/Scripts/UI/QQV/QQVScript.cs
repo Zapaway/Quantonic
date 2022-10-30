@@ -173,8 +173,10 @@ namespace UIScripts.QQV {
         /// </summary>
         public void SelectQubitRepresentation(int representationIndex) {
             QubitRepresentation qubitRep = _getQubitRepresentation(representationIndex);
-            qubitRep.rawImageScript.Button.Select();
-            qubitRep.rawImageScript.Button.OnSelect(null);  // forces the highlight
+            if (!qubitRep.rawImageScript.Button.IsDestroyed()) {
+                qubitRep.rawImageScript.Button.Select();
+                qubitRep.rawImageScript.Button.OnSelect(null);  // forces the highlight
+            }
         }
 
         /// <summary>
